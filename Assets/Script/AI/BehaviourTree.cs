@@ -1,12 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 namespace BehaviourTree
 {
-    public abstract class Node : MonoBehaviour
+    public abstract class Node
     {
+        protected static MonoBehaviour mono;
+        static string lockthis = "lock";
+
         public enum ExecResult
         {
             Success,
@@ -17,6 +19,15 @@ namespace BehaviourTree
         {
             result = ExecResult.InProcess;
             nodeList = new List<Node>();
+
+            lock(lockthis) 
+            { 
+                if(mono == null)
+                {
+                    var go = new GameObject("AI_Mono");
+                    mono = go.AddComponent<MonoBehaviour>();
+                }
+            }
         }
 
         public ExecResult result;
@@ -30,7 +41,7 @@ namespace BehaviourTree
         {
             foreach (Node node in nodeList)
             {
-                yield return StartCoroutine(node.Exec());
+                yield return mono.StartCoroutine(node.Exec());
                 if (node.result == ExecResult.Failure)
                     break;
             }
@@ -45,7 +56,7 @@ namespace BehaviourTree
         {
             foreach (Node node in nodeList)
             {
-                yield return StartCoroutine(node.Exec());
+                yield return mono.StartCoroutine(node.Exec());
             }
 
             result = ExecResult.Success;
@@ -57,7 +68,7 @@ namespace BehaviourTree
             {
                 foreach (Node node in nodeList)
                 {
-                    StartCoroutine(node.Exec());
+                    mono.StartCoroutine(node.Exec());
                 }
 
                 while (true)
