@@ -6,7 +6,8 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
 {
     static public PlayerController Instance { get; private set; }
-    private Controller controller;
+    Controller controller;
+    public bool isHold = false;
 
     private void Awake()
     {
@@ -24,15 +25,33 @@ public class PlayerController : MonoBehaviour
         controller.Disable();
     }
 
+    private void Start()
+    {
+        StartCoroutine(MonitorRightClick());
+    }
+
     public Vector2 GetMovement()
     {
         return controller.PC.Move.ReadValue<Vector2>(); 
     }
 
-    //TODO...
-    public bool IsHold()  
+    IEnumerator MonitorRightClick()
     {
-        var b = controller.PC.RightClick.ReadValue<float>();
-        return b > 0;
-    }
+        int holdFrameCount = 0;
+
+        while (true)
+        {
+            yield return null;
+
+            if (controller.PC.RightClick.ReadValue<float>() > 0) 
+            {
+                if(holdFrameCount++ > 10)
+                    isHold = true;
+                continue;
+            }
+
+            isHold = false;
+            holdFrameCount = 0;
+        }
+    } 
 }

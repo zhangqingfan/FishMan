@@ -13,7 +13,7 @@ public class Test : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        var bo = PlayerController.Instance.IsHold();
+        var bo = PlayerController.Instance.isHold;
         if (bo)
         Debug.Log(bo);
     }
