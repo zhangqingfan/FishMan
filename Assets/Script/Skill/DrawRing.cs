@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DrawCircle : MonoBehaviour
+public class DrawRing : MonoBehaviour
 {
     [Range(0.1f, 10)]
     public float scale = 1;
@@ -21,11 +21,11 @@ public class DrawCircle : MonoBehaviour
     private void Start()
     {
         meshFilter = gameObject.GetComponent<MeshFilter>();
-        if(meshFilter == null )
+        if(meshFilter == null)
             meshFilter = gameObject.AddComponent<MeshFilter>();
 
         meshRenderer = gameObject.GetComponent<MeshRenderer>();
-        if(meshRenderer == null )
+        if(meshRenderer == null)
             meshRenderer = gameObject.AddComponent<MeshRenderer>();
         
         CreateCircle();
