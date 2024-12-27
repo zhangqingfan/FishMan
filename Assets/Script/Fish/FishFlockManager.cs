@@ -71,7 +71,7 @@ public class FishFlockManager : MonoBehaviour
                 fishFlockTargets[i] = pos + gameObject.transform.position;
             }
         }
-    }
+    } 
 
     IEnumerator FlockMove()
     {
