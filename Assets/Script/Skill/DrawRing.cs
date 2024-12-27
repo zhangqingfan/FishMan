@@ -74,15 +74,11 @@ public class DrawRing : MonoBehaviour
         triangles[triangleCount - 2] = vertex.Length - 1;
         triangles[triangleCount - 1] = vertex.Length - 2;
         
-        for(int i = 0; i < triangles.Length; i++)
-            Debug.Log(triangles[i]);
-
-
         var uvs = new Vector2[vertex.Length];
         for (int i = 0; i < vertex.Length; i++)
         {
             uvs[i] = new Vector2(0.5f + vertex[i].x / 2, 0.5f + vertex[i].z / 2);
-            Debug.Log(uvs[i]);
+            //Debug.Log(uvs[i]);
         }
 
         for (int i = 0; i < vertex.Length; i++)
