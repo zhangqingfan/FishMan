@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
+using UnityEditor.Overlays;
 using UnityEngine;
 
 public class FishFlockManager : MonoBehaviour
@@ -17,16 +19,25 @@ public class FishFlockManager : MonoBehaviour
     public float spawnHeightScale = 0.5f;
 
     public GameObject fishPrefab;
+    FishFlock[] fishFlocks;
+    Vector3[] fishFlockTargets;
 
     private void Start()
     {
-        for(int i = 0; i < flockCount; i++) 
+        fishFlocks = new FishFlock[flockCount];
+        fishFlockTargets = new Vector3[flockCount];
+
+        for (int i = 0; i < flockCount; i++) 
         {
-            CreateFlocks();
+            fishFlocks[i] = CreateFlocks();
+            fishFlockTargets[i] = fishFlocks[i].flockPosition;
         }
+
+        StartCoroutine(SearchFlockTargets());
+        StartCoroutine(FlockMove());
     }
 
-    void CreateFlocks()
+    FishFlock CreateFlocks()
     {
         var go = new GameObject();
         go.transform.parent = transform;
@@ -35,15 +46,44 @@ public class FishFlockManager : MonoBehaviour
         flock.number = fishNumber;
         flock.spawnRadius = spawnRadius;
         flock.spawnHeightScale = spawnHeightScale;
+
+        var pos = Random.onUnitSphere * spawnRadius;
+        pos.y *= spawnHeightScale;
+        flock.flockPosition = pos + gameObject.transform.position;
         flock.CreateFishes();
+
+        return flock;
     }
 
-    void FishMove1()
+    IEnumerator SearchFlockTargets()
     {
-        var v3 = Vector3.zero;
-        for (int i = 0; i < fishTransforms.Length; i++)
+        while (true)
         {
-            fishTransforms[i].localPosition = Vector3.SmoothDamp(fishTransforms[i].position, targets[i], ref v3, 0.5f);
+            yield return new WaitForSeconds(Random.Range(1.0f, 5.0f));
+
+            for (int i = 0; i < flockCount; i++)
+            {
+                if (Random.value > 0.6)
+                    continue;
+
+                var pos = Random.onUnitSphere * spawnRadius;
+                pos.y *= spawnHeightScale;
+                fishFlockTargets[i] = pos + gameObject.transform.position;
+            }
+        }
+    }
+
+    IEnumerator FlockMove()
+    {
+        while (true)
+        {
+            yield return null;
+
+            var v = Vector3.zero;
+            for (int i = 0; i < fishFlocks.Length; i++)
+            {
+                fishFlocks[i].flockPosition = Vector3.SmoothDamp(fishFlocks[i].flockPosition, fishFlockTargets[i], ref v, 0.5f);
+            }
         }
     }
 }
