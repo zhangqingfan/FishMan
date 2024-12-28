@@ -25,8 +25,6 @@ public class FishFlockManager : MonoBehaviour
 
     private void Start()
     {
-        GraphicsSettings.useScriptableRenderPipelineBatching = false;
-
         fishFlocks = new FishFlock[flockCount];
         fishFlockTargets = new Vector3[flockCount];
 
@@ -42,7 +40,7 @@ public class FishFlockManager : MonoBehaviour
 
     FishFlock CreateFlocks(GameObject fishPrefab)
     {
-        var go = new GameObject();
+        var go = new GameObject("flock");
         go.transform.parent = transform;
         
         var flock = go.AddComponent<FishFlock>();
