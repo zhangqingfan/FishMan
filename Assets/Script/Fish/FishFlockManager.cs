@@ -10,7 +10,7 @@ public class FishFlockManager : MonoBehaviour
     [Range(1, 100)]
     public int flockCount;
 
-    [Range(1, 1000)]
+    [Range(1, 3000)]
     public int fishNumber = 5;
 
     [Range(10, 100)]
@@ -45,7 +45,7 @@ public class FishFlockManager : MonoBehaviour
         
         var flock = go.AddComponent<FishFlock>();
         flock.number = fishNumber;
-        flock.spawnRadius = 30;
+        flock.spawnRadius = spawnRadius;
         flock.spawnHeightScale = spawnHeightScale;
         flock.fishPrefab = fishPrefab; 
 
