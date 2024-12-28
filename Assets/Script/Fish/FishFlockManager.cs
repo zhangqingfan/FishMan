@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEditor.Overlays;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class FishFlockManager : MonoBehaviour
 {
@@ -13,7 +14,7 @@ public class FishFlockManager : MonoBehaviour
     public int fishNumber = 5;
 
     [Range(10, 100)]
-    public int spawnRadius = 30;
+    public int spawnRadius = 60;
 
     [Range(0.1f, 1.5f)]
     public float spawnHeightScale = 0.5f;
@@ -24,12 +25,14 @@ public class FishFlockManager : MonoBehaviour
 
     private void Start()
     {
+        GraphicsSettings.useScriptableRenderPipelineBatching = false;
+
         fishFlocks = new FishFlock[flockCount];
         fishFlockTargets = new Vector3[flockCount];
 
         for (int i = 0; i < flockCount; i++) 
         {
-            fishFlocks[i] = CreateFlocks();
+            fishFlocks[i] = CreateFlocks(GameObject.CreatePrimitive(PrimitiveType.Cube));
             fishFlockTargets[i] = fishFlocks[i].flockPosition;
         }
 
@@ -37,15 +40,16 @@ public class FishFlockManager : MonoBehaviour
         StartCoroutine(FlockMove());
     }
 
-    FishFlock CreateFlocks()
+    FishFlock CreateFlocks(GameObject fishPrefab)
     {
         var go = new GameObject();
         go.transform.parent = transform;
         
         var flock = go.AddComponent<FishFlock>();
         flock.number = fishNumber;
-        flock.spawnRadius = spawnRadius;
+        flock.spawnRadius = 30;
         flock.spawnHeightScale = spawnHeightScale;
+        flock.fishPrefab = fishPrefab; 
 
         var pos = Random.onUnitSphere * spawnRadius;
         pos.y *= spawnHeightScale;

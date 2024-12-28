@@ -208,8 +208,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.39256522, y: 0.6054264, z: -0.45691848, w: 0.52017015}
-  m_LocalPosition: {x: -0.8556302, y: 1.759119, z: -0.3538097}
+  m_LocalRotation: {x: 0.2922201, y: 0.5138638, z: -0.1916606, w: 0.7834652}
+  m_LocalPosition: {x: -83.16961, y: 101.1557, z: -53.811165}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -515,7 +515,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   flockCount: 17
-  fishNumber: 100
+  fishNumber: 434
   spawnRadius: 30
   spawnHeightScale: 0.5
   fishPrefab: {fileID: 0}

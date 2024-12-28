@@ -11,11 +11,16 @@ public class FishFlock : MonoBehaviour
     public float spawnHeightScale = 0.5f;
 
     public Vector3 flockPosition;
+    public GameObject fishPrefab;
    
     NativeArray<Vector3> fishPositions;  //暂时没用到太多！！！
     NativeArray<Vector3> fishTargets;
     NativeArray<float> fishSpeeds;   
     Transform[] fishTransforms;
+
+    RenderParams renderParams;
+    Mesh fishMesh;
+    Matrix4x4[] fishInstanceMatrixs;
     
     private void OnDestroy()
     {
@@ -30,23 +35,30 @@ public class FishFlock : MonoBehaviour
         fishTargets = new NativeArray<Vector3>(number, Allocator.Persistent);
         fishSpeeds = new NativeArray<float>(number, Allocator.Persistent);
         fishTransforms = new Transform[number];
+        fishInstanceMatrixs = new Matrix4x4[number];
 
-        for(int i = 0; i < number; i++) 
+        for (int i = 0; i < number; i++) 
         {
             var pos = Random.onUnitSphere * spawnRadius;
             pos.y *= spawnHeightScale;
             fishPositions[i] = pos;
 
-            var fish = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            //var fish = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            var fish = Instantiate(fishPrefab);
             fish.transform.localRotation = Random.rotation;
             fish.transform.parent = this.gameObject.transform;
             fish.transform.position = fishPositions[i] + flockPosition;
             fishTransforms[i] = fish.transform;
+            fish.GetComponent<Renderer>().sharedMaterial.enableInstancing = true;
         }
+
+        renderParams = new RenderParams(fishPrefab.GetComponent<Renderer>().sharedMaterial);
+        fishMesh = fishPrefab.GetComponent<MeshFilter>().sharedMesh;
 
         StartCoroutine(SearchTargets());
         StartCoroutine(ChangeSpeed());
-        StartCoroutine(FishMove());
+        StartCoroutine(Move());
+        StartCoroutine(Render());
     }
 
     IEnumerator SearchTargets()
@@ -83,7 +95,7 @@ public class FishFlock : MonoBehaviour
         }
     }
 
-    IEnumerator FishMove() 
+    IEnumerator Move() 
     {
         while(true)
         {
@@ -100,7 +112,23 @@ public class FishFlock : MonoBehaviour
         }
     }
 
-    void Dispose()
+    IEnumerator Render()
+    {
+        while(true)
+        { 
+            yield return null;
+            
+            for(int i = 0; i < number; i++)
+            {
+                var fishTrans = fishTransforms[i];
+                fishInstanceMatrixs[i] = Matrix4x4.TRS(fishTrans.position, fishTrans.rotation, fishTrans.localScale);
+            }
+
+            Graphics.RenderMeshInstanced(renderParams, fishMesh, 0, fishInstanceMatrixs);
+        }
+    }
+
+        void Dispose()
     {
         if(fishPositions != null) { fishPositions.Dispose(); }
         if(fishTargets != null) { fishTargets.Dispose();}
