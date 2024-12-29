@@ -4,6 +4,7 @@ using Unity.Jobs;
 using UnityEngine;
 using Unity.Mathematics;
 using System;
+using Unity.Burst;
 
 public class FishFlock : MonoBehaviour
 {
@@ -26,6 +27,7 @@ public class FishFlock : MonoBehaviour
         public float passTime;
     }
 
+    [BurstCompile]
     public struct JobFish : IJobParallelFor
     {
         public int spawnRadius;
@@ -66,7 +68,6 @@ public class FishFlock : MonoBehaviour
             if (random.NextFloat() < 6.0f)
             {
                 var pos = new Vector3(random.NextFloat(), random.NextFloat(), random.NextFloat()).normalized;
-                Debug.Log(pos);
                 pos *= spawnRadius;
                 pos.y *= spawnHeightScale;
                 fish.target = pos + flockPosition;
@@ -90,11 +91,13 @@ public class FishFlock : MonoBehaviour
     {
         Dispose();
 
-        jobFish = new JobFish();
-        jobFish.fishArray = new NativeArray<Fish>(number, Allocator.Persistent);
-        jobFish.spawnRadius = spawnRadius;
-        jobFish.spawnHeightScale = spawnHeightScale;
-        jobFish.flockPosition = flockPosition;
+        jobFish = new JobFish
+        {
+            fishArray = new NativeArray<Fish>(number, Allocator.Persistent),
+            spawnRadius = spawnRadius,
+            spawnHeightScale = spawnHeightScale,
+            flockPosition = flockPosition
+        };
 
         for (int i = 0; i < number; i++) 
         {
@@ -119,7 +122,7 @@ public class FishFlock : MonoBehaviour
     {
         jobFish.deltaTime = Time.deltaTime;
         jobFish.flockPosition = this.flockPosition;
-        JobHandle jobHandle = jobFish.Schedule(jobFish.fishArray.Length, 64);
+        JobHandle jobHandle = jobFish.Schedule(jobFish.fishArray.Length, 64 * 2);
         jobHandle.Complete();
     }
 
