@@ -32,7 +32,6 @@ public class FishFlock : MonoBehaviour
         public float spawnHeightScale;
         public Vector3 flockPosition;
         public float deltaTime;
-        public Unity.Mathematics.Random random;
         public NativeArray<Fish> fishArray;
 
         public void Execute(int index)
@@ -58,12 +57,17 @@ public class FishFlock : MonoBehaviour
 
             fish.passTime += deltaTime;
             if (fish.passTime < fish.nextUpdateTime)
-                return;
-
-            if (random.NextFloat() < 60.6)
             {
-                var f3 = random.NextFloat3() * spawnRadius;
-                var pos = new Vector3(f3.x, f3.y, f3.z);
+                fishArray[index] = fish;
+                return;
+            }
+
+            var random = new Unity.Mathematics.Random((uint)DateTime.Now.Ticks + (uint)index);
+            if (random.NextFloat() < 6.0f)
+            {
+                var pos = new Vector3(random.NextFloat(), random.NextFloat(), random.NextFloat()).normalized;
+                Debug.Log(pos);
+                pos *= spawnRadius;
                 pos.y *= spawnHeightScale;
                 fish.target = pos + flockPosition;
                 fish.speed = random.NextFloat(2, 10);
@@ -91,11 +95,11 @@ public class FishFlock : MonoBehaviour
         jobFish.spawnRadius = spawnRadius;
         jobFish.spawnHeightScale = spawnHeightScale;
         jobFish.flockPosition = flockPosition;
-        jobFish.random = new Unity.Mathematics.Random((uint)UnityEngine.Random.Range(1, 1000));
 
         for (int i = 0; i < number; i++) 
         {
             var pos = UnityEngine.Random.onUnitSphere * spawnRadius;
+            //Debug.Log(pos);
             pos.y *= spawnHeightScale;
 
             var fish = jobFish.fishArray[i];

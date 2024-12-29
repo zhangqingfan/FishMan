@@ -85,6 +85,7 @@ public class FishFlockManager : MonoBehaviour
             for (int i = 0; i < fishFlocks.Length; i++)
             {
                 fishFlocks[i].flockPosition = Vector3.SmoothDamp(fishFlocks[i].flockPosition, fishFlockTargets[i], ref v, 0.5f);
+                //Debug.Log(fishFlocks[i].flockPosition);
             }
         }
     }

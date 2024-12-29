@@ -514,8 +514,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c8418833d16cdcb41a0c91d75b340ccb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  flockCount: 3
-  fishNumber: 3000
+  flockCount: 1
+  fishNumber: 1757
   spawnRadius: 100
   spawnHeightScale: 0.5
   fishPrefab: {fileID: 0}
