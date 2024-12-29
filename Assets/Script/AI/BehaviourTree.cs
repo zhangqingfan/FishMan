@@ -21,7 +21,7 @@ namespace BehaviourTree
             nodeList = new List<Node>();
 
             lock(lockthis) 
-            { 
+            {
                 if(mono == null)
                 {
                     var go = new GameObject("AI_Mono");
