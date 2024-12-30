@@ -13,6 +13,16 @@ public class WorldManager : MonoBehaviour
     private void Start()
     {
         CreateEffect("Splash", this.transform.position, 10f);
+        CreateEffect("Splash", this.transform.position, 10f);
+        CreateEffect("Splash", this.transform.position, 10f);
+        CreateEffect("Splash", this.transform.position, 10f);
+        CreateEffect("Splash", this.transform.position, 10f);
+        CreateEffect("Splash", this.transform.position, 10f);
+        CreateEffect("Splash", this.transform.position, 10f);
+        CreateEffect("Splash", this.transform.position, 10f);
+        CreateEffect("Splash", this.transform.position, 10f);
+        CreateEffect("Splash", this.transform.position, 10f);
+        CreateEffect("Splash", this.transform.position, 10f);
     }
 
     private void OnDestroy()
@@ -26,10 +36,7 @@ public class WorldManager : MonoBehaviour
     {
         if (effectPool.ContainsKey(name) == false)
         {
-            if(LoadFromAA(name, position, time) == false)
-            {
-                Debug.Log("Already Loaded!");
-            }   
+            LoadFromAA(name, position, time);
             return;
         }
 
@@ -62,9 +69,18 @@ public class WorldManager : MonoBehaviour
         {
             if (op.Status == AsyncOperationStatus.Succeeded)
             {
-                addressHandles[name] = handle;
-                var obj = Instantiate(addressHandles[name].Result, position, Quaternion.identity);
-                effectPool[name] = new Queue<GameObject>();
+                if(addressHandles.ContainsKey(name) == false)
+                {
+                    addressHandles[name] = handle;
+                    effectPool[name] = new Queue<GameObject>();
+                }
+                else
+                {
+                    Debug.Log($"Repeated loading request {name}");
+                    Addressables.Release(handle);
+                }
+
+                var obj = Instantiate(addressHandles[name].Result, position, Quaternion.identity);                
                 StartCoroutine(ShowEffect(name, obj, time));
             }
             else
