@@ -1,8 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Net;
 using UnityEngine;
-using UnityEngine.InputSystem.XR;
 
 public class PathFinding : MonoBehaviour
 {
@@ -26,7 +24,7 @@ public class PathFinding : MonoBehaviour
     {
         wayPoints = FindObjectsOfType<WayPoint>();
         BuildConnection();
-        OnButtonClicked();
+        //OnButtonClicked();
     }
     public void BuildConnection()
     {
