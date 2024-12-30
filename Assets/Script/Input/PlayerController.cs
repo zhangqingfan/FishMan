@@ -7,6 +7,7 @@ public class PlayerController : MonoBehaviour
 {
     static public PlayerController Instance { get; private set; }
     Controller controller;
+    [HideInInspector]
     public bool isHold = false;
 
     private void Awake()
