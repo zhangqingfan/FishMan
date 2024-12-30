@@ -167,7 +167,7 @@ public class PathFinding : MonoBehaviour
             foreach(var w in wayPoints[i].neighborPointSet) 
             {
                 Gizmos.DrawLine(wayPoints[i].Position, w.Position);
-            }
+            } 
         }
     }
 
