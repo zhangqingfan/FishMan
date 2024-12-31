@@ -12,17 +12,7 @@ public class WorldManager : MonoBehaviour
 
     private void Start()
     {
-        CreateEffect("Splash", this.transform.position, 10f);
-        CreateEffect("Splash", this.transform.position, 10f);
-        CreateEffect("Splash", this.transform.position, 10f);
-        CreateEffect("Splash", this.transform.position, 10f);
-        CreateEffect("Splash", this.transform.position, 10f);
-        CreateEffect("Splash", this.transform.position, 10f);
-        CreateEffect("Splash", this.transform.position, 10f);
-        CreateEffect("Splash", this.transform.position, 10f);
-        CreateEffect("Splash", this.transform.position, 10f);
-        CreateEffect("Splash", this.transform.position, 10f);
-        CreateEffect("Splash", this.transform.position, 10f);
+
     }
 
     private void OnDestroy()

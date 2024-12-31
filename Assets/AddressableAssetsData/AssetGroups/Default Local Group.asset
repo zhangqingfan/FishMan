@@ -18,7 +18,7 @@ MonoBehaviour:
   m_GUID: 2ae9d49255677394096a097017303a52
   m_SerializeEntries:
   - m_GUID: 260d58bf4ce684efb9299c1cfb9ce266
-    m_Address: Assets/Script/Prefab/Splash.prefab
+    m_Address: Splash
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
