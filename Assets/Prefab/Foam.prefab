@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 6580138727074135275}
   - component: {fileID: 9105920538800045060}
   m_Layer: 0
-  m_Name: FoamGenerator
+  m_Name: Foam
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
