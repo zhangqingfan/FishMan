@@ -16,7 +16,7 @@ public class ShipController : MonoBehaviour
     Camera renderCamera;
     Vector3 cameraEuler = new Vector3(300f, 180f, 0f);
     float cameraDistance = 20f;
-    float scrollSpeed = 100f;
+    float scrollSpeed = 200f;
 
     public Transform wheelTrans;
     public float wheelSpeed = 0.01f;
@@ -36,8 +36,6 @@ public class ShipController : MonoBehaviour
 
     private void LateUpdate()
     {
-        renderCamera.transform.LookAt(transform.position);
-
         if (PlayerController.Instance.isHold == true)
         {
             var mouseOffset = PlayerController.Instance.GetMouseOffset();
@@ -47,22 +45,19 @@ public class ShipController : MonoBehaviour
             cameraEuler.x += mouseOffset.y * mouseSpeed * Time.deltaTime;
             cameraEuler.y += mouseOffset.x * mouseSpeed * Time.deltaTime;
             cameraEuler.x = Mathf.Clamp(cameraEuler.x, 290f, 340f);
-
-            var rotation = Quaternion.Euler(cameraEuler);
-            var direction = (rotation * Vector3.forward);
-            renderCamera.transform.position = transform.position + direction * cameraDistance;
         }
 
         var scroll = PlayerController.Instance.GetMouseScroll();
         if (scroll.y != 0)
         {
-            var direction = (renderCamera.transform.position - transform.position).normalized;
-            cameraDistance = (renderCamera.transform.position - transform.position).magnitude;
-
             cameraDistance += (scrollSpeed * Time.deltaTime * scroll.y) / -120f;
             cameraDistance = Mathf.Clamp(cameraDistance, 20, 80);
-            renderCamera.transform.position = transform.position + direction * cameraDistance;
         }
+
+        renderCamera.transform.LookAt(transform.position);
+        var rotation = Quaternion.Euler(cameraEuler);
+        var direction = (rotation * Vector3.forward);
+        renderCamera.transform.position = transform.position + direction * cameraDistance;
     }
 
     void Update()
