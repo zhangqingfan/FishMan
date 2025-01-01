@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -9,16 +10,59 @@ public class ShipController : MonoBehaviour
     [Range(0.1f, 1f)]
     public float backwardFactor = 0.5f;
     public float turnAngle = 0.5f;
+    [Range(10f, 50f)]
+    public float mouseSpeed = 25f;
+
+    Camera renderCamera;
+    Vector3 cameraEuler = new Vector3(300f, 180f, 0f);
+    float cameraDistance = 20f;
+    float scrollSpeed = 100f;
 
     public Transform wheelTrans;
     public float wheelSpeed = 0.01f;
-
     float rotateY = 0f;
+
     Rigidbody rb;
 
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
+
+        renderCamera = Camera.main;
+        var rotation = Quaternion.Euler(cameraEuler);
+        var direction = (rotation * Vector3.forward).normalized;
+        renderCamera.transform.position = transform.position + direction * cameraDistance;
+    }
+
+    private void LateUpdate()
+    {
+        renderCamera.transform.LookAt(transform.position);
+
+        if (PlayerController.Instance.isHold == true)
+        {
+            var mouseOffset = PlayerController.Instance.GetMouseOffset();
+            if (mouseOffset == Vector2.zero)
+                return;
+
+            cameraEuler.x += mouseOffset.y * mouseSpeed * Time.deltaTime;
+            cameraEuler.y += mouseOffset.x * mouseSpeed * Time.deltaTime;
+            cameraEuler.x = Mathf.Clamp(cameraEuler.x, 290f, 340f);
+
+            var rotation = Quaternion.Euler(cameraEuler);
+            var direction = (rotation * Vector3.forward);
+            renderCamera.transform.position = transform.position + direction * cameraDistance;
+        }
+
+        var scroll = PlayerController.Instance.GetMouseScroll();
+        if (scroll.y != 0)
+        {
+            var direction = (renderCamera.transform.position - transform.position).normalized;
+            cameraDistance = (renderCamera.transform.position - transform.position).magnitude;
+
+            cameraDistance += (scrollSpeed * Time.deltaTime * scroll.y) / -120f;
+            cameraDistance = Mathf.Clamp(cameraDistance, 20, 80);
+            renderCamera.transform.position = transform.position + direction * cameraDistance;
+        }
     }
 
     void Update()

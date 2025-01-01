@@ -36,6 +36,16 @@ public class PlayerController : MonoBehaviour
         return controller.PC.Move.ReadValue<Vector2>(); 
     }
 
+    public Vector2 GetMouseOffset()
+    {
+        return controller.PC.MouseOffset.ReadValue<Vector2>();
+    }
+
+    public Vector2 GetMouseScroll() 
+    {
+        return controller.PC.MouseScroll.ReadValue<Vector2>();
+    }
+
     IEnumerator MonitorRightClick()
     {
         int holdFrameCount = 0;
