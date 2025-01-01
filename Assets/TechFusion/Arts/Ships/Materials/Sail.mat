@@ -101,6 +101,7 @@ Material:
     - _DstBlendAlpha: 0
     - _Emission: 0
     - _EnvironmentReflections: 1
+    - _Float: 0
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
@@ -130,7 +131,7 @@ Material:
     - _SwingFrequenceX: 50
     - _SwingFrequenceY: 10
     - _SwingFrequenceZ: 300
-    - _SwingSpeed: 200
+    - _SwingSpeed: 100
     - _WorkflowMode: 1
     - _XMax: 0
     - _XMin: 0
