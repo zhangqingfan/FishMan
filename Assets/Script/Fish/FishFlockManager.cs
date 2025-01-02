@@ -1,9 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
-using UnityEditor.Overlays;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 public class FishFlockManager : MonoBehaviour
 {
@@ -19,10 +18,13 @@ public class FishFlockManager : MonoBehaviour
     [Range(0.1f, 1.5f)]
     public float spawnHeightScale = 0.5f;
 
+    [Serialize]
+    public List<Transform> sharks = new List<Transform>();
+
     public GameObject fishPrefab;
     FishFlock[] fishFlocks;
     Vector3[] fishFlockTargets;
-
+    
     private void Start()
     {
         fishFlocks = new FishFlock[flockCount];
@@ -49,9 +51,10 @@ public class FishFlockManager : MonoBehaviour
         flock.spawnHeightScale = spawnHeightScale;
         flock.fishPrefab = fishPrefab; 
 
-        var pos = Random.onUnitSphere * spawnRadius;
+        var pos = UnityEngine.Random.onUnitSphere * spawnRadius;
         pos.y *= spawnHeightScale;
         flock.flockPosition = pos + gameObject.transform.position;
+        flock.sharkTrans = sharks;
         flock.CreateFishes();
 
         return flock;
@@ -61,14 +64,14 @@ public class FishFlockManager : MonoBehaviour
     {
         while (true)
         {
-            yield return new WaitForSeconds(Random.Range(1.0f, 5.0f));
+            yield return new WaitForSeconds(UnityEngine.Random.Range(1.0f, 5.0f));
 
             for (int i = 0; i < flockCount; i++)
             {
-                if (Random.value > 0.6)
+                if (UnityEngine.Random.value > 0.6)
                     continue;
 
-                var pos = Random.onUnitSphere * spawnRadius;
+                var pos = UnityEngine.Random.onUnitSphere * spawnRadius;
                 pos.y *= spawnHeightScale;
                 fishFlockTargets[i] = pos + gameObject.transform.position;
             }

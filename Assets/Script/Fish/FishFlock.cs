@@ -5,6 +5,8 @@ using UnityEngine;
 using Unity.Mathematics;
 using System;
 using Unity.Burst;
+using System.Collections.Generic;
+using static UnityEditor.PlayerSettings;
 
 public class FishFlock : MonoBehaviour
 {
@@ -14,6 +16,7 @@ public class FishFlock : MonoBehaviour
 
     public Vector3 flockPosition;
     public GameObject fishPrefab;
+    public List<Transform> sharkTrans;
     
     public struct Fish
     {
@@ -35,9 +38,10 @@ public class FishFlock : MonoBehaviour
         public Vector3 flockPosition;
         public float deltaTime;
         public NativeArray<Fish> fishArray;
+        public NativeArray<Vector3> sharks;
 
         public void Execute(int index)
-        {
+        {            
             Move(index);
             Update(index);
         }
@@ -47,7 +51,8 @@ public class FishFlock : MonoBehaviour
             var fish = fishArray[index];
 
             fish.position += (fish.rotation * Vector3.forward).normalized * fish.speed * deltaTime;
-            fish.position.y = math.clamp(fish.position.y, float.MinValue, WorldManager.height);
+            fish.position.y = fish.position.y > WorldManager.height ? WorldManager.height : fish.position.y;
+            Debug.Log(fish.position.y);
             var direction = Quaternion.LookRotation((fish.target - fish.position).normalized);
             fish.rotation = Quaternion.RotateTowards(fish.rotation, direction, 0.5f);
 
@@ -57,6 +62,22 @@ public class FishFlock : MonoBehaviour
         void Update(int index)
         {
             var fish = fishArray[index];
+
+            Vector3 escape = Vector3.zero;
+            foreach (var shark in sharks)
+            {
+                var dir = fish.position - shark;
+                var weight = dir.magnitude - 20;
+                weight = weight >= 0 ? 0 : -weight;
+                escape += 2f * weight * dir.normalized;
+            }
+            
+            if(escape != Vector3.zero)
+            {
+                fish.target = fish.position + escape;
+                fishArray[index] = fish;
+                return;
+            }
 
             fish.passTime += deltaTime;
             if (fish.passTime < fish.nextUpdateTime)
@@ -68,7 +89,7 @@ public class FishFlock : MonoBehaviour
             var random = new Unity.Mathematics.Random((uint)DateTime.Now.Ticks + (uint)index);
             if (random.NextFloat() < 6.0f)
             {
-                var pos = new Vector3(random.NextFloat(), random.NextFloat(), random.NextFloat()).normalized;
+                var pos = new Vector3(2 * random.NextFloat() - 1f, 2 * random.NextFloat() - 1f, 2 * random.NextFloat() - 1f).normalized;
                 pos *= spawnRadius;
                 pos.y *= spawnHeightScale;
                 fish.target = pos + flockPosition;
@@ -97,7 +118,8 @@ public class FishFlock : MonoBehaviour
             fishArray = new NativeArray<Fish>(number, Allocator.Persistent),
             spawnRadius = spawnRadius,
             spawnHeightScale = spawnHeightScale,
-            flockPosition = flockPosition
+            flockPosition = flockPosition,
+            sharks = new NativeArray<Vector3>(sharkTrans.Count, Allocator.Persistent),
         };
 
         for (int i = 0; i < number; i++) 
@@ -109,7 +131,7 @@ public class FishFlock : MonoBehaviour
             var fish = jobFish.fishArray[i];
 
             fish.position = pos + flockPosition;
-            fish.position.y = math.clamp(fish.position.y, float.MinValue, WorldManager.height);
+            fish.position.y = fish.position.y > WorldManager.height ? WorldManager.height : fish.position.y;
             fish.rotation = Quaternion.identity;
             fish.nextUpdateTime = 0;
             fish.passTime = 0;
@@ -122,6 +144,12 @@ public class FishFlock : MonoBehaviour
 
     void Update()
     {
+        for(int i = 0; i < sharkTrans.Count; i++) 
+        {
+            jobFish.sharks[i] = sharkTrans[i].position;
+            Debug.Log(jobFish.sharks[i]);
+        }
+
         jobFish.deltaTime = Time.deltaTime;
         jobFish.flockPosition = this.flockPosition;
         JobHandle jobHandle = jobFish.Schedule(jobFish.fishArray.Length, 64 * 2);
@@ -134,7 +162,8 @@ public class FishFlock : MonoBehaviour
         var renderParams = new RenderParams(fishPrefab.GetComponent<Renderer>().sharedMaterial);
         var fishInstanceMatrixs = new Matrix4x4[jobFish.fishArray.Length];
         var scale = new Vector3(1, 1, 1);
-        fishPrefab.GetComponent<Renderer>().sharedMaterial.enableInstancing = true;
+
+        Debug.Log("GPU Instancing state: " + fishPrefab.GetComponent<Renderer>().sharedMaterial.enableInstancing);
 
         while (true)
         { 
