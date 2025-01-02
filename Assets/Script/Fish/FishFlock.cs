@@ -47,6 +47,7 @@ public class FishFlock : MonoBehaviour
             var fish = fishArray[index];
 
             fish.position += (fish.rotation * Vector3.forward).normalized * fish.speed * deltaTime;
+            fish.position.y = math.clamp(fish.position.y, float.MinValue, WorldManager.height);
             var direction = Quaternion.LookRotation((fish.target - fish.position).normalized);
             fish.rotation = Quaternion.RotateTowards(fish.rotation, direction, 0.5f);
 
@@ -108,6 +109,7 @@ public class FishFlock : MonoBehaviour
             var fish = jobFish.fishArray[i];
 
             fish.position = pos + flockPosition;
+            fish.position.y = math.clamp(fish.position.y, float.MinValue, WorldManager.height);
             fish.rotation = Quaternion.identity;
             fish.nextUpdateTime = 0;
             fish.passTime = 0;
