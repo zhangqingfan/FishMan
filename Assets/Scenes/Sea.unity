@@ -133,6 +133,7 @@ GameObject:
   - component: {fileID: 674074522}
   - component: {fileID: 674074521}
   - component: {fileID: 674074523}
+  - component: {fileID: 674074524}
   m_Layer: 0
   m_Name: WorldManager
   m_TagString: Untagged
@@ -180,6 +181,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cdadfc17e8ef45d46a46de824e46fed5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &674074524
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 674074520}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8418833d16cdcb41a0c91d75b340ccb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  flockCount: 1
+  fishNumber: 1428
+  spawnRadius: 60
+  spawnHeightScale: 0.5
+  fishPrefab: {fileID: 4276648904083818682, guid: db9b9482ae9f241619015119784ced70,
+    type: 3}
 --- !u!1 &689064487
 GameObject:
   m_ObjectHideFlags: 0

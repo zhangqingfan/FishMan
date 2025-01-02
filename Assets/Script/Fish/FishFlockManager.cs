@@ -30,7 +30,7 @@ public class FishFlockManager : MonoBehaviour
 
         for (int i = 0; i < flockCount; i++) 
         {
-            fishFlocks[i] = CreateFlocks(GameObject.CreatePrimitive(PrimitiveType.Cube));
+            fishFlocks[i] = CreateFlocks(fishPrefab);
             fishFlockTargets[i] = fishFlocks[i].flockPosition;
         }
 
