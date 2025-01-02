@@ -40,6 +40,10 @@ public class FishFlock : MonoBehaviour
         public NativeArray<Fish> fishArray;
         public NativeArray<Vector3> sharks;
 
+        public float dangerRadius;
+        public float minSpeed;
+        public float maxSpeed;
+
         public void Execute(int index)
         {            
             Move(index);
@@ -67,14 +71,17 @@ public class FishFlock : MonoBehaviour
             foreach (var shark in sharks)
             {
                 var dir = fish.position - shark;
-                var weight = dir.magnitude - 20;
+                var weight = dir.magnitude - dangerRadius;
                 weight = weight >= 0 ? 0 : -weight;
-                escape += 2f * weight * dir.normalized;
+                escape += 2 * weight * dir.normalized;
             }
             
             if(escape != Vector3.zero)
             {
                 fish.target = fish.position + escape;
+                var speed = escape.magnitude / dangerRadius;
+                var factor = Mathf.Clamp01((float)speed);
+                fish.speed = minSpeed + (maxSpeed - minSpeed) * factor;
                 fishArray[index] = fish;
                 return;
             }
@@ -93,7 +100,7 @@ public class FishFlock : MonoBehaviour
                 pos *= spawnRadius;
                 pos.y *= spawnHeightScale;
                 fish.target = pos + flockPosition;
-                fish.speed = random.NextFloat(2, 10);
+                fish.speed = random.NextFloat(minSpeed, maxSpeed);
             }
 
             fish.passTime = 0;
@@ -119,6 +126,9 @@ public class FishFlock : MonoBehaviour
             spawnRadius = spawnRadius,
             spawnHeightScale = spawnHeightScale,
             flockPosition = flockPosition,
+            dangerRadius = 20f,
+            minSpeed = 2f,
+            maxSpeed = 10f,
             sharks = new NativeArray<Vector3>(sharkTrans.Count, Allocator.Persistent),
         };
 
@@ -133,6 +143,7 @@ public class FishFlock : MonoBehaviour
             fish.position = pos + flockPosition;
             fish.position.y = fish.position.y > WorldManager.height ? WorldManager.height : fish.position.y;
             fish.rotation = Quaternion.identity;
+            fish.speed = jobFish.minSpeed;
             fish.nextUpdateTime = 0;
             fish.passTime = 0;
 

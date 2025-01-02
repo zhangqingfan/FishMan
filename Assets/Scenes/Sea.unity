@@ -194,9 +194,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   flockCount: 1
-  fishNumber: 1
+  fishNumber: 1829
   spawnRadius: 60
-  spawnHeightScale: 0.5
+  spawnHeightScale: 1.5
   sharks:
   - {fileID: 1273442305}
   fishPrefab: {fileID: 4276648904083818682, guid: db9b9482ae9f241619015119784ced70,
