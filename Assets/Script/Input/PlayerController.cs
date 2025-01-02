@@ -7,6 +7,7 @@ public class PlayerController : MonoBehaviour
 {
     static public PlayerController Instance { get; private set; }
     Controller controller;
+    [HideInInspector]
     public bool isHold = false;
 
     private void Awake()
@@ -33,6 +34,16 @@ public class PlayerController : MonoBehaviour
     public Vector2 GetMovement()
     {
         return controller.PC.Move.ReadValue<Vector2>(); 
+    }
+
+    public Vector2 GetMouseOffset()
+    {
+        return controller.PC.MouseOffset.ReadValue<Vector2>();
+    }
+
+    public Vector2 GetMouseScroll() 
+    {
+        return controller.PC.MouseScroll.ReadValue<Vector2>();
     }
 
     IEnumerator MonitorRightClick()
