@@ -52,7 +52,7 @@ public class FishFlock : MonoBehaviour
 
             fish.position += (fish.rotation * Vector3.forward).normalized * fish.speed * deltaTime;
             fish.position.y = fish.position.y > WorldManager.height ? WorldManager.height : fish.position.y;
-            Debug.Log(fish.position.y);
+            //Debug.Log(fish.position.y);
             var direction = Quaternion.LookRotation((fish.target - fish.position).normalized);
             fish.rotation = Quaternion.RotateTowards(fish.rotation, direction, 0.5f);
 
@@ -147,7 +147,7 @@ public class FishFlock : MonoBehaviour
         for(int i = 0; i < sharkTrans.Count; i++) 
         {
             jobFish.sharks[i] = sharkTrans[i].position;
-            Debug.Log(jobFish.sharks[i]);
+            //Debug.Log(jobFish.sharks[i]);
         }
 
         jobFish.deltaTime = Time.deltaTime;
@@ -182,5 +182,6 @@ public class FishFlock : MonoBehaviour
     void Dispose()
     {
         if(jobFish.fishArray != null) {  jobFish.fishArray.Dispose(); }
+        if(jobFish.sharks != null) { jobFish.sharks.Dispose(); }
     }
 }
