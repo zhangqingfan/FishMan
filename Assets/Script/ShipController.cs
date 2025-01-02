@@ -39,12 +39,12 @@ public class ShipController : MonoBehaviour
         if (PlayerController.Instance.isHold == true)
         {
             var mouseOffset = PlayerController.Instance.GetMouseOffset();
-            if (mouseOffset == Vector2.zero)
-                return;
-
-            cameraEuler.x += mouseOffset.y * mouseSpeed * Time.deltaTime;
-            cameraEuler.y += mouseOffset.x * mouseSpeed * Time.deltaTime;
-            cameraEuler.x = Mathf.Clamp(cameraEuler.x, 290f, 340f);
+            if (mouseOffset != Vector2.zero)
+            {
+                cameraEuler.x += mouseOffset.y * mouseSpeed * Time.deltaTime;
+                cameraEuler.y += mouseOffset.x * mouseSpeed * Time.deltaTime;
+                cameraEuler.x = Mathf.Clamp(cameraEuler.x, 290f, 340f);
+            }
         }
 
         var scroll = PlayerController.Instance.GetMouseScroll();
@@ -54,10 +54,10 @@ public class ShipController : MonoBehaviour
             cameraDistance = Mathf.Clamp(cameraDistance, 20, 80);
         }
 
-        renderCamera.transform.LookAt(transform.position);
         var rotation = Quaternion.Euler(cameraEuler);
         var direction = (rotation * Vector3.forward);
         renderCamera.transform.position = transform.position + direction * cameraDistance;
+        renderCamera.transform.LookAt(transform.position);
     }
 
     void Update()
