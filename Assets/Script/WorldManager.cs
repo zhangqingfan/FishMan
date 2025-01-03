@@ -10,6 +10,8 @@ public class WorldManager : MonoBehaviour
     Dictionary<string, AsyncOperationHandle<GameObject>> addressHandles = new Dictionary<string, AsyncOperationHandle<GameObject>>();
     Dictionary<string, Queue<GameObject>> effectPool = new Dictionary<string, Queue<GameObject>>();
 
+    public static float height = -10f;
+
     private void Start()
     {
 
