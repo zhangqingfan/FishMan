@@ -6,9 +6,10 @@ using UnityEngine.UIElements;
 public class SteerBehaviour : MonoBehaviour
 {
     [Header("Move")]
+    [Range(2, 10)]
     public float maxSpeed = 10.0f;
-    public float turnAngle = 0.5f;
-    public float slowRadius = 1f;
+    readonly float turnAngle = 30f;
+    readonly float stopDistance = 0.1f;
 
     [Header("Wander")]
     public Vector2 wanderTimeRange = new Vector2(2, 10);
@@ -17,6 +18,7 @@ public class SteerBehaviour : MonoBehaviour
     [Header("Pursue")]
     public float maxPursueLength = 30f;
 
+    [Header("Target")]
     public Transform targetTrans;
 
     Rigidbody rb;
@@ -27,55 +29,72 @@ public class SteerBehaviour : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         collisionSensor = GetComponent<CollisionSensor>();
-        //Wander();
+        //wanderCoroutine = Wander();
     }
 
-    private void FixedUpdate()
+    private void Update()
     {
-        var velocity = Seek(targetTrans.position);
-        
-        velocity = collisionSensor.AvoidCollision(velocity);
-        if (velocity == Vector3.zero)
+        var velocity = Arrive(targetTrans.position);
+        Debug.Log(velocity);
+
+        collisionSensor.AvoidCollision(velocity, out var newVelocity); 
+        if(newVelocity == Vector3.zero)
         {
             Debug.Log("I am stuck, help! " + gameObject.name);
+            rb.velocity = Vector3.zero;
             return;
+        }
+        
+        if(newVelocity != velocity)
+        {
+            velocity = newVelocity;
+            rb.velocity = Vector3.zero;
         }
 
         ApplySteering(velocity);
         FaceTarget(velocity);
 
-        Debug.DrawLine(transform.position, targetTrans.position, Color.red);
-    }
-    
-    void ApplySteering(Vector3 acceleration)
-    {
-        rb.velocity += acceleration * Time.deltaTime;
-        rb.velocity = Vector3.ClampMagnitude(rb.velocity, maxSpeed);
+        Debug.DrawLine(transform.position, targetTrans.position, Color.green);
+        Debug.DrawLine(transform.position, transform.position + 20 * velocity.normalized, Color.yellow);
     }
 
-    public void  FaceTarget(Vector3 acceleration)
+    void ApplySteering(Vector3 velocity)
     {
-        var rotation = Quaternion.LookRotation(acceleration);
-        transform.rotation = Quaternion.RotateTowards(transform.rotation, rotation, turnAngle * Time.deltaTime);
+        if (velocity.magnitude > maxSpeed)
+            velocity = velocity.normalized * maxSpeed;
+
+        rb.velocity = Vector3.Lerp(rb.velocity, velocity, Time.deltaTime);
+        //Debug.Log(rb.velocity.magnitude);
+    }
+
+    public void  FaceTarget(Vector3 velocity)
+    {
+        if (rb.velocity.magnitude <= 0.06f)
+            return;
+
+        var rotation = Quaternion.LookRotation(velocity);
+        rb.rotation = Quaternion.RotateTowards(rb.rotation, rotation, turnAngle * Time.deltaTime);
     }
 
     public Vector3 Arrive(Vector3 target)
     {
         var dir = (target - transform.position);
         var distance = (target - transform.position).magnitude;
+        var slowRadius = 8f;
 
         if (distance > slowRadius)
             return Seek(target);
 
         var speed = maxSpeed * distance / slowRadius;
         var desireVelocity = dir.normalized * speed;
-        return desireVelocity;
+        desireVelocity -= rb.velocity;
+        return desireVelocity; 
     }
 
     public Vector3 Seek(Vector3 target)
     {
-        Vector3 desiredVelocity = (target - transform.position).normalized * maxSpeed;
-        return Vector3.ClampMagnitude(desiredVelocity, maxSpeed);
+        var v3 = target - transform.position;
+        return v3.magnitude < stopDistance ? Vector3.zero : v3.normalized * maxSpeed;
     }
 
     public void Wander()
