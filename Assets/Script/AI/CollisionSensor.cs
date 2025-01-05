@@ -58,16 +58,17 @@ public class CollisionSensor : MonoBehaviour
     {
         var deltaLocalX = 2 * boxCollider.size.x / sensorCount;
         var verticalDir = Quaternion.Euler(0, 90, 0) * forward;
+        verticalDir.Normalize();
 
         var result = false;
         for (int i = 0; i < sensorCount / 2; i++)
         {
-            var startPos = transform.position + deltaLocalX * i * verticalDir.normalized;
+            var startPos = transform.position + deltaLocalX * i * verticalDir;
             var bo = Physics.Raycast(startPos, forward, out RaycastHit hitInfo, detectLength, collisionLayer);
             //Debug.DrawLine(startPos, startPos + forward * detectLength, Color.red);
             result = bo == true ? true : result;
              
-            startPos = transform.position + deltaLocalX * -i * verticalDir.normalized;
+            startPos = transform.position + deltaLocalX * -i * verticalDir;
             bo = Physics.Raycast(startPos, forward, out hitInfo, detectLength, collisionLayer);
             //Debug.DrawLine(startPos, startPos + forward * detectLength, Color.red);
             result = bo == true ? true : result;

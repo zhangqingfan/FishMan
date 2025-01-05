@@ -13,7 +13,7 @@ public class SteerBehaviour : MonoBehaviour
 
     [Header("Wander")]
     public Vector2 wanderTimeRange = new Vector2(2, 10);
-    public float wanderRange = 10f;
+    public float wanderRange = 30f;
 
     [Header("Pursue")]
     public float maxPursueLength = 30f;
@@ -24,42 +24,29 @@ public class SteerBehaviour : MonoBehaviour
     Rigidbody rb;
     CollisionSensor collisionSensor;
     Coroutine wanderCoroutine;
+    Vector3 originalPos;
 
     private void Start()
     {
+        originalPos = transform.position;
         rb = GetComponent<Rigidbody>();
         collisionSensor = GetComponent<CollisionSensor>();
-        //wanderCoroutine = Wander();
+        Wander();
     }
 
     private void Update()
     {
         var velocity = Seek(targetTrans.position);
 
-        //var result = collisionSensor.AvoidCollision(velocity, out var newVelocity);
-        //if(result == true)
-        {
-            var result = collisionSensor.AvoidCollision(rb.velocity, out var newVelocity);
-            if(result == true)
-            {
+         var result = collisionSensor.AvoidCollision(rb.velocity, out var newVelocity);
+         if(result == true)
+          {
                 rb.velocity = newVelocity.normalized * maxSpeed;
-                Debug.Log("11");
-            }
-
-            /*if (newVelocity == Vector3.zero)
-            {
-                Debug.Log("I am stuck, help! " + gameObject.name);
-                return;
-            }
-            Debug.DrawLine(transform.position, transform.position + newVelocity.normalized * maxSpeed, Color.red);
-            rb.velocity = newVelocity.normalized * maxSpeed;
-            */
-        }
+          }
 
         ApplySteering(velocity);
         FaceTarget(velocity);
-
-        Debug.DrawLine(transform.position, transform.position + velocity, Color.green);
+        //Debug.DrawLine(transform.position, transform.position + velocity, Color.green);
     }
     
     public Vector3 Seek(Vector3 target)
@@ -110,10 +97,10 @@ public class SteerBehaviour : MonoBehaviour
     {
         while (true)
         {
-            var targetPos = new Vector3(Random.Range(-1, 1), Random.Range(-1, 1), Random.Range(-1, 1)) * wanderRange;
-            targetTrans.position = transform.position + targetPos;
+            var targetPos = new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), Random.Range(-1f, 1f)) * wanderRange;
+            targetTrans.position = originalPos + targetPos;
             var y = targetTrans.position.y > WorldManager.height ? WorldManager.height : targetTrans.position.y;
-            targetTrans.position = new Vector3(targetTrans.position.x, y, targetTrans.position.z);
+            targetTrans.position = new Vector3(targetTrans.position.x, 0, targetTrans.position.z);
             yield return new WaitForSeconds(Random.Range(wanderTimeRange.x, wanderTimeRange.y));
         }
     }
