@@ -6,8 +6,7 @@ namespace BehaviourTree
 {
     public abstract class Node
     {
-        protected static MonoBehaviour mono;
-        static string lockthis = "lock";
+        protected MonoBehaviour mono;
 
         public enum ExecResult
         {
@@ -15,19 +14,11 @@ namespace BehaviourTree
             InProcess,
             Failure
         }
-        public Node()
+        protected Node(MonoBehaviour mono)
         {
             result = ExecResult.InProcess;
             nodeList = new List<Node>();
-
-            lock(lockthis) 
-            { 
-                if(mono == null)
-                {
-                    var go = new GameObject("AI_Mono");
-                    mono = go.AddComponent<MonoBehaviour>();
-                }
-            }
+            this.mono = mono;
         }
 
         public ExecResult result;
@@ -37,6 +28,10 @@ namespace BehaviourTree
 
     public class Selector : Node
     {
+        public Selector(MonoBehaviour mono) : base(mono)
+        {
+        }
+
         public override IEnumerator Exec()
         {
             foreach (Node node in nodeList)
@@ -52,6 +47,10 @@ namespace BehaviourTree
 
     public class Sequence : Node
     {
+        public Sequence(MonoBehaviour mono) : base(mono)
+        {
+        }
+
         public override IEnumerator Exec()
         {
             foreach (Node node in nodeList)
@@ -64,6 +63,10 @@ namespace BehaviourTree
 
         public class Parallel : Node
         {
+            public Parallel(MonoBehaviour mono) : base(mono)
+            {
+            }
+
             public override IEnumerator Exec()
             {
                 foreach (Node node in nodeList)

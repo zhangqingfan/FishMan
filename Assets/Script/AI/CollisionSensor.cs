@@ -1,12 +1,10 @@
 using System.Collections.Generic;
-using Unity.Mathematics;
-using Unity.VisualScripting;
 using UnityEngine;
 
+[RequireComponent(typeof(BoxCollider))]
 public class CollisionSensor : MonoBehaviour
 {
     public LayerMask collisionLayer;
-    int sensorCount = 4;
     int deltaSensorAngle = 20;
     float detectLength = 0;
 
@@ -38,7 +36,7 @@ public class CollisionSensor : MonoBehaviour
             if (DetectCollision(curDir) == false)
             {
                 newVelocity = curDir.normalized * speed;
-                //Debug.DrawLine(transform.position, transform.position + newVelocity * 2, Color.yellow, 10f);
+                Debug.DrawLine(transform.position, transform.position + newVelocity * 2, Color.yellow, 10f);
                 break;
             }
 
@@ -47,7 +45,7 @@ public class CollisionSensor : MonoBehaviour
             if (DetectCollision(curDir) == false)
             {
                 newVelocity = curDir.normalized * speed;                
-                //Debug.DrawLine(transform.position, transform.position + newVelocity * 2, Color.yellow, 10f);
+                Debug.DrawLine(transform.position, transform.position + newVelocity * 2, Color.yellow, 10f);
                 break;
             }
         }
@@ -56,21 +54,24 @@ public class CollisionSensor : MonoBehaviour
 
     bool DetectCollision(Vector3 forward)
     {
-        var deltaLocalX = 2 * boxCollider.size.x / sensorCount;
-        var verticalDir = Quaternion.Euler(0, 90, 0) * forward;
-        verticalDir.Normalize();
-
-        var result = false;
-        for (int i = 0; i < sensorCount / 2; i++)
+        var startPoints = new List<Vector3>
         {
-            var startPos = transform.position + deltaLocalX * i * verticalDir;
-            var bo = Physics.Raycast(startPos, forward, out RaycastHit hitInfo, detectLength, collisionLayer);
-            //Debug.DrawLine(startPos, startPos + forward * detectLength, Color.red);
-            result = bo == true ? true : result;
-             
-            startPos = transform.position + deltaLocalX * -i * verticalDir;
-            bo = Physics.Raycast(startPos, forward, out hitInfo, detectLength, collisionLayer);
-            //Debug.DrawLine(startPos, startPos + forward * detectLength, Color.red);
+            transform.position,
+            transform.TransformPoint(new Vector3(boxCollider.size.x / 2, boxCollider.size.y / 2, 0)),
+            transform.TransformPoint(new Vector3(boxCollider.size.x / 2, -boxCollider.size.y / 2, 0)),
+            transform.TransformPoint(new Vector3(-boxCollider.size.x / 2, boxCollider.size.y / 2, 0)),
+            transform.TransformPoint(new Vector3(-boxCollider.size.x / 2, -boxCollider.size.y / 2, 0))
+        };
+        return RayDetect(forward, startPoints, detectLength, collisionLayer);
+    }
+
+    bool RayDetect(Vector3 forward, List<Vector3> startPoints, float detectLength, LayerMask collisionLayer)
+    {
+        var result = false;
+        for (int i = 0; i < startPoints.Count; i++) 
+        {
+            var bo = Physics.Raycast(startPoints[i], forward, out RaycastHit hitInfo, detectLength, collisionLayer);
+            Debug.DrawLine(startPoints[i], startPoints[i] + forward * detectLength, Color.red);
             result = bo == true ? true : result;
         }
         return result;

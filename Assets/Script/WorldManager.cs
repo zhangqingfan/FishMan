@@ -11,7 +11,7 @@ public class WorldManager : MonoBehaviour
     Dictionary<string, Queue<GameObject>> goPool = new Dictionary<string, Queue<GameObject>>();
     WorldManager _instance;
     public WorldManager Instance => _instance;
-    public static float height = -10f;
+    public static readonly float height = -10f;
 
     private void Awake()
     {
