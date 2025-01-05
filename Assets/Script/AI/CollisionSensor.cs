@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -5,74 +6,72 @@ using UnityEngine;
 public class CollisionSensor : MonoBehaviour
 {
     public LayerMask collisionLayer;
-    public int sensorCount = 8;
-    public int deltaSensorAngle = 30;
+    int sensorCount = 4;
+    int deltaSensorAngle = 20;
+    float detectLength = 0;
 
     BoxCollider boxCollider;
 
     void Start()
     { 
         boxCollider = GetComponent<BoxCollider>();
+        detectLength = 4 * boxCollider.size.z;
     }
 
-    public void AvoidCollision(Vector3 velocity, out Vector3 newVelocity)
+    public bool AvoidCollision(Vector3 velocity, out Vector3 newVelocity)
     {
         newVelocity = Vector3.zero;
-        var loopCount =  360 / deltaSensorAngle;
-        var localForward = Quaternion.LookRotation(transform.InverseTransformDirection(velocity.normalized)).eulerAngles;
 
-        for (int i = 0; i <= loopCount / 2; i++) 
-        {  
-            localForward.y += i * deltaSensorAngle;
-            var worldForward = transform.TransformDirection(Quaternion.Euler(localForward) * Vector3.forward);
-            worldForward.Normalize();
-            if(DetectCollision(worldForward) == false)
+        if (DetectCollision(velocity) == false)
+        {
+            newVelocity = velocity;
+            return false;
+        }
+
+        var speed = velocity.magnitude;
+        var loopCount =  360 / deltaSensorAngle;
+
+        for (int i = 1; i <= loopCount / 2; i++) 
+        {
+            var curDir = Quaternion.Euler(0, i * deltaSensorAngle, 0) * velocity;
+            //Debug.DrawLine(transform.position, transform.position + curDir, Color.cyan);
+            if (DetectCollision(curDir) == false)
             {
-                //todo...这里要修改！！！！
-                worldForward.y = velocity.y;
-                newVelocity = worldForward.normalized * velocity.magnitude;
+                newVelocity = curDir.normalized * speed;
+                //Debug.DrawLine(transform.position, transform.position + newVelocity * 2, Color.yellow, 10f);
+                break;
             }
 
-            localForward.y -= i * deltaSensorAngle;
-            worldForward = transform.TransformDirection(Quaternion.Euler(localForward) * Vector3.forward);
-            worldForward.Normalize();
-            if (DetectCollision(worldForward) == false)
+            curDir = Quaternion.Euler(0, -1 * i * deltaSensorAngle, 0) * velocity;
+            //Debug.DrawLine(transform.position, transform.position + curDir, Color.cyan);
+            if (DetectCollision(curDir) == false)
             {
-                worldForward.y = velocity.y;
-                newVelocity = worldForward.normalized * velocity.magnitude;
+                newVelocity = curDir.normalized * speed;                
+                //Debug.DrawLine(transform.position, transform.position + newVelocity * 2, Color.yellow, 10f);
+                break;
             }
         }
+        return true;
     }
 
     bool DetectCollision(Vector3 forward)
     {
-        ShowRay(forward);
-
-        var minLocalX = -boxCollider.size.x;
         var deltaLocalX = 2 * boxCollider.size.x / sensorCount;
+        var verticalDir = Quaternion.Euler(0, 90, 0) * forward;
 
-        for (int i = 0; i < sensorCount; i++)
+        var result = false;
+        for (int i = 0; i < sensorCount / 2; i++)
         {
-            var localPos = new Vector3(minLocalX + deltaLocalX * i, 0, 0);
-            var worldPos = transform.TransformPoint(localPos);
-            var bo = Physics.Raycast(worldPos, forward, 2 * boxCollider.size.z, collisionLayer);
-            if (bo == true)
-                return true;
+            var startPos = transform.position + deltaLocalX * i * verticalDir.normalized;
+            var bo = Physics.Raycast(startPos, forward, out RaycastHit hitInfo, detectLength, collisionLayer);
+            //Debug.DrawLine(startPos, startPos + forward * detectLength, Color.red);
+            result = bo == true ? true : result;
+             
+            startPos = transform.position + deltaLocalX * -i * verticalDir.normalized;
+            bo = Physics.Raycast(startPos, forward, out hitInfo, detectLength, collisionLayer);
+            //Debug.DrawLine(startPos, startPos + forward * detectLength, Color.red);
+            result = bo == true ? true : result;
         }
-
-        return false;
-    }
-
-    public void ShowRay(Vector3 forward)
-    {
-        var minLocalX = -boxCollider.size.x;
-        var deltaLocalX = 2 * boxCollider.size.x / sensorCount;
-
-        for (int i = 0; i < sensorCount; i++)
-        {
-            var localPos = new Vector3(minLocalX + deltaLocalX * i, 0, 0);
-            var worldPos = transform.TransformPoint(localPos);
-            Debug.DrawLine(worldPos, worldPos + forward * 2 * boxCollider.size.z, Color.red);
-        }
+        return result;
     }
 }

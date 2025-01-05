@@ -1,8 +1,8 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UIElements;
 
+[RequireComponent(typeof(CollisionSensor))]
+[RequireComponent(typeof(Rigidbody))]
 public class SteerBehaviour : MonoBehaviour
 {
     [Header("Move")]
@@ -34,28 +34,38 @@ public class SteerBehaviour : MonoBehaviour
 
     private void Update()
     {
-        var velocity = Arrive(targetTrans.position);
-        Debug.Log(velocity);
+        var velocity = Seek(targetTrans.position);
 
-        collisionSensor.AvoidCollision(velocity, out var newVelocity); 
-        if(newVelocity == Vector3.zero)
+        //var result = collisionSensor.AvoidCollision(velocity, out var newVelocity);
+        //if(result == true)
         {
-            Debug.Log("I am stuck, help! " + gameObject.name);
-            rb.velocity = Vector3.zero;
-            return;
-        }
-        
-        if(newVelocity != velocity)
-        {
-            velocity = newVelocity;
-            rb.velocity = Vector3.zero;
+            var result = collisionSensor.AvoidCollision(rb.velocity, out var newVelocity);
+            if(result == true)
+            {
+                rb.velocity = newVelocity.normalized * maxSpeed;
+                Debug.Log("11");
+            }
+
+            /*if (newVelocity == Vector3.zero)
+            {
+                Debug.Log("I am stuck, help! " + gameObject.name);
+                return;
+            }
+            Debug.DrawLine(transform.position, transform.position + newVelocity.normalized * maxSpeed, Color.red);
+            rb.velocity = newVelocity.normalized * maxSpeed;
+            */
         }
 
         ApplySteering(velocity);
         FaceTarget(velocity);
 
-        Debug.DrawLine(transform.position, targetTrans.position, Color.green);
-        Debug.DrawLine(transform.position, transform.position + 20 * velocity.normalized, Color.yellow);
+        Debug.DrawLine(transform.position, transform.position + velocity, Color.green);
+    }
+    
+    public Vector3 Seek(Vector3 target)
+    {
+        var v3 = target - transform.position;
+        return v3.magnitude < stopDistance ? Vector3.zero : v3.normalized * maxSpeed;
     }
 
     void ApplySteering(Vector3 velocity)
@@ -67,7 +77,7 @@ public class SteerBehaviour : MonoBehaviour
         //Debug.Log(rb.velocity.magnitude);
     }
 
-    public void  FaceTarget(Vector3 velocity)
+    public void FaceTarget(Vector3 velocity)
     {
         if (rb.velocity.magnitude <= 0.06f)
             return;
@@ -88,13 +98,7 @@ public class SteerBehaviour : MonoBehaviour
         var speed = maxSpeed * distance / slowRadius;
         var desireVelocity = dir.normalized * speed;
         desireVelocity -= rb.velocity;
-        return desireVelocity; 
-    }
-
-    public Vector3 Seek(Vector3 target)
-    {
-        var v3 = target - transform.position;
-        return v3.magnitude < stopDistance ? Vector3.zero : v3.normalized * maxSpeed;
+        return desireVelocity;
     }
 
     public void Wander()
@@ -104,7 +108,7 @@ public class SteerBehaviour : MonoBehaviour
 
     IEnumerator WanderCoroutine()
     {
-        while(true)
+        while (true)
         {
             var targetPos = new Vector3(Random.Range(-1, 1), Random.Range(-1, 1), Random.Range(-1, 1)) * wanderRange;
             targetTrans.position = transform.position + targetPos;
@@ -116,7 +120,7 @@ public class SteerBehaviour : MonoBehaviour
 
     public Vector3 Pursue(Vector3 target, Vector3 targetVelocity)
     {
-        var dir  = target - transform.position;
+        var dir = target - transform.position;
         var distance = dir.magnitude;
 
         if (distance > maxPursueLength)
