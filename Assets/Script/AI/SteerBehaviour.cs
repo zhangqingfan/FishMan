@@ -24,7 +24,7 @@ public class SteerBehaviour : MonoBehaviour
 
     Rigidbody rb;
     CollisionSensor collisionSensor;
-    Coroutine wanderCoroutine;
+    Coroutine wanderCoroutine = null;
     Vector3 originalPos;
 
     private void Start()
@@ -89,9 +89,20 @@ public class SteerBehaviour : MonoBehaviour
         return desireVelocity;
     }
 
-    public void Wander()
+    public void Wander(bool bo)
     {
-        wanderCoroutine = StartCoroutine(WanderCoroutine());
+        if(bo == false && wanderCoroutine != null)
+        {
+            StopCoroutine(wanderCoroutine);
+            wanderCoroutine = null;
+            return;
+        }
+
+        else if(bo == true && wanderCoroutine == null)
+        {
+            wanderCoroutine = StartCoroutine(WanderCoroutine());
+            return;
+        }        
     }
 
     IEnumerator WanderCoroutine()

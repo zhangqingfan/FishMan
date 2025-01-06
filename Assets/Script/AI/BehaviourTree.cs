@@ -1,12 +1,19 @@
+using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+
+class CoroutineMono : MonoBehaviour
+{
+
+}
 
 namespace BehaviourTree
 {
     public abstract class Node
     {
-        protected MonoBehaviour mono;
+        protected static MonoBehaviour mono;
+        static string lockObject = "lock";
 
         public enum ExecResult
         {
@@ -14,11 +21,19 @@ namespace BehaviourTree
             InProcess,
             Failure
         }
-        protected Node(MonoBehaviour mono)
+        public Node()
         {
-            result = ExecResult.InProcess;
+            result = ExecResult.Failure;
             nodeList = new List<Node>();
-            this.mono = mono;
+
+            lock (lockObject)
+            {
+                if (mono == null)
+                {
+                    var go = new GameObject("AI_Mono");
+                    mono = go.AddComponent<CoroutineMono>();
+                }
+            }
         }
 
         public ExecResult result;
@@ -28,10 +43,6 @@ namespace BehaviourTree
 
     public class Selector : Node
     {
-        public Selector(MonoBehaviour mono) : base(mono)
-        {
-        }
-
         public override IEnumerator Exec()
         {
             foreach (Node node in nodeList)
@@ -47,10 +58,6 @@ namespace BehaviourTree
 
     public class Sequence : Node
     {
-        public Sequence(MonoBehaviour mono) : base(mono)
-        {
-        }
-
         public override IEnumerator Exec()
         {
             foreach (Node node in nodeList)
@@ -63,10 +70,6 @@ namespace BehaviourTree
 
         public class Parallel : Node
         {
-            public Parallel(MonoBehaviour mono) : base(mono)
-            {
-            }
-
             public override IEnumerator Exec()
             {
                 foreach (Node node in nodeList)

@@ -57,6 +57,7 @@ public class CollisionSensor : MonoBehaviour
         var startPoints = new List<Vector3>
         {
             transform.position,
+            //TODO...这里可以改进的！！！记住，先别改就是了。
             transform.TransformPoint(new Vector3(boxCollider.size.x / 2, boxCollider.size.y / 2, 0)),
             transform.TransformPoint(new Vector3(boxCollider.size.x / 2, -boxCollider.size.y / 2, 0)),
             transform.TransformPoint(new Vector3(-boxCollider.size.x / 2, boxCollider.size.y / 2, 0)),

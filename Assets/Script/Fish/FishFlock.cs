@@ -93,7 +93,7 @@ public class FishFlock : MonoBehaviour
                 return;
             }
 
-            var random = new Unity.Mathematics.Random((uint)(MathF.Cos(index * 50) * 100) + (uint)index);
+            var random = new Unity.Mathematics.Random((uint)(math.cos(index * 50) * 100) + (uint)index);
             if (random.NextFloat() < 6.0f)
             {
                 var pos = new Vector3(2 * random.NextFloat() - 1f, 2 * random.NextFloat() - 1f, 2 * random.NextFloat() - 1f).normalized;
