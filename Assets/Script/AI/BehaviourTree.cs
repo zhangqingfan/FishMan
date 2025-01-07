@@ -45,14 +45,17 @@ namespace BehaviourTree
     {
         public override IEnumerator Exec()
         {
+            result = ExecResult.InProcess;
             foreach (Node node in nodeList)
             {
                 yield return mono.StartCoroutine(node.Exec());
-                if (node.result == ExecResult.Failure)
-                    break;
+                if (node.result == ExecResult.Success)
+                {
+                    result = ExecResult.Success;
+                    yield break;
+                }
             }
-
-            result = ExecResult.Success;
+            result = ExecResult.Failure;
         }
     }
 

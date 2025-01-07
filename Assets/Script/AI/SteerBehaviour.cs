@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -19,29 +20,33 @@ public class SteerBehaviour : MonoBehaviour
     [Header("Pursue")]
     public float maxPursueLength = 30f;
 
-    [Header("Target")]
+    [HideInInspector]
     public Transform targetTrans;
-
+    
     Rigidbody rb;
     CollisionSensor collisionSensor;
     Coroutine wanderCoroutine = null;
     Vector3 originalPos;
+
+    Func<Vector3, Vector3> movePattern;
 
     private void Start()
     {
         originalPos = transform.position;
         rb = GetComponent<Rigidbody>();
         collisionSensor = GetComponent<CollisionSensor>();
-        //Wander();
+        targetTrans = new GameObject("SharkTarget").transform;
+        movePattern += Seek;
     }
 
     private void Update()
     {
-        var velocity = Seek(targetTrans.position);
+        var velocity = movePattern(targetTrans.position);
 
          var result = collisionSensor.AvoidCollision(rb.velocity, out var newVelocity);
          if(result == true)
           {
+                //TOOD...吃完饭回来改进！
                 rb.velocity = newVelocity.normalized * maxSpeed;
           }
 
@@ -62,7 +67,6 @@ public class SteerBehaviour : MonoBehaviour
             velocity = velocity.normalized * maxSpeed;
 
         rb.velocity = Vector3.Lerp(rb.velocity, velocity, Time.deltaTime);
-        //Debug.Log(rb.velocity.magnitude);
     }
 
     public void FaceTarget(Vector3 velocity)
@@ -93,6 +97,8 @@ public class SteerBehaviour : MonoBehaviour
     {
         if(bo == false && wanderCoroutine != null)
         {
+            movePattern = null;
+            movePattern += Seek;
             StopCoroutine(wanderCoroutine);
             wanderCoroutine = null;
             return;
@@ -100,6 +106,8 @@ public class SteerBehaviour : MonoBehaviour
 
         else if(bo == true && wanderCoroutine == null)
         {
+            movePattern = null;
+            movePattern += Arrive;
             wanderCoroutine = StartCoroutine(WanderCoroutine());
             return;
         }        
@@ -109,11 +117,11 @@ public class SteerBehaviour : MonoBehaviour
     {
         while (true)
         {
-            var targetPos = new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), Random.Range(-1f, 1f)) * wanderRange;
+            var targetPos = new Vector3(UnityEngine.Random.Range(-1f, 1f), UnityEngine.Random.Range(-1f, 1f), UnityEngine.Random.Range(-1f, 1f)) * wanderRange;
             targetTrans.position = originalPos + targetPos;
             var y = targetTrans.position.y > WorldManager.height ? WorldManager.height : targetTrans.position.y;
             targetTrans.position = new Vector3(targetTrans.position.x, y, targetTrans.position.z);
-            yield return new WaitForSeconds(Random.Range(wanderTimeRange.x, wanderTimeRange.y));
+            yield return new WaitForSeconds(UnityEngine.Random.Range(wanderTimeRange.x, wanderTimeRange.y));
         }
     }
 

@@ -54,14 +54,22 @@ public class CollisionSensor : MonoBehaviour
 
     bool DetectCollision(Vector3 forward)
     {
+        var centerPoint = transform.Find("centerPoint").transform;
+        var offsetZ = centerPoint.localPosition.z;
+
         var startPoints = new List<Vector3>
         {
-            transform.position,
-            //TODO...这里可以改进的！！！记住，先别改就是了。
-            transform.TransformPoint(new Vector3(boxCollider.size.x / 2, boxCollider.size.y / 2, 0)),
-            transform.TransformPoint(new Vector3(boxCollider.size.x / 2, -boxCollider.size.y / 2, 0)),
-            transform.TransformPoint(new Vector3(-boxCollider.size.x / 2, boxCollider.size.y / 2, 0)),
-            transform.TransformPoint(new Vector3(-boxCollider.size.x / 2, -boxCollider.size.y / 2, 0))
+            boxCollider.transform.position,
+            centerPoint.position,
+            transform.TransformPoint(new Vector3(boxCollider.size.x / 2, boxCollider.size.y / 2, boxCollider.size.z / 2 + offsetZ)),
+            transform.TransformPoint(new Vector3(boxCollider.size.x / 2, boxCollider.size.y / 2, -boxCollider.size.z / 2 + offsetZ)),
+            transform.TransformPoint(new Vector3(-boxCollider.size.x / 2, boxCollider.size.y / 2, boxCollider.size.z / 2 + offsetZ)),
+            transform.TransformPoint(new Vector3(-boxCollider.size.x / 2, boxCollider.size.y / 2, -boxCollider.size.z / 2 + offsetZ)),
+            transform.TransformPoint(new Vector3(boxCollider.size.x / 2, -boxCollider.size.y / 2, boxCollider.size.z / 2 + offsetZ)),
+            transform.TransformPoint(new Vector3(boxCollider.size.x / 2, -boxCollider.size.y / 2, -boxCollider.size.z / 2 + offsetZ)),
+            transform.TransformPoint(new Vector3(-boxCollider.size.x / 2, -boxCollider.size.y / 2, boxCollider.size.z / 2 + offsetZ)),
+            transform.TransformPoint(new Vector3(-boxCollider.size.x / 2, -boxCollider.size.y / 2, -boxCollider.size.z / 2 + offsetZ)),
+
         };
         return RayDetect(forward, startPoints, detectLength, collisionLayer);
     }

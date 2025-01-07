@@ -4,7 +4,7 @@ using UnityEngine;
 [RequireComponent(typeof(SteerBehaviour))]
 public class Actor : MonoBehaviour
 {
-    SteerBehaviour steerBehaviour;
+    public SteerBehaviour steerBehaviour;
 
     private void OnEnable()
     {
@@ -40,7 +40,10 @@ public class ActorManager
         foreach (var item in actorList)
         {
             if (item == actor)
+            {
                 actorList.Remove(item);
+                return;
+            }   
         }
     }
 

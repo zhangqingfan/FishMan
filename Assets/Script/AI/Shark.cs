@@ -6,12 +6,12 @@ using UnityEngine;
 public class SharkAI : BehaviourTree.Node
 {
     Selector selector;
-    public SharkAI(SteerBehaviour steerBehaviour)
+    public SharkAI(Shark shark)
     {
-        var selector = new Selector();
-       
-        var wander = new SharkWander(steerBehaviour);
-        var pursue = new SharkPursue(steerBehaviour);
+        selector = new Selector();
+
+        var wander = new SharkWander(shark);
+        var pursue = new SharkPursue(shark);
         selector.nodeList.Add(pursue);
         selector.nodeList.Add(wander);
 
@@ -20,21 +20,21 @@ public class SharkAI : BehaviourTree.Node
 
     public void Update()
     {
-        if (selector.result == ExecResult.InProcess)
-            return;
-
-        selector.Exec();
+        if (selector.result == ExecResult.Success || selector.result == ExecResult.Failure)
+        {
+            mono.StartCoroutine(selector.Exec());
+        }
     }
 }
 
 public class SharkWander : BehaviourTree.Node
 {
-    SteerBehaviour steerBehaviour;
-    public SharkWander(SteerBehaviour steer) { steerBehaviour = steer; }
+    Shark shark;
+    public SharkWander(Shark shark) { this.shark = shark; }
 
     public override IEnumerator Exec()
     {
-        steerBehaviour.Wander(true);
+        shark.steerBehaviour.Wander(true);
         result = ExecResult.Success;
         yield break;
     }
@@ -42,44 +42,55 @@ public class SharkWander : BehaviourTree.Node
 
 public class SharkPursue: BehaviourTree.Node
 {
-    SteerBehaviour steerBehaviour;
-    public SharkPursue(SteerBehaviour steer) {  steerBehaviour = steer; }   
-
+    Shark shark;
+    Transform target;
+    public SharkPursue(Shark shark) { this.shark = shark; }
+    
     public override IEnumerator Exec()
     {
-        while(true) 
+        while (true)
         {
             yield return null;
 
-            //TODO...
-
-
-
-            steerBehaviour.Wander(false);
+            if(target != null && Vector3.Distance(target.position, shark.gameObject.transform.position) <= 15f)
+            {
+                shark.steerBehaviour.targetTrans.position = target.position;
+                continue;
+            }
+                
+            target = null;
+            var actors = ActorManager.Instance.GetActorInRange<Actor>(shark.gameObject.transform.position, 20f);
+            foreach (var actor in actors) 
+            {
+                if (actor != shark)
+                {
+                    shark.steerBehaviour.Wander(false);
+                    target = actor.transform;
+                    continue;
+                }
+            }
 
             break;
         }
-
-        result = ExecResult.Success;
+        result = ExecResult.Failure;
     }
 }
 
 
-public class Shark : MonoBehaviour
+public class Shark : Actor
 {
     Animator animator;
-    SteerBehaviour steerBehaviour;
     SharkAI sharkAI;
 
     void Start()
     {
         steerBehaviour = GetComponent<SteerBehaviour>();
         animator = GetComponent<Animator>();
-        sharkAI = new SharkAI(steerBehaviour);
+        sharkAI = new SharkAI(this);
     }
 
     void Update()
     {
-        //sharkAI.Update();
+        sharkAI.Update();
     }
 }
