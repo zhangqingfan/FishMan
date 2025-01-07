@@ -9,12 +9,12 @@ public class SharkAI : BehaviourTree.Node
     public SharkAI(Shark shark)
     {
         selector = new Selector();
-
         var wander = new SharkWander(shark);
         var pursue = new SharkPursue(shark);
         selector.nodeList.Add(pursue);
         selector.nodeList.Add(wander);
 
+        //not necessary;
         nodeList.Add(selector);
     }
 
