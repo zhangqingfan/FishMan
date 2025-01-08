@@ -43,29 +43,29 @@ public class SharkWander : BehaviourTree.Node
 public class SharkPursue: BehaviourTree.Node
 {
     Shark shark;
-    Transform target;
+    
     public SharkPursue(Shark shark) { this.shark = shark; }
     
     public override IEnumerator Exec()
     {
+        Transform target = null;
+        
         while (true)
         {
             yield return null;
 
             if(target != null && Vector3.Distance(target.position, shark.gameObject.transform.position) <= 15f)
             {
-                shark.steerBehaviour.targetTrans.position = target.position;
+                shark.steerBehaviour.Seek(target.position);
                 continue;
             }
                 
-            target = null;
             var actors = ActorManager.Instance.GetActorInRange<Actor>(shark.gameObject.transform.position, 20f);
             foreach (var actor in actors) 
             {
                 if (actor != shark)
                 {
                     shark.steerBehaviour.Wander(false);
-                    target = actor.transform;
                     continue;
                 }
             }
@@ -76,12 +76,10 @@ public class SharkPursue: BehaviourTree.Node
     }
 }
 
-
 public class Shark : Actor
 {
     Animator animator;
     SharkAI sharkAI;
-
     void Start()
     {
         steerBehaviour = GetComponent<SteerBehaviour>();

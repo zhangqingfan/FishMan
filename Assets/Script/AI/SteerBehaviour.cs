@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
 [RequireComponent(typeof(CollisionSensor))]
 [RequireComponent(typeof(Rigidbody))]
@@ -24,11 +25,11 @@ public class SteerBehaviour : MonoBehaviour
     public Transform targetTrans;
     
     Rigidbody rb;
+    Vector3 steerVelocity;
+
     CollisionSensor collisionSensor;
     Coroutine wanderCoroutine = null;
     Vector3 originalPos;
-
-    Func<Vector3, Vector3> movePattern;
 
     private void Start()
     {
@@ -36,13 +37,10 @@ public class SteerBehaviour : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         collisionSensor = GetComponent<CollisionSensor>();
         targetTrans = new GameObject("SharkTarget").transform;
-        movePattern += Seek;
     }
 
     private void Update()
     {
-        var velocity = movePattern(targetTrans.position);
-
          var result = collisionSensor.AvoidCollision(rb.velocity, out var newVelocity);
          if(result == true)
           {
@@ -50,55 +48,56 @@ public class SteerBehaviour : MonoBehaviour
                 rb.velocity = newVelocity.normalized * maxSpeed;
           }
 
-        ApplySteering(velocity);
-        FaceTarget(velocity);
+        ApplySteering();
+        FaceTarget();
         //Debug.DrawLine(transform.position, transform.position + velocity, Color.green);
     }
     
-    public Vector3 Seek(Vector3 target)
+    public void Seek(Vector3 target)
     {
         var v3 = target - transform.position;
-        return v3.magnitude < stopDistance ? Vector3.zero : v3.normalized * maxSpeed;
+        steerVelocity = v3.magnitude < stopDistance ? Vector3.zero : v3.normalized * maxSpeed;
     }
 
-    void ApplySteering(Vector3 velocity)
+    void ApplySteering()
     {
-        if (velocity.magnitude > maxSpeed)
-            velocity = velocity.normalized * maxSpeed;
+        if (steerVelocity.magnitude > maxSpeed)
+            steerVelocity = steerVelocity.normalized * maxSpeed;
 
-        rb.velocity = Vector3.Lerp(rb.velocity, velocity, Time.deltaTime);
+        rb.velocity = Vector3.Lerp(rb.velocity, steerVelocity, Time.deltaTime);
     }
 
-    public void FaceTarget(Vector3 velocity)
+    public void FaceTarget()
     {
         if (rb.velocity.magnitude <= 0.06f)
             return;
 
-        var rotation = Quaternion.LookRotation(velocity);
+        var rotation = Quaternion.LookRotation(steerVelocity);
         rb.rotation = Quaternion.RotateTowards(rb.rotation, rotation, turnAngle * Time.deltaTime);
     }
 
-    public Vector3 Arrive(Vector3 target)
+    public void Arrive(Vector3 target)
     {
         var dir = (target - transform.position);
         var distance = (target - transform.position).magnitude;
         var slowRadius = 8f;
 
         if (distance > slowRadius)
-            return Seek(target);
+        {
+            Seek(target);
+            return;
+        } 
 
         var speed = maxSpeed * distance / slowRadius;
         var desireVelocity = dir.normalized * speed;
         desireVelocity -= rb.velocity;
-        return desireVelocity;
+        steerVelocity = desireVelocity;
     }
 
     public void Wander(bool bo)
     {
         if(bo == false && wanderCoroutine != null)
         {
-            movePattern = null;
-            movePattern += Seek;
             StopCoroutine(wanderCoroutine);
             wanderCoroutine = null;
             return;
@@ -106,8 +105,6 @@ public class SteerBehaviour : MonoBehaviour
 
         else if(bo == true && wanderCoroutine == null)
         {
-            movePattern = null;
-            movePattern += Arrive;
             wanderCoroutine = StartCoroutine(WanderCoroutine());
             return;
         }        
@@ -115,27 +112,41 @@ public class SteerBehaviour : MonoBehaviour
 
     IEnumerator WanderCoroutine()
     {
+        var targetPos = new Vector3(UnityEngine.Random.Range(-1f, 1f), UnityEngine.Random.Range(-1f, 1f), UnityEngine.Random.Range(-1f, 1f)) * wanderRange;
+        targetTrans.position = originalPos + targetPos;
+        var y = targetTrans.position.y > WorldManager.height ? WorldManager.height : targetTrans.position.y;
+        targetTrans.position = new Vector3(targetTrans.position.x, y, targetTrans.position.z);
+
+        var wanderTime = UnityEngine.Random.Range(wanderTimeRange.x, wanderTimeRange.y);
+        var passTime = 0f;
+
         while (true)
         {
-            var targetPos = new Vector3(UnityEngine.Random.Range(-1f, 1f), UnityEngine.Random.Range(-1f, 1f), UnityEngine.Random.Range(-1f, 1f)) * wanderRange;
-            targetTrans.position = originalPos + targetPos;
-            var y = targetTrans.position.y > WorldManager.height ? WorldManager.height : targetTrans.position.y;
-            targetTrans.position = new Vector3(targetTrans.position.x, y, targetTrans.position.z);
-            yield return new WaitForSeconds(UnityEngine.Random.Range(wanderTimeRange.x, wanderTimeRange.y));
+            yield return null;
+
+            passTime += Time.deltaTime;
+            if (passTime >= wanderTime)
+                break;
+
+            Arrive(targetTrans.position);
         }
+        wanderCoroutine = null;
     }
 
-    public Vector3 Pursue(Vector3 target, Vector3 targetVelocity)
+    public void Pursue(Vector3 target, Vector3 targetVelocity)
     {
         var dir = target - transform.position;
         var distance = dir.magnitude;
 
         if (distance > maxPursueLength)
-            return Vector3.zero;
+        { 
+            steerVelocity = Vector3.zero;
+            return;
+        } 
 
         float predictionTime = distance / rb.velocity.magnitude;
         Vector3 predictedPosition = target + targetVelocity * predictionTime;
 
-        return Seek(predictedPosition);
+        Seek(predictedPosition);
     }
 }
