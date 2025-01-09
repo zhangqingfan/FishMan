@@ -18,6 +18,11 @@ public class WorldManager : MonoBehaviour
         _instance = this;
     }
 
+    private void Start()
+    {
+        
+    }
+
     private void OnDestroy()
     {
         foreach(var item in addressHandles.Values)

@@ -381,6 +381,7 @@ GameObject:
   - component: {fileID: 674074521}
   - component: {fileID: 674074523}
   - component: {fileID: 674074524}
+  - component: {fileID: 674074525}
   m_Layer: 0
   m_Name: WorldManager
   m_TagString: Untagged
@@ -448,6 +449,19 @@ MonoBehaviour:
   - {fileID: 1273442305}
   fishPrefab: {fileID: 4276648904083818682, guid: db9b9482ae9f241619015119784ced70,
     type: 3}
+--- !u!114 &674074525
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 674074520}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 170224c4dd046e646a2f80abbf9ab0d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mat: {fileID: 2100000, guid: 51d0f5e62f0443644aec3be9cd7887be, type: 2}
 --- !u!1 &689064487
 GameObject:
   m_ObjectHideFlags: 0
