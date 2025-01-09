@@ -1,7 +1,5 @@
 using BehaviourTree;
 using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class ShipAI : BehaviourTree.Node
@@ -30,6 +28,7 @@ public class Greeting : Node
 {
     Transform playerShip;
     NpcShip npcShip;
+    Transform helloPanelTrans;
 
     public Greeting(NpcShip npcShip)
     {
@@ -40,14 +39,17 @@ public class Greeting : Node
     {
         while(true)
         {
+            yield return null;
+
             var dis = (playerShip.position - npcShip.transform.position).magnitude;
-            if(dis > 2f)
+            //Debug.Log(dis);
+            if(dis > 12f)
             {
                 result = ExecResult.Failure;
                 yield break;
             }
 
-            Debug.Log("Say hello!!");
+           
         }
     }
 }
@@ -62,6 +64,8 @@ public class ShipWander : Node
 
     public override IEnumerator Exec()
     {
+        Debug.Log("wandering");
+        result = ExecResult.Success;
         yield break;
     }
 }

@@ -54,13 +54,14 @@ public class CollisionSensor : MonoBehaviour
 
     bool DetectCollision(Vector3 forward)
     {
-        var centerPoint = transform.Find("centerPoint").transform;
-        var offsetZ = centerPoint.localPosition.z;
+        var centerGo = transform.Find("centerPoint");
+        var offsetZ = centerGo == null ? 0 : centerGo.transform.localPosition.z;
+        var centerPoint = centerGo == null ? Vector3.zero : centerGo.transform.position;
 
         var startPoints = new List<Vector3>
         {
             boxCollider.transform.position,
-            centerPoint.position,
+            centerPoint,
             transform.TransformPoint(new Vector3(boxCollider.size.x / 2, boxCollider.size.y / 2, boxCollider.size.z / 2 + offsetZ)),
             transform.TransformPoint(new Vector3(boxCollider.size.x / 2, boxCollider.size.y / 2, -boxCollider.size.z / 2 + offsetZ)),
             transform.TransformPoint(new Vector3(-boxCollider.size.x / 2, boxCollider.size.y / 2, boxCollider.size.z / 2 + offsetZ)),
