@@ -60,12 +60,12 @@ public class DrawRing : MonoBehaviour
         for(int i = 0, j = 0; i < vertex.Length - 2; i += 2, j += 6)
         {
             triangles[j] = i;
-            triangles[j + 1] = i + 1;
-            triangles[j + 2] = i + 2;
+            triangles[j + 1] = i + 2;
+            triangles[j + 2] = i + 1;
 
             triangles[j + 3] = i + 2;
-            triangles[j + 4] = i + 1;
-            triangles[j + 5] = i + 3;
+            triangles[j + 4] = i + 3;
+            triangles[j + 5] = i + 1;
         }
         triangles[triangleCount - 6] = 0;
         triangles[triangleCount - 5] = 1;
