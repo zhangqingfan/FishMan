@@ -32,16 +32,6 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 9d64b38a29aea034398da178322a7ca5
-    m_Address: NpcShip
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: c2307f600da4340378f593c24b0fe2dd
-    m_Address: Ship
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 13a8be735e34f214ea531dfe1ee33bfd
     m_Address: Assets/Prefab/Shark.prefab
     m_ReadOnly: 0

@@ -29,6 +29,7 @@ public class Greeting : Node
     Transform playerShip;
     NpcShip npcShip;
     Camera renderCamera;
+    float length = 18f;
 
     public Greeting(NpcShip npcShip)
     {
@@ -39,7 +40,7 @@ public class Greeting : Node
     public override IEnumerator Exec()
     {
         var dis = (playerShip.position - npcShip.transform.position).magnitude;
-        if (dis > 18f)
+        if (dis > length)
         {
             result = ExecResult.Failure;
             npcShip.greetPanel.localScale = Vector3.zero;
@@ -54,7 +55,7 @@ public class Greeting : Node
             npcShip.greetPanel.rotation = renderCamera.transform.rotation;
 
             dis = (playerShip.position - npcShip.transform.position).magnitude;
-            if(dis > 18f)
+            if(dis > length)
             {
                 npcShip.greetPanel.DOScale(Vector3.zero, 0.1f);
                 result = ExecResult.Failure;
