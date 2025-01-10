@@ -1,7 +1,7 @@
 using BehaviourTree;
 using System.Collections;
 using UnityEngine;
-
+using DG.Tweening;
 public class ShipAI : BehaviourTree.Node
 {
     NpcShip ship;
@@ -28,28 +28,38 @@ public class Greeting : Node
 {
     Transform playerShip;
     NpcShip npcShip;
-    Transform helloPanelTrans;
+    Camera renderCamera;
 
     public Greeting(NpcShip npcShip)
     {
         playerShip = GameObject.Find("Ship").transform;
         this.npcShip = npcShip;
+        renderCamera = Camera.main;
     }
     public override IEnumerator Exec()
     {
-        while(true)
+        var dis = (playerShip.position - npcShip.transform.position).magnitude;
+        if (dis > 18f)
+        {
+            result = ExecResult.Failure;
+            npcShip.greetPanel.localScale = Vector3.zero;
+            yield break;
+        }
+
+        npcShip.greetPanel.DOScale(new Vector3(1, 1, 1), 0.1f);
+
+        while (true)
         {
             yield return null;
+            npcShip.greetPanel.rotation = renderCamera.transform.rotation;
 
-            var dis = (playerShip.position - npcShip.transform.position).magnitude;
-            //Debug.Log(dis);
-            if(dis > 12f)
+            dis = (playerShip.position - npcShip.transform.position).magnitude;
+            if(dis > 18f)
             {
+                npcShip.greetPanel.DOScale(Vector3.zero, 0.1f);
                 result = ExecResult.Failure;
                 yield break;
             }
-
-           
         }
     }
 }
@@ -73,6 +83,7 @@ public class ShipWander : Node
 public class NpcShip : Actor
 {
     ShipAI shipAI;
+    public Transform greetPanel;
 
     void Start()
     {
