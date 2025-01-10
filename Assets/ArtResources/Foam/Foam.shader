@@ -7,7 +7,7 @@ Shader "Unlit/Foam"
     }
     SubShader
     {
-        Tags { "RenderType"="Transparent" }
+        Tags { "Queue"="Transparent" }
         LOD 100
 
         Pass
