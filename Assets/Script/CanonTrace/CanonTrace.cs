@@ -16,12 +16,12 @@ public class CanonTrace : MonoBehaviour
             lineRenderer = transform.AddComponent<LineRenderer>();
     }
 
-    void CaculateInitialSpeed(float maxRange)
+    public void CaculateInitialSpeed(float maxRange)
     {
         initialSpeed = Mathf.Sqrt(maxRange * Physics.gravity.y);
     }
 
-    void DrawTrajectory(float angle)
+    public void DrawTrajectory(float angle)
     {
         float g = Physics.gravity.y;
 
@@ -37,14 +37,15 @@ public class CanonTrace : MonoBehaviour
         {
             float z = velocityX * timeStep;
             float y = velocityY * timeStep - 0.5f * g * timeStep * timeStep;
-            positionList.Add(new Vector3(0, y, z));
+            var worldPos = transform.TransformPoint(new Vector3(0, y, z));
+            positionList.Add(worldPos);
         }
 
         lineRenderer.positionCount = pointsCount;
         lineRenderer.SetPositions(positionList.ToArray());
     }
 
-    float CalculateLaunchAngle(float targetDistance, float initialSpeed)
+    public float CalculateLaunchAngle(float targetDistance)
     {
         float g = Physics.gravity.y;
 
