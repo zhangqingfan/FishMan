@@ -62,6 +62,15 @@ public partial class @Controller: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""LeftClick"",
+                    ""type"": ""Button"",
+                    ""id"": ""d99dcd29-c5ae-4148-9d99-2f83ef36a35e"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -152,6 +161,17 @@ public partial class @Controller: IInputActionCollection2, IDisposable
                     ""action"": ""MouseScroll"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""4d081c3d-14dc-442f-983f-cd520002b629"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""LeftClick"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -164,6 +184,7 @@ public partial class @Controller: IInputActionCollection2, IDisposable
         m_PC_RightClick = m_PC.FindAction("RightClick", throwIfNotFound: true);
         m_PC_MouseOffset = m_PC.FindAction("MouseOffset", throwIfNotFound: true);
         m_PC_MouseScroll = m_PC.FindAction("MouseScroll", throwIfNotFound: true);
+        m_PC_LeftClick = m_PC.FindAction("LeftClick", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -229,6 +250,7 @@ public partial class @Controller: IInputActionCollection2, IDisposable
     private readonly InputAction m_PC_RightClick;
     private readonly InputAction m_PC_MouseOffset;
     private readonly InputAction m_PC_MouseScroll;
+    private readonly InputAction m_PC_LeftClick;
     public struct PCActions
     {
         private @Controller m_Wrapper;
@@ -237,6 +259,7 @@ public partial class @Controller: IInputActionCollection2, IDisposable
         public InputAction @RightClick => m_Wrapper.m_PC_RightClick;
         public InputAction @MouseOffset => m_Wrapper.m_PC_MouseOffset;
         public InputAction @MouseScroll => m_Wrapper.m_PC_MouseScroll;
+        public InputAction @LeftClick => m_Wrapper.m_PC_LeftClick;
         public InputActionMap Get() { return m_Wrapper.m_PC; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -258,6 +281,9 @@ public partial class @Controller: IInputActionCollection2, IDisposable
             @MouseScroll.started += instance.OnMouseScroll;
             @MouseScroll.performed += instance.OnMouseScroll;
             @MouseScroll.canceled += instance.OnMouseScroll;
+            @LeftClick.started += instance.OnLeftClick;
+            @LeftClick.performed += instance.OnLeftClick;
+            @LeftClick.canceled += instance.OnLeftClick;
         }
 
         private void UnregisterCallbacks(IPCActions instance)
@@ -274,6 +300,9 @@ public partial class @Controller: IInputActionCollection2, IDisposable
             @MouseScroll.started -= instance.OnMouseScroll;
             @MouseScroll.performed -= instance.OnMouseScroll;
             @MouseScroll.canceled -= instance.OnMouseScroll;
+            @LeftClick.started -= instance.OnLeftClick;
+            @LeftClick.performed -= instance.OnLeftClick;
+            @LeftClick.canceled -= instance.OnLeftClick;
         }
 
         public void RemoveCallbacks(IPCActions instance)
@@ -297,5 +326,6 @@ public partial class @Controller: IInputActionCollection2, IDisposable
         void OnRightClick(InputAction.CallbackContext context);
         void OnMouseOffset(InputAction.CallbackContext context);
         void OnMouseScroll(InputAction.CallbackContext context);
+        void OnLeftClick(InputAction.CallbackContext context);
     }
 }
