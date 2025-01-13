@@ -7,7 +7,9 @@ public class PlayerController : MonoBehaviour
 {
     static public PlayerController Instance { get; private set; }
     Controller controller;
+    [HideInInspector]
     public bool isHold = false;
+    public bool showRing = false;
 
     private void Awake()
     {
@@ -28,11 +30,22 @@ public class PlayerController : MonoBehaviour
     private void Start()
     {
         StartCoroutine(MonitorRightClick());
+        StartCoroutine(MonitorLeftClick());
     }
 
     public Vector2 GetMovement()
     {
         return controller.PC.Move.ReadValue<Vector2>(); 
+    }
+
+    public Vector2 GetMouseOffset()
+    {
+        return controller.PC.MouseOffset.ReadValue<Vector2>();
+    }
+
+    public Vector2 GetMouseScroll() 
+    {
+        return controller.PC.MouseScroll.ReadValue<Vector2>();
     }
 
     IEnumerator MonitorRightClick()
@@ -53,5 +66,31 @@ public class PlayerController : MonoBehaviour
             isHold = false;
             holdFrameCount = 0;
         }
-    } 
+    }
+
+    public IEnumerator MonitorLeftClick()
+    {
+        while (true)
+        {
+            yield return null;
+
+            if (isHold == true)
+            {
+                showRing = false;
+                continue;
+            }
+
+            if (controller.PC.LeftClick.ReadValue<float>() > 0)
+            {
+                showRing = true;
+                continue;
+            }
+
+            if (controller.PC.RightClick.ReadValue<float>() > 0)
+            {
+                showRing = false;
+                continue;
+            }
+        }
+    }
 }

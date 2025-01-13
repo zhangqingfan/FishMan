@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class DrawRing : MonoBehaviour
 {
-    [Range(0.1f, 10)]
+    [Range(0.1f, 10f)]
     public float scale = 1;
 
     [Range(0.01f, 0.9f)]
@@ -18,7 +18,7 @@ public class DrawRing : MonoBehaviour
     MeshRenderer meshRenderer;
     bool canOnValidate = false;
 
-    private void Start()
+    private void Awake()
     {
         meshFilter = gameObject.GetComponent<MeshFilter>();
         if(meshFilter == null)
@@ -29,6 +29,7 @@ public class DrawRing : MonoBehaviour
             meshRenderer = gameObject.AddComponent<MeshRenderer>();
         
         CreateCircle();
+        meshRenderer.enabled = false;
         canOnValidate = true;
     }
 
@@ -60,12 +61,12 @@ public class DrawRing : MonoBehaviour
         for(int i = 0, j = 0; i < vertex.Length - 2; i += 2, j += 6)
         {
             triangles[j] = i;
-            triangles[j + 1] = i + 1;
-            triangles[j + 2] = i + 2;
+            triangles[j + 1] = i + 2;
+            triangles[j + 2] = i + 1;
 
             triangles[j + 3] = i + 2;
-            triangles[j + 4] = i + 1;
-            triangles[j + 5] = i + 3;
+            triangles[j + 4] = i + 3;
+            triangles[j + 5] = i + 1;
         }
         triangles[triangleCount - 6] = 0;
         triangles[triangleCount - 5] = 1;
