@@ -24,10 +24,9 @@ public class CanonTrace : MonoBehaviour
         renderCamera = Camera.main;
     }
 
-    private void Update()
+    void LateUpdate()
     {
-        var showRing = PlayerController.Instance.showRing;
-        GetComponent<MeshRenderer>().enabled = showRing;
+        var showRing = PlayerController.Instance.showRing;        
         lineRenderer.enabled = showRing;
 
         if (showRing == true)
@@ -88,7 +87,7 @@ public class CanonTrace : MonoBehaviour
             var curTimeStep = timeStep * i;
             float z = velocityX * curTimeStep;
             float y = velocityY * curTimeStep - 0.5f * g * curTimeStep * curTimeStep;
-            var worldPos = transform.TransformPoint(new Vector3(0, y, z / 2));  //Œ¥Ω‚÷Æ√’£ø£ø£ø£ø
+            var worldPos = transform.TransformPoint(new Vector3(0, y, z));
             positionList.Add(worldPos);
         }
 

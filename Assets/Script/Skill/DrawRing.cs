@@ -1,10 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class DrawRing : MonoBehaviour
 {
-    [Range(0.1f, 10f)]
+    [Range(5f, 20f)]
     public float scale = 1;
 
     [Range(0.01f, 0.9f)]
@@ -37,6 +35,12 @@ public class DrawRing : MonoBehaviour
     {
         if (canOnValidate == true)
             CreateCircle();
+    }
+
+    private void LateUpdate()
+    {
+        var showRing = PlayerController.Instance.showRing;
+        GetComponent<MeshRenderer>().enabled = showRing;
     }
 
     void CreateCircle()
