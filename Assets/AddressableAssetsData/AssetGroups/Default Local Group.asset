@@ -28,7 +28,12 @@ MonoBehaviour:
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 13a8be735e34f214ea531dfe1ee33bfd
-    m_Address: Assets/Prefab/Shark.prefab
+    m_Address: Shark
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c24ce1ec4a0f949419ff0b0394f29c3c
+    m_Address: Ball
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

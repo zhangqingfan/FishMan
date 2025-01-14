@@ -9,18 +9,12 @@ public class WorldManager : MonoBehaviour
 {
     Dictionary<string, AsyncOperationHandle<GameObject>> addressHandles = new Dictionary<string, AsyncOperationHandle<GameObject>>();
     Dictionary<string, Queue<GameObject>> goPool = new Dictionary<string, Queue<GameObject>>();
-    WorldManager _instance;
-    public WorldManager Instance => _instance;
+    public static WorldManager Instance;
     public static readonly float height = -10f;
 
     private void Awake()
     {
-        _instance = this;
-    }
-
-    private void Start()
-    {
-        
+        Instance = this;
     }
 
     private void OnDestroy()
@@ -30,12 +24,13 @@ public class WorldManager : MonoBehaviour
             Addressables.Release(item);
         }
     }
-    public void CreateObject(string name, Vector3 position, float time = 5f)
+
+    public GameObject CreateObject(string name, Vector3 position, float time = 5f)
     {
         if (goPool.ContainsKey(name) == false)
         {
             LoadFromAA(name, position, time);
-            return;
+            return null;
         }
 
         if (goPool[name].Count == 0)
@@ -46,15 +41,33 @@ public class WorldManager : MonoBehaviour
 
         var obj = goPool[name].Dequeue();
         obj.transform.position = position;
-        StartCoroutine(ShowObject(name, obj, time));
+
+        if(time >= 0)
+            StartCoroutine(ShowObject(name, obj, time));
+        
+        return obj;
     }
-     
-    IEnumerator ShowObject(string name, GameObject effect, float time)
+
+    IEnumerator ShowObject(string name, GameObject gameObject, float time)
     {
-        effect.SetActive(true);
-        yield return new WaitForSeconds(time);
-        effect.SetActive(false);
-        goPool[name].Enqueue(effect);
+        if (time >= 0f)
+        {
+            gameObject.SetActive(true);
+            yield return new WaitForSeconds(time);
+        }
+        ReleaseObject(name, gameObject);
+    }
+
+    public void ReleaseObject(string name, GameObject gameObject)
+    {
+        if (goPool.ContainsKey(name) == false)
+        {
+            Debug.Log("Memory pool does not contain " + name);
+            return;
+        }            
+
+        gameObject.SetActive(false);
+        goPool[name].Enqueue(gameObject);
     }
 
     bool LoadFromAA(string name, Vector3 position, float time = 5f)

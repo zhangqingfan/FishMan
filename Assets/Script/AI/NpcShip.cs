@@ -75,7 +75,7 @@ public class ShipWander : Node
 
     public override IEnumerator Exec()
     {
-        Debug.Log("wandering");
+        //Debug.Log("wandering");
         result = ExecResult.Success;
         yield break;
     }
