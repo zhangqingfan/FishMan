@@ -52,13 +52,12 @@ public class CanonTrace : MonoBehaviour
                 hitPoint = hitInfo.point;
                 var startPoint = gameObject.transform.position;
                 var offset = hitPoint - startPoint;
-                offset.y = 0;
+                
 
+                //todo...–ﬁ∏ƒ’‚¿Ô
                 var rotation = Quaternion.LookRotation(offset);
-                var euler = rotation.eulerAngles;
-                euler.x = 0;
-                euler.z = 0;
-                gameObject.transform.rotation = Quaternion.Euler(euler);
+
+                gameObject.transform.rotation = rotation;// Quaternion.Euler(euler);
 
                 eulerX = CalculateLaunchAngle(offset.magnitude);                
                 DrawTrajectory(eulerX);
