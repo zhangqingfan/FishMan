@@ -15,8 +15,8 @@ public class PathFinding : MonoBehaviour
     public LayerMask layer;
     [Range(10, 100)]
     public int maxConnectLength = 100;
-
-    WayPoint[] wayPoints;
+    [HideInInspector]
+    public WayPoint[] wayPoints;
     HashSet<WayPoint> openSet = new HashSet<WayPoint>();
     HashSet<WayPoint> closeSet = new HashSet<WayPoint>();
 
@@ -156,7 +156,7 @@ public class PathFinding : MonoBehaviour
 #if UNITY_EDITOR
     void OnDrawGizmos()
     {
-        return;
+        //return;
         if (wayPoints == null)
             return;
 

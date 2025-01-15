@@ -2,6 +2,7 @@ using BehaviourTree;
 using System.Collections;
 using UnityEngine;
 using DG.Tweening;
+using System.Collections.Generic;
 public class ShipAI : BehaviourTree.Node
 {
     NpcShip ship;
@@ -68,14 +69,44 @@ public class Greeting : Node
 public class ShipWander : Node
 {
     NpcShip npcShip;
+    List<Vector3> wayPoints = new List<Vector3> ();
     public ShipWander(NpcShip npcShip)
     {
         this.npcShip = npcShip;
     }
 
+    WayPoint FindRandomWayPoint()
+    {
+        int index = Random.Range(0, PathFinding.instance.wayPoints.Length);
+        return PathFinding.instance.wayPoints.Length == 0 ? null : PathFinding.instance.wayPoints[index];
+    }
+
+    //todo...修改这里有bug，被打断之后就没办法继续寻路了！
     public override IEnumerator Exec()
     {
-        //Debug.Log("wandering");
+        var endPoint = FindRandomWayPoint();
+        if(endPoint == null)
+        {
+            result = ExecResult.Failure;
+            yield break;
+        }
+
+        wayPoints = PathFinding.instance.FindPath(npcShip.gameObject.transform.position, endPoint.transform.position);
+        var curIndex = 0;
+        while(curIndex < wayPoints.Count)
+        {
+            yield return null;
+
+            var dis = Vector3.Distance(npcShip.gameObject.transform.position, wayPoints[curIndex]);
+            if(dis < 1.0f)
+            {
+                curIndex++;
+                continue;
+            }
+
+            npcShip.steerBehaviour.Arrive(wayPoints[curIndex]);
+        }
+
         result = ExecResult.Success;
         yield break;
     }
