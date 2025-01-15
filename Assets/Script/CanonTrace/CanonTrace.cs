@@ -9,10 +9,13 @@ public class CanonTrace : MonoBehaviour
     public float timeStep = 0.05f;
     
     float initialSpeed;
-    LineRenderer lineRenderer;
     float g = -Physics.gravity.y;
+    LineRenderer lineRenderer;
     Camera renderCamera;
     Vector3 hitPoint;
+
+    float fireCD = 2f;
+    float passedFireTime = 0f;
 
     void Start()
     {
@@ -20,14 +23,16 @@ public class CanonTrace : MonoBehaviour
         if (lineRenderer == null)
             lineRenderer = transform.AddComponent<LineRenderer>();
 
-        CaculateInitialSpeed(12.3f);
         renderCamera = Camera.main;
+        WorldManager.Instance.CreateObject("Ball", gameObject.transform.position, 0f); // pre-warm memory pool;
+
+        var radius = transform.parent.GetComponentInChildren<DrawRing>().scale;
+        CaculateInitialSpeed(radius);
     }
 
-    private void Update()
+    void Update()
     {
-        var showRing = PlayerController.Instance.showRing;
-        GetComponent<MeshRenderer>().enabled = showRing;
+        var showRing = PlayerController.Instance.showRing;        
         lineRenderer.enabled = showRing;
 
         if (showRing == true)
@@ -39,25 +44,39 @@ public class CanonTrace : MonoBehaviour
             screenPosition.z = 1.5f;
             var endPosition = renderCamera.ScreenToWorldPoint(screenPosition);
 
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            //Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
+            float eulerX = 0f;
             if (Physics.Raycast(startPosition, endPosition - startPosition, out RaycastHit hitInfo, Mathf.Infinity, 1 << LayerMask.NameToLayer("Sea")))
             {
                 hitPoint = hitInfo.point;
                 var startPoint = gameObject.transform.position;
                 var offset = hitPoint - startPoint;
-                offset.y = 0;
+                
 
+                //todo...修改这里
                 var rotation = Quaternion.LookRotation(offset);
-                var euler = rotation.eulerAngles;
-                euler.x = 0;
-                euler.z = 0;
-                gameObject.transform.rotation = Quaternion.Euler(euler);
 
-                var eulerX = CalculateLaunchAngle(offset.magnitude);                
+                gameObject.transform.rotation = rotation;// Quaternion.Euler(euler);
+
+                eulerX = CalculateLaunchAngle(offset.magnitude);                
                 DrawTrajectory(eulerX);
                 //Debug.Log(offset.magnitude + " / " + eulerX );
             }
+
+            if(true && passedFireTime >= fireCD)
+            {
+                Debug.Log(eulerX);
+                var ball = WorldManager.Instance.CreateObject("Ball", gameObject.transform.position, -1f);
+                var velocity = gameObject.transform.rotation * Quaternion.Euler(-eulerX, 0, 0) * Vector3.forward;
+                velocity = velocity.normalized * initialSpeed;
+                //velocity = transform.TransformDirection(velocity);
+                ball.GetComponent<Ball>().AddVelocity(velocity);
+
+                passedFireTime = 0f;
+            }
+
+            passedFireTime += Time.deltaTime;
         }
     }
 
@@ -88,7 +107,7 @@ public class CanonTrace : MonoBehaviour
             var curTimeStep = timeStep * i;
             float z = velocityX * curTimeStep;
             float y = velocityY * curTimeStep - 0.5f * g * curTimeStep * curTimeStep;
-            var worldPos = transform.TransformPoint(new Vector3(0, y, z / 2));  //未解之谜？？？？
+            var worldPos = transform.TransformPoint(new Vector3(0, y, z));
             positionList.Add(worldPos);
         }
 

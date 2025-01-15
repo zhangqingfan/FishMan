@@ -8,13 +8,14 @@ using UnityEngine.ResourceManagement.AsyncOperations;
 public class WorldManager : MonoBehaviour
 {
     Dictionary<string, AsyncOperationHandle<GameObject>> addressHandles = new Dictionary<string, AsyncOperationHandle<GameObject>>();
-    Dictionary<string, Queue<GameObject>> effectPool = new Dictionary<string, Queue<GameObject>>();
+    Dictionary<string, Queue<GameObject>> goPool = new Dictionary<string, Queue<GameObject>>();
+    public static WorldManager Instance;
+    public static readonly float fishHeight = -10f;
+    public static readonly float seaHeight = 0f;
 
-    public static float height = -10f;
-
-    private void Start()
+    private void Awake()
     {
-
+        Instance = this;
     }
 
     private void OnDestroy()
@@ -24,31 +25,50 @@ public class WorldManager : MonoBehaviour
             Addressables.Release(item);
         }
     }
-    public void CreateEffect(string name, Vector3 position, float time = 5f)
+
+    public GameObject CreateObject(string name, Vector3 position, float time = 5f)
     {
-        if (effectPool.ContainsKey(name) == false)
+        if (goPool.ContainsKey(name) == false)
         {
             LoadFromAA(name, position, time);
-            return;
+            return null;
         }
 
-        if (effectPool[name].Count == 0)
+        if (goPool[name].Count == 0)
         {
             GameObject go = Instantiate(addressHandles[name].Result, position, Quaternion.identity);
-            effectPool[name].Enqueue(go);
+            goPool[name].Enqueue(go);
         }
 
-        var obj = effectPool[name].Dequeue();
+        var obj = goPool[name].Dequeue();
         obj.transform.position = position;
-        StartCoroutine(ShowEffect(name, obj, time));
+
+        if(time >= 0)
+            StartCoroutine(ShowObject(name, obj, time));
+        
+        return obj;
     }
-     
-    IEnumerator ShowEffect(string name, GameObject effect, float time)
+
+    IEnumerator ShowObject(string name, GameObject gameObject, float time)
     {
-        effect.SetActive(true);
-        yield return new WaitForSeconds(time);
-        effect.SetActive(false);
-        effectPool[name].Enqueue(effect);
+        if (time >= 0f)
+        {
+            gameObject.SetActive(true);
+            yield return new WaitForSeconds(time);
+        }
+        ReleaseObject(name, gameObject);
+    }
+
+    public void ReleaseObject(string name, GameObject gameObject)
+    {
+        if (goPool.ContainsKey(name) == false)
+        {
+            Debug.Log("Memory pool does not contain " + name);
+            return;
+        }            
+
+        gameObject.SetActive(false);
+        goPool[name].Enqueue(gameObject);
     }
 
     bool LoadFromAA(string name, Vector3 position, float time = 5f)
@@ -64,7 +84,7 @@ public class WorldManager : MonoBehaviour
                 if(addressHandles.ContainsKey(name) == false)
                 {
                     addressHandles[name] = handle;
-                    effectPool[name] = new Queue<GameObject>();
+                    goPool[name] = new Queue<GameObject>();
                 }
                 else
                 {
@@ -73,7 +93,7 @@ public class WorldManager : MonoBehaviour
                 }
 
                 var obj = Instantiate(addressHandles[name].Result, position, Quaternion.identity);                
-                StartCoroutine(ShowEffect(name, obj, time));
+                StartCoroutine(ShowObject(name, obj, time));
             }
             else
             {
