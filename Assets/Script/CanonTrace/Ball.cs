@@ -12,7 +12,7 @@ public class Ball : MonoBehaviour
 
     void Update()
     {
-        if(transform.position.y < WorldManager.height) 
+        if(transform.position.y < WorldManager.seaHeight) 
         {
             WorldManager.Instance.CreateObject("Splash", transform.position);
             WorldManager.Instance.ReleaseObject("Ball", gameObject);           

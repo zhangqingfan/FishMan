@@ -114,7 +114,7 @@ public class SteerBehaviour : MonoBehaviour
     {
         var targetPos = new Vector3(UnityEngine.Random.Range(-1f, 1f), UnityEngine.Random.Range(-1f, 1f), UnityEngine.Random.Range(-1f, 1f)) * wanderRange;
         targetTrans.position = originalPos + targetPos;
-        var y = targetTrans.position.y > WorldManager.height ? WorldManager.height : targetTrans.position.y;
+        var y = targetTrans.position.y > WorldManager.fishHeight ? WorldManager.fishHeight : targetTrans.position.y;
         targetTrans.position = new Vector3(targetTrans.position.x, y, targetTrans.position.z);
 
         var wanderTime = UnityEngine.Random.Range(wanderTimeRange.x, wanderTimeRange.y);
