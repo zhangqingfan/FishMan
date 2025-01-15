@@ -1,13 +1,19 @@
+using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+
+class CoroutineMono : MonoBehaviour
+{
+
+}
 
 namespace BehaviourTree
 {
     public abstract class Node
     {
         protected static MonoBehaviour mono;
-        static string lockthis = "lock";
+        static string lockObject = "lock";
 
         public enum ExecResult
         {
@@ -17,15 +23,15 @@ namespace BehaviourTree
         }
         public Node()
         {
-            result = ExecResult.InProcess;
+            result = ExecResult.Failure;
             nodeList = new List<Node>();
 
-            lock(lockthis) 
-            { 
-                if(mono == null)
+            lock (lockObject)
+            {
+                if (mono == null)
                 {
                     var go = new GameObject("AI_Mono");
-                    mono = go.AddComponent<MonoBehaviour>();
+                    mono = go.AddComponent<CoroutineMono>();
                 }
             }
         }
@@ -39,14 +45,17 @@ namespace BehaviourTree
     {
         public override IEnumerator Exec()
         {
+            result = ExecResult.InProcess;
             foreach (Node node in nodeList)
             {
                 yield return mono.StartCoroutine(node.Exec());
-                if (node.result == ExecResult.Failure)
-                    break;
+                if (node.result == ExecResult.Success)
+                {
+                    result = ExecResult.Success;
+                    yield break;
+                }
             }
-
-            result = ExecResult.Success;
+            result = ExecResult.Failure;
         }
     }
 

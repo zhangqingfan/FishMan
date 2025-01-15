@@ -22,8 +22,18 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 0103c100de533fd4ab5ace8f7e2a0503
-    m_Address: Foam
+  - m_GUID: db9b9482ae9f241619015119784ced70
+    m_Address: Fish
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 13a8be735e34f214ea531dfe1ee33bfd
+    m_Address: Shark
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c24ce1ec4a0f949419ff0b0394f29c3c
+    m_Address: Ball
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

@@ -72,7 +72,7 @@ public class FishFlockManager : MonoBehaviour
                     continue;
 
                 var pos = UnityEngine.Random.onUnitSphere * spawnRadius;
-                pos.y = WorldManager.height - spawnRadius;
+                pos.y = WorldManager.fishHeight - spawnRadius;
                 pos.y *= spawnHeightScale;
                 fishFlockTargets[i] = pos + gameObject.transform.position;
             }

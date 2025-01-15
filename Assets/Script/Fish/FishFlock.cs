@@ -55,7 +55,7 @@ public class FishFlock : MonoBehaviour
             var fish = fishArray[index];
 
             fish.position += (fish.rotation * Vector3.forward).normalized * fish.speed * deltaTime;
-            fish.position.y = fish.position.y > WorldManager.height ? WorldManager.height : fish.position.y;
+            fish.position.y = fish.position.y > WorldManager.fishHeight ? WorldManager.fishHeight : fish.position.y;
             //Debug.Log(fish.position.y);
             var direction = Quaternion.LookRotation((fish.target - fish.position).normalized);
             fish.rotation = Quaternion.RotateTowards(fish.rotation, direction, 0.5f);
@@ -93,7 +93,7 @@ public class FishFlock : MonoBehaviour
                 return;
             }
 
-            var random = new Unity.Mathematics.Random((uint)DateTime.Now.Ticks + (uint)index);
+            var random = new Unity.Mathematics.Random((uint)(math.cos(index * 50) * 100) + (uint)index);
             if (random.NextFloat() < 6.0f)
             {
                 var pos = new Vector3(2 * random.NextFloat() - 1f, 2 * random.NextFloat() - 1f, 2 * random.NextFloat() - 1f).normalized;
@@ -141,7 +141,7 @@ public class FishFlock : MonoBehaviour
             var fish = jobFish.fishArray[i];
 
             fish.position = pos + flockPosition;
-            fish.position.y = fish.position.y > WorldManager.height ? WorldManager.height : fish.position.y;
+            fish.position.y = fish.position.y > WorldManager.fishHeight ? WorldManager.fishHeight : fish.position.y;
             fish.rotation = Quaternion.identity;
             fish.speed = jobFish.minSpeed;
             fish.nextUpdateTime = 0;
