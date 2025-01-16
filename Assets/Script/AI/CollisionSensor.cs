@@ -57,7 +57,8 @@ public class CollisionSensor : MonoBehaviour
     {
         var centerGo = transform.Find("centerPoint");
         var offsetZ = centerGo == null ? 0 : centerGo.transform.localPosition.z;
-        var centerPoint = centerGo == null ? Vector3.zero : centerGo.transform.position;
+        var centerPoint = centerGo == null ? transform.position : centerGo.transform.position;
+        forward.Normalize();
 
         var startPoints = new List<Vector3>
         {

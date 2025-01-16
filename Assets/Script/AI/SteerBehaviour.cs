@@ -44,15 +44,21 @@ public class SteerBehaviour : MonoBehaviour
          var result = collisionSensor.AvoidCollision(rb.velocity, out var newVelocity);
          if(result == true)
           {
-                //TOOD...吃完饭回来改进！
-                rb.velocity = newVelocity.normalized * maxSpeed;
-          }
+            rb.velocity = newVelocity.normalized * maxSpeed * 0.5f;
+            //rb.velocity = Vector3.Lerp(rb.velocity, newVelocity.normalized * maxSpeed, Time.deltaTime);
+        }
 
         ApplySteering();
         FaceTarget();
         //Debug.DrawLine(transform.position, transform.position + velocity, Color.green);
     }
     
+    public void Stop()
+    {
+        steerVelocity = Vector3.zero;
+        rb.velocity = Vector3.zero;
+    }
+
     public void Seek(Vector3 target)
     {
         var v3 = target - transform.position;

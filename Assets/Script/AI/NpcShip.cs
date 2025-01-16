@@ -49,6 +49,7 @@ public class Greeting : Node
         }
 
         npcShip.greetPanel.DOScale(new Vector3(1, 1, 1), 0.1f);
+        npcShip.steerBehaviour.Stop();
 
         while (true)
         {
@@ -70,6 +71,8 @@ public class ShipWander : Node
 {
     NpcShip npcShip;
     List<Vector3> wayPoints = new List<Vector3> ();
+    int curIndex = 0;
+
     public ShipWander(NpcShip npcShip)
     {
         this.npcShip = npcShip;
@@ -81,32 +84,31 @@ public class ShipWander : Node
         return PathFinding.instance.wayPoints.Length == 0 ? null : PathFinding.instance.wayPoints[index];
     }
 
-    //todo...修改这里有bug，被打断之后就没办法继续寻路了！
     public override IEnumerator Exec()
     {
-        var endPoint = FindRandomWayPoint();
-        if(endPoint == null)
-        {
-            result = ExecResult.Failure;
-            yield break;
-        }
+        yield return null;
 
-        wayPoints = PathFinding.instance.FindPath(npcShip.gameObject.transform.position, endPoint.transform.position);
-        var curIndex = 0;
-        while(curIndex < wayPoints.Count)
+        if (curIndex >= wayPoints.Count)
         {
-            yield return null;
-
-            var dis = Vector3.Distance(npcShip.gameObject.transform.position, wayPoints[curIndex]);
-            if(dis < 1.0f)
+            curIndex = 0;
+            var endPoint = FindRandomWayPoint();
+            if (endPoint == null)
             {
-                curIndex++;
-                continue;
+                result = ExecResult.Failure;
+                yield break;
             }
 
-            npcShip.steerBehaviour.Arrive(wayPoints[curIndex]);
+            wayPoints = PathFinding.instance.FindPath(npcShip.gameObject.transform.position, endPoint.transform.position);
+            foreach (var p in wayPoints)
+                Debug.Log(p);
         }
 
+        npcShip.steerBehaviour.Arrive(wayPoints[curIndex]);
+
+        var dis = Vector3.Distance(npcShip.gameObject.transform.position, wayPoints[curIndex]);
+        if(dis < 1.0f)
+            curIndex++;
+        
         result = ExecResult.Success;
         yield break;
     }
@@ -126,5 +128,6 @@ public class NpcShip : Actor
     void Update()
     {
         shipAI.Update();
+        Debug.Log(transform.position);
     }
 }

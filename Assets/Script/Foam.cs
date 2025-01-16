@@ -4,7 +4,9 @@ using UnityEngine;
 
 public class Foam : MonoBehaviour
 {
+#pragma warning disable CS0414 // 字段“Foam.speed”已被赋值，但从未使用过它的值
     int speed = 10;
+#pragma warning restore CS0414 // 字段“Foam.speed”已被赋值，但从未使用过它的值
     Vector3 oldPos = Vector3.zero;
     float oldSpeed = 0;
     ParticleSystem ps;
