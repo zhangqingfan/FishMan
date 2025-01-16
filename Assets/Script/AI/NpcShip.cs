@@ -2,6 +2,7 @@ using BehaviourTree;
 using System.Collections;
 using UnityEngine;
 using DG.Tweening;
+using System.Collections.Generic;
 public class ShipAI : BehaviourTree.Node
 {
     NpcShip ship;
@@ -48,6 +49,7 @@ public class Greeting : Node
         }
 
         npcShip.greetPanel.DOScale(new Vector3(1, 1, 1), 0.1f);
+        npcShip.steerBehaviour.Stop();
 
         while (true)
         {
@@ -68,14 +70,45 @@ public class Greeting : Node
 public class ShipWander : Node
 {
     NpcShip npcShip;
+    List<Vector3> wayPoints = new List<Vector3> ();
+    int curIndex = 0;
+
     public ShipWander(NpcShip npcShip)
     {
         this.npcShip = npcShip;
     }
 
+    WayPoint FindRandomWayPoint()
+    {
+        int index = Random.Range(0, PathFinding.instance.wayPoints.Length);
+        return PathFinding.instance.wayPoints.Length == 0 ? null : PathFinding.instance.wayPoints[index];
+    }
+
     public override IEnumerator Exec()
     {
-        //Debug.Log("wandering");
+        yield return null;
+
+        if (curIndex >= wayPoints.Count)
+        {
+            curIndex = 0;
+            var endPoint = FindRandomWayPoint();
+            if (endPoint == null)
+            {
+                result = ExecResult.Failure;
+                yield break;
+            }
+
+            wayPoints = PathFinding.instance.FindPath(npcShip.gameObject.transform.position, endPoint.transform.position);
+            foreach (var p in wayPoints)
+                Debug.Log(p);
+        }
+
+        npcShip.steerBehaviour.Arrive(wayPoints[curIndex]);
+
+        var dis = Vector3.Distance(npcShip.gameObject.transform.position, wayPoints[curIndex]);
+        if(dis < 1.0f)
+            curIndex++;
+        
         result = ExecResult.Success;
         yield break;
     }
@@ -95,5 +128,6 @@ public class NpcShip : Actor
     void Update()
     {
         shipAI.Update();
+        Debug.Log(transform.position);
     }
 }

@@ -5,15 +5,16 @@ using UnityEngine;
 public class CollisionSensor : MonoBehaviour
 {
     public LayerMask collisionLayer;
+    public float avoidFactor = 4;
     int deltaSensorAngle = 20;
-    float detectLength = 0;
-
+   
     BoxCollider boxCollider;
+    float avoidDistance;
 
     void Start()
     { 
         boxCollider = GetComponent<BoxCollider>();
-        detectLength = 4 * boxCollider.size.z;
+        avoidDistance = avoidFactor * boxCollider.size.z;
     }
 
     public bool AvoidCollision(Vector3 velocity, out Vector3 newVelocity)
@@ -56,7 +57,8 @@ public class CollisionSensor : MonoBehaviour
     {
         var centerGo = transform.Find("centerPoint");
         var offsetZ = centerGo == null ? 0 : centerGo.transform.localPosition.z;
-        var centerPoint = centerGo == null ? Vector3.zero : centerGo.transform.position;
+        var centerPoint = centerGo == null ? transform.position : centerGo.transform.position;
+        forward.Normalize();
 
         var startPoints = new List<Vector3>
         {
@@ -72,7 +74,7 @@ public class CollisionSensor : MonoBehaviour
             transform.TransformPoint(new Vector3(-boxCollider.size.x / 2, -boxCollider.size.y / 2, -boxCollider.size.z / 2 + offsetZ)),
 
         };
-        return RayDetect(forward, startPoints, detectLength, collisionLayer);
+        return RayDetect(forward, startPoints, avoidDistance, collisionLayer);
     }
 
     bool RayDetect(Vector3 forward, List<Vector3> startPoints, float detectLength, LayerMask collisionLayer)

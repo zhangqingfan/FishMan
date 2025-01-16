@@ -67,7 +67,7 @@ public class ShipController : MonoBehaviour
         }
 
         rb.AddRelativeForce(momentum * move.y * Vector3.forward);
-
+        
         var rotationY = Quaternion.AngleAxis(turnAngle * move.x, Vector3.up);
         transform.localRotation *= rotationY;
 
@@ -85,5 +85,6 @@ public class ShipController : MonoBehaviour
             var newEuler = new Vector3(wheelTrans.localEulerAngles.x, rotateY, wheelTrans.localEulerAngles.z);
             wheelTrans.localEulerAngles = newEuler;
         }
+        //Debug.Log(transform.position);
     }
 }

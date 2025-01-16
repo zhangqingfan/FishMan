@@ -66,7 +66,7 @@ public class CanonTrace : MonoBehaviour
 
             if(true && passedFireTime >= fireCD)
             {
-                Debug.Log(eulerX);
+                //Debug.Log(eulerX);
                 var ball = WorldManager.Instance.CreateObject("Ball", gameObject.transform.position, -1f);
                 var velocity = gameObject.transform.rotation * Quaternion.Euler(-eulerX, 0, 0) * Vector3.forward;
                 velocity = velocity.normalized * initialSpeed;
