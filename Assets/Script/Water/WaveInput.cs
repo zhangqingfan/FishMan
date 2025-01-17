@@ -9,6 +9,7 @@ public class WaveInput
     public float amplitude;
     public float length;
     public float speed;
+    [Range(0, 6.28f)]
     public float angle;
 }
 
@@ -16,11 +17,20 @@ public class WaveInput
 public class WaveSetting : ScriptableObject
 {
     public List<WaveInput> input = new List<WaveInput>();
-    [HideInInspector]
-    public Vector4[] inputs = new Vector4[6];
-
-    public void Update()
+    
+    List<Vector4> waveData = new List<Vector4>();
+    public Vector4[] GetWaveData()
     {
-        //TODO...
+        waveData.Clear();
+        foreach(var e  in input)
+        {
+            var wave = new Vector4();
+            wave.x = e.amplitude;
+            wave.y = e.length;
+            wave.z = e.speed;
+            wave.w = e.angle;
+            waveData.Add(wave);
+        }
+        return waveData.ToArray();
     }
 }

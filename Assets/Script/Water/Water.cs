@@ -9,11 +9,11 @@ public class Water : MonoBehaviour
 
     void WaterUpdate(WaveSetting setting)
     {
-        var count = setting.inputs.Length;
+        var count = setting.input.Count;
         if(count > 0 ) 
         {
             Shader.SetGlobalInt("dataCount", count);
-            Shader.SetGlobalVectorArray("waveData", setting.inputs);
+            Shader.SetGlobalVectorArray("waveData", setting.GetWaveData());
         }
     }
 

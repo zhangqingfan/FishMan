@@ -6,9 +6,9 @@ public class WaterMesh: MonoBehaviour
 {
     public Material mat;
     [Range(2, 100)]
-    public int segmentsPerEdge = 2;
+    public int segmentsPerEdge;
     [Range(10, 100)]
-    public int length = 10;
+    public int length;
 
     List<Grid> grids = new List<Grid>();
     bool canOnValidate = false;

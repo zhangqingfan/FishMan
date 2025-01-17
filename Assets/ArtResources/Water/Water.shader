@@ -1,4 +1,4 @@
-Shader "Unlit/Water"
+Shader "Water"
 {
     Properties
     {
@@ -27,18 +27,16 @@ Shader "Unlit/Water"
 
             struct v2f
             {
-                float3 vertex : POSITION;
+                float4 vertex : POSITION;
                 float3 normal : TEXCOORD0;
             };
-
 
             v2f vert (appdata v)
             {
                 Wave wave = SampleWave(v.vertex, _Time.y);
-                float4 pos = float4(wave.pos.x, wave.pos.y, wave.pos.z, 1.0);
-                
+
                 v2f o;
-                o.vertex = UnityObjectToClipPos(pos);
+                o.vertex = UnityObjectToClipPos(wave.pos);
                 o.normal = wave.normal;
 
                 return o;

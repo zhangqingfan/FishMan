@@ -30,9 +30,8 @@ float3 SamplePosition(float3 pos, float time)
         float phase = dot(pos, direction) * k - omega * time;
         float displacement = amplitude * sin(phase);
 
-        newPos.z += displacement;
+        newPos.y += displacement;
     }
-     
     return newPos;
 }
 
