@@ -1,8 +1,9 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.UIElements;
+using static Water;
 
-public class WaterMesh: MonoBehaviour 
+partial class Water : MonoBehaviour 
 {
     public Material mat;
     [Range(2, 100)]
@@ -12,33 +13,48 @@ public class WaterMesh: MonoBehaviour
 
     List<Grid> grids = new List<Grid>();
     bool canOnValidate = false;
+
     public class Grid
     {
         public GameObject centerPoint;
+        public Vector3 offset;
         public int lodLevel;
     }
 
     private void OnValidate()
     {
         if(canOnValidate)
-            ModifyPlane(grids[0], length, segmentsPerEdge);
+        {
+            for(int i = 0; i < grids.Count; i++)
+            {
+                Destroy(grids[i].centerPoint);
+            }
+            grids.Clear();
+            CreatePlanes();
+        }
     }
 
     private void Start()
     {
-        grids.Add(CreatePlane(this.transform, Vector3.zero, 10, 2));
         canOnValidate = true;
+        CreatePlanes();
     }
 
-    void ModifyPlane(Grid grid, float length, int segmentsPerEdge)
+    //todo...bug
+    void CreatePlanes()
     {
-        var centerpoint = grid.centerPoint.transform.localPosition;
-        Destroy(grid.centerPoint);
-        grids.Clear();
-        grids.Add(CreatePlane(transform, centerpoint, length, segmentsPerEdge));
+        for (int i = -1; i <= 1; i++)
+        {
+            for (int j = -1; j <= 1; j++)
+            {
+                var offset = new Vector3(i, 0, j);
+                Debug.Log(Vector3.zero + offset * length);
+                grids.Add(CreatePlane(this.transform, Vector3.zero + offset * length, length, segmentsPerEdge, offset));
+            }
+        }
     }
 
-    public Grid CreatePlane(Transform parent, Vector3 localCenterPos, float length, int segmentsPerEdge)
+    public Grid CreatePlane(Transform parent, Vector3 localCenterPos, float length, int segmentsPerEdge, Vector3 gridOffset)
     {
         Mesh mesh = new Mesh();
         Mathf.Clamp(segmentsPerEdge, 2, segmentsPerEdge);
@@ -99,6 +115,7 @@ public class WaterMesh: MonoBehaviour
         grid.lodLevel = 0;
         grid.centerPoint.transform.parent = parent;
         grid.centerPoint.transform.localPosition = localCenterPos;
+        grid.offset = gridOffset;
 
         return grid;
     }

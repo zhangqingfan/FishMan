@@ -2,8 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(WaterMesh))]
-public class Water : MonoBehaviour
+public partial class Water : MonoBehaviour
 {
     public WaveSetting setting;
 
