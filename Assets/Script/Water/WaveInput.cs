@@ -15,7 +15,12 @@ public class WaveInput
 [CreateAssetMenu(fileName = "WaveSetting", menuName = "Custom/WaveSetting")]
 public class WaveSetting : ScriptableObject
 {
-    public List<WaveInput> inputList;
+    public List<WaveInput> input = new List<WaveInput>();
+    [HideInInspector]
+    public Vector4[] inputs = new Vector4[6];
 
-    
+    public void Update()
+    {
+        //TODO...
+    }
 }
