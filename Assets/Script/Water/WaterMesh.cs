@@ -1,9 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
-using static Water;
 
-public class Water: MonoBehaviour 
+public class WaterMesh: MonoBehaviour 
 {
     public Material mat;
     [Range(2, 100)]
