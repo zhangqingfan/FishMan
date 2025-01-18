@@ -47,6 +47,6 @@ public class Reflection : MonoBehaviour
         var dir = Vector3.Reflect(cameraTrans.forward, transform.up);
         reflectCamera.transform.LookAt(reflectCamera.transform.position + dir);//
 
-        reflectCamera.Render();
+        UniversalRenderPipeline.RenderSingleCamera(context, reflectCamera);
     }
 }
