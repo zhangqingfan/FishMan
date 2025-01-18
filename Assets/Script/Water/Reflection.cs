@@ -11,20 +11,8 @@ public class Reflection : MonoBehaviour
 
     public LayerMask reflectLayerMask;
 
-    [Range(0.3f, 1.0f)]
-    public float reflectQualilty;
-
     Camera reflectCamera;
     Transform cameraTrans;
-
-    private void OnValidate()
-    {
-        return;
-        renderTexture.Release();
-        renderTexture.width = Mathf.RoundToInt(Screen.width * reflectQualilty);
-        renderTexture.height = Mathf.RoundToInt(Screen.height * reflectQualilty);
-        renderTexture.Create();
-    }
 
     private void OnEnable()
     {
@@ -42,13 +30,14 @@ public class Reflection : MonoBehaviour
 
         var go = new GameObject("Reflection Camera");
         reflectCamera = go.AddComponent<Camera>();
+        //reflectCamera.CopyFrom(Camera.main);  //不知道为什么不能在这里调用
         reflectCamera.enabled = false;
         reflectCamera.targetTexture = renderTexture;
-        reflectMaterial.SetTexture("_ReflectionTex", renderTexture);
-        //Shader.SetGlobalTexture("_ReflectionTex", renderTexture);
 
-        reflectCamera.CopyFrom(Camera.main);
-        reflectCamera.cullingMask = reflectLayerMask;
+        //reflectCamera.CopyFrom(Camera.main);  //在这里调用就可以，很奇怪！
+        Shader.SetGlobalTexture("_ReflectionTex", renderTexture);
+
+        Debug.Log(reflectCamera.pixelRect);
     }
 
     void BeginRender(ScriptableRenderContext context, Camera camera)
@@ -56,7 +45,8 @@ public class Reflection : MonoBehaviour
         if (camera != Camera.main)
             return;
 
- 
+        reflectCamera.CopyFrom(Camera.main);
+        reflectCamera.cullingMask = reflectLayerMask;
 
         var dis = Vector3.Dot(cameraTrans.position - transform.position, transform.up);
         var pos = cameraTrans.position - transform.up.normalized * dis * 2;
@@ -65,23 +55,21 @@ public class Reflection : MonoBehaviour
         var dir = Vector3.Reflect(cameraTrans.forward, transform.up);
         reflectCamera.transform.rotation = Quaternion.LookRotation(dir);
 
+        UniversalRenderPipeline.RenderSingleCamera(context, reflectCamera);
+    }
+
+    /*void BeginRender(ScriptableRenderContext context, Camera camera)
+    {
+        if (camera != Camera.main)
+            return;
+
+        
+
         var viewPos = Camera.main.worldToCameraMatrix.MultiplyPoint(transform.position);
         var viewNormal = Camera.main.worldToCameraMatrix.MultiplyVector(-transform.up);
         float w = -Vector3.Dot(viewPos, viewNormal);
         reflectCamera.projectionMatrix = reflectCamera.CalculateObliqueMatrix(new Vector4(viewNormal.x, viewNormal.y, viewNormal.z, w));
 
         UniversalRenderPipeline.RenderSingleCamera(context, reflectCamera);
-    }
-
-    /*
-    var plane = CameraSpacePlane(mainCamera.worldToCameraMatrix, transform.position - transform.up * 0.001f, -transform.up);
-    Vector4 CameraSpacePlane(Matrix4x4 worldToCameraMatrix, Vector3 pos, Vector3 normal)
-    {
-        Vector3 viewPos = worldToCameraMatrix.MultiplyPoint(pos);
-        Vector3 viewNormal = worldToCameraMatrix.MultiplyVector(normal).normalized;
-        
-        return new Vector4(viewNormal.x, viewNormal.y, viewNormal.z, w);
-    }
-    */
-
+    }*/
 }
