@@ -6,7 +6,7 @@ using static Water;
 partial class Water : MonoBehaviour 
 {
     public Material mat;
-    [Range(2, 100)]
+    [Range(1, 100)]
     public int segmentsPerEdge;
     [Range(10, 100)]
     public int length;
@@ -40,7 +40,6 @@ partial class Water : MonoBehaviour
         CreatePlanes();
     }
 
-    //todo...bug
     void CreatePlanes()
     {
         for (int i = -1; i <= 1; i++)
@@ -48,7 +47,6 @@ partial class Water : MonoBehaviour
             for (int j = -1; j <= 1; j++)
             {
                 var offset = new Vector3(i, 0, j);
-                Debug.Log(Vector3.zero + offset * length);
                 grids.Add(CreatePlane(this.transform, Vector3.zero + offset * length, length, segmentsPerEdge, offset));
             }
         }
@@ -62,8 +60,8 @@ partial class Water : MonoBehaviour
 
         var vertex = new Vector3[(segmentsPerEdge + 1) * (segmentsPerEdge + 1)];
         var offset = length / segmentsPerEdge;
-        vertex[0].x = localCenterPos.x - offset * segmentsPerEdge / 2;
-        vertex[0].z = localCenterPos.y - offset * segmentsPerEdge / 2;
+        vertex[0].x = -offset * segmentsPerEdge / 2;
+        vertex[0].z = -offset * segmentsPerEdge / 2;
         vertex[0].y = 0;
 
         for (int i = 0; i <= segmentsPerEdge; i++)
@@ -74,6 +72,7 @@ partial class Water : MonoBehaviour
                 vertex[index].x = vertex[0].x + i * offset;
                 vertex[index].z = vertex[0].z + j * offset;
                 vertex[index].y = 0;
+                Debug.Log(vertex[index]);
             }
         }
 

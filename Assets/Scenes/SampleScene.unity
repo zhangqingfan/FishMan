@@ -169,7 +169,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   setting: {fileID: 11400000, guid: f1510f84ddd0ac946a397bb2c40d649f, type: 2}
   mat: {fileID: 2100000, guid: e0118334d7916744d92387c236619e82, type: 2}
-  segmentsPerEdge: 2
+  segmentsPerEdge: 1
   length: 10
 --- !u!114 &29159951
 MonoBehaviour:
@@ -183,9 +183,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 170224c4dd046e646a2f80abbf9ab0d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mat: {fileID: 2100000, guid: e0118334d7916744d92387c236619e82, type: 2}
-  segmentsPerEdge: 32
-  length: 57
 --- !u!1 &330585543
 GameObject:
   m_ObjectHideFlags: 0
