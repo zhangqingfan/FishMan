@@ -16,9 +16,15 @@ public class WaveInput
 [CreateAssetMenu(fileName = "WaveSetting", menuName = "Custom/WaveSetting")]
 public class WaveSetting : ScriptableObject
 {
-    public List<WaveInput> input = new List<WaveInput>();
-    
+    public bool isChanged = false;
+    public List<WaveInput> input = new List<WaveInput>();   
     List<Vector4> waveData = new List<Vector4>();
+
+    void OnValidate()
+    {
+        isChanged = true;
+    }
+
     public Vector4[] GetWaveData()
     {
         waveData.Clear();
