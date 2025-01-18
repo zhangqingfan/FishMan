@@ -19,6 +19,7 @@ public class Reflection : MonoBehaviour
 
     private void OnValidate()
     {
+        return;
         renderTexture.Release();
         renderTexture.width = Mathf.RoundToInt(Screen.width * reflectQualilty);
         renderTexture.height = Mathf.RoundToInt(Screen.height * reflectQualilty);
