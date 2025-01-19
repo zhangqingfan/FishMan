@@ -1,120 +1,76 @@
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
-using static Water;
 
 partial class Water : MonoBehaviour 
 {
-    public Material mat;
-    [Range(1, 100)]
+    [Range(2, 30)]
     public int segmentsPerEdge;
+    
     [Range(10, 100)]
     public int length;
+    
+    public GameObject seaMeshPrefab;
+    public Material mat;
 
-    List<Grid> grids = new List<Grid>();
+    List<Grid> gridList = new List<Grid>();
+    List<Vector3> offsetList = new List<Vector3>();
     bool canOnValidate = false;
 
     public class Grid
     {
-        public GameObject centerPoint;
+        public GameObject mesh;
         public Vector3 offset;
-        public int lodLevel;
     }
 
     private void OnValidate()
     {
-        if(canOnValidate)
+        if (canOnValidate)
         {
-            for(int i = 0; i < grids.Count; i++)
+            for (int i = 0; i < gridList.Count; i++)
             {
-                Destroy(grids[i].centerPoint);
+                Destroy(gridList[i].mesh);
             }
-            grids.Clear();
-            CreatePlanes();
+            
+            gridList.Clear();
+            CreatePlanes(offsetList);
         }
     }
 
     private void Start()
     {
         canOnValidate = true;
-        CreatePlanes();
+
+        //offsetList.Add(new Vector3(-1, 0, -1));
+        //offsetList.Add(new Vector3(-1, 0, 0));
+        //offsetList.Add(new Vector3(-1, 0, 1));
+        //offsetList.Add(new Vector3(0, 0, -1));
+        offsetList.Add(new Vector3(0, 0, 0));
+        //offsetList.Add(new Vector3(0, 0, 1));
+        //offsetList.Add(new Vector3(1, 0, -1));
+        //offsetList.Add(new Vector3(1, 0, 0));
+        //offsetList.Add(new Vector3(1, 0, 1));
+
+        CreatePlanes(offsetList);
     }
 
-    void CreatePlanes()
+    void CreatePlanes(List<Vector3> offsets)
     {
-        for (int i = -1; i <= 1; i++)
+        for(int i = 0; i < offsets.Count; i++) 
         {
-            for (int j = -1; j <= 1; j++)
-            {
-                var offset = new Vector3(i, 0, j);
-                grids.Add(CreatePlane(this.transform, Vector3.zero + offset * length, length, segmentsPerEdge, offset));
-            }
+            gridList.Add(CreatePlane(offsets[i]));
         }
     }
 
-    public Grid CreatePlane(Transform parent, Vector3 localCenterPos, float length, int segmentsPerEdge, Vector3 gridOffset)
+    Grid CreatePlane(Vector3 offset)
     {
-        Mesh mesh = new Mesh();
-        Mathf.Clamp(segmentsPerEdge, 2, segmentsPerEdge);
-        segmentsPerEdge = (segmentsPerEdge % 2 == 0) ? segmentsPerEdge : segmentsPerEdge + 1;
-
-        var vertex = new Vector3[(segmentsPerEdge + 1) * (segmentsPerEdge + 1)];
-        var offset = length / segmentsPerEdge;
-        vertex[0].x = -offset * segmentsPerEdge / 2;
-        vertex[0].z = -offset * segmentsPerEdge / 2;
-        vertex[0].y = 0;
-
-        for (int i = 0; i <= segmentsPerEdge; i++)
-        {
-            for (int j = 0; j <= segmentsPerEdge; j++)
-            {
-                var index = i * (segmentsPerEdge + 1) + j;
-                vertex[index].x = vertex[0].x + i * offset;
-                vertex[index].z = vertex[0].z + j * offset;
-                vertex[index].y = 0;
-                Debug.Log(vertex[index]);
-            }
-        }
-
-        var triangleCount = segmentsPerEdge * segmentsPerEdge * 2 * 3;
-        var triangles = new int[triangleCount];
-        var k = 0;
-        for (int i = 0; i < segmentsPerEdge; i++)
-        {
-            for (int j = 0; j < segmentsPerEdge; j++)
-            {
-                triangles[k] = i * (segmentsPerEdge + 1) + j;
-                triangles[k + 1] = i * (segmentsPerEdge + 1) + j + 1;
-                triangles[k + 2] = (i + 1) * (segmentsPerEdge + 1) + j + 1;
-
-                triangles[k + 3] = i * (segmentsPerEdge + 1) + j;
-                triangles[k + 4] = (i + 1) * (segmentsPerEdge + 1) + j + 1;
-                triangles[k + 5] = (i + 1) * (segmentsPerEdge + 1) + j;
-                
-                k += 6;
-            }
-        }
-
-        var uvs = new Vector2[vertex.Length];
-        for (int i = 0; i < vertex.Length; i++)
-        {
-            uvs[i] = new Vector2(0.5f, 0.5f);            
-        }
-
-        mesh.vertices = vertex;
-        mesh.triangles = triangles;
-        mesh.uv = uvs;
+        var mesh = Instantiate(seaMeshPrefab, transform);
+        mesh.transform.localPosition = offset * length;
+        mesh.GetComponent<SeaMesh>().CreatePlane(length, segmentsPerEdge, mat);
 
         var grid = new Grid();
-        grid.centerPoint = new GameObject("center");
-        var mf = grid.centerPoint.AddComponent<MeshFilter>();
-        mf.mesh = mesh;
-        var mr = grid.centerPoint.AddComponent<MeshRenderer>();
-        mr.material = mat;
-        grid.lodLevel = 0;
-        grid.centerPoint.transform.parent = parent;
-        grid.centerPoint.transform.localPosition = localCenterPos;
-        grid.offset = gridOffset;
+        grid.offset = offset;
+        grid.mesh = mesh;
 
         return grid;
     }

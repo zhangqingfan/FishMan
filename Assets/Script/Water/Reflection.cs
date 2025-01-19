@@ -39,7 +39,6 @@ public class Reflection : MonoBehaviour
 
         Debug.Log(reflectCamera.pixelRect);
     }
-
     void BeginRender(ScriptableRenderContext context, Camera camera)
     {
         if (camera != Camera.main)
@@ -55,21 +54,11 @@ public class Reflection : MonoBehaviour
         var dir = Vector3.Reflect(cameraTrans.forward, transform.up);
         reflectCamera.transform.rotation = Quaternion.LookRotation(dir);
 
-        UniversalRenderPipeline.RenderSingleCamera(context, reflectCamera);
-    }
-
-    /*void BeginRender(ScriptableRenderContext context, Camera camera)
-    {
-        if (camera != Camera.main)
-            return;
-
-        
-
-        var viewPos = Camera.main.worldToCameraMatrix.MultiplyPoint(transform.position);
-        var viewNormal = Camera.main.worldToCameraMatrix.MultiplyVector(-transform.up);
+        var viewPos = reflectCamera.worldToCameraMatrix.MultiplyPoint(transform.position);
+        var viewNormal = reflectCamera.worldToCameraMatrix.MultiplyVector(transform.up);
         float w = -Vector3.Dot(viewPos, viewNormal);
         reflectCamera.projectionMatrix = reflectCamera.CalculateObliqueMatrix(new Vector4(viewNormal.x, viewNormal.y, viewNormal.z, w));
 
         UniversalRenderPipeline.RenderSingleCamera(context, reflectCamera);
-    }*/
+    }
 }
