@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WaveSetting
   isChanged: 0
   input:
-  - amplitude: 0.5
+  - amplitude: 0.1
     length: 30
     speed: 0.5
-    angle: 6.2
+    angle: 1.1
   - amplitude: 0.2
     length: 20
     speed: 0.1
@@ -28,5 +28,5 @@ MonoBehaviour:
     angle: 2.15
   - amplitude: 0.5
     length: 15
-    speed: 1
+    speed: 0.1
     angle: 4.71

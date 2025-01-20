@@ -61,5 +61,7 @@ public class SeaMesh : MonoBehaviour
         mf.mesh = mesh;
         var mr = gameObject.AddComponent<MeshRenderer>();
         mr.material = mat;
-     }
+
+        gameObject.layer = LayerMask.NameToLayer("Reflection");
+    }
 }
