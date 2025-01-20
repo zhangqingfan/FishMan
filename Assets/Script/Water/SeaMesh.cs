@@ -24,7 +24,7 @@ public class SeaMesh : MonoBehaviour
                 vertex[index].x = vertex[0].x + i * offset;
                 vertex[index].z = vertex[0].z + j * offset;
                 vertex[index].y = 0;
-                Debug.Log(vertex[index]);
+                //Debug.Log(vertex[index]);
             }
         }
 
