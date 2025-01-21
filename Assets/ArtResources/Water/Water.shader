@@ -14,7 +14,7 @@
         Pass
         {
             ZWrite Off
-            Blend SrcAlpha OneMinusSrcAlpha
+            //Blend SrcAlpha OneMinusSrcAlpha
 
             CGPROGRAM
             #pragma vertex vert
@@ -35,24 +35,22 @@
 
             half GetUnderWaterLength(float2 screenUV, float2 depth_distance)
             {
-                float depth = tex2D(_CameraDepthTexture, screenUV).r;
+                float depth = tex2D(_CameraDepthTexture, screenUV);
                 float linearDepth = LinearEyeDepth(depth);
                 
-                float totalLength = depth * depth_distance.y / depth_distance.x;
-                depth = totalLength - depth_distance.y;
-                return 10;
-                return depth;
+                float totalLength = linearDepth * depth_distance.y / depth_distance.x;
+                float underWaterLength = totalLength - depth_distance.y;
+
+                return underWaterLength;
             }
 
             half4 GetAbsorbColor(float2 distortUV, half underWaterLength) 
             {
-                //return float4(0,0,0,1);
-
                 float4 color = tex2D(_CameraOpaqueTexture, distortUV);
                 float absorbFactor = exp(-_AbsorbScale * underWaterLength);
                 absorbFactor = saturate(absorbFactor);
 
-                return float4(1,0,0,1);
+                return color * absorbFactor;
             }
 
             struct appdata
@@ -77,7 +75,7 @@
                 o.normal = mul(unity_ObjectToWorld, wave.normal);
                 o.screenPos = ComputeScreenPos(o.vertex);
                 
-                float4 viewPos = mul(UNITY_MATRIX_MV, v.vertex);
+                float4 viewPos = mul(UNITY_MATRIX_MV, wave.pos);
                 o.depth_distance.x = viewPos.z;
                 o.depth_distance.y = length(viewPos);
                 
@@ -88,16 +86,17 @@
             {
                 float4 col = (1, 1, 1, 1);
                 float2 screenUV = i.screenPos.xy / i.screenPos.w;
-                
+                                
                 //underWaterLength < 0 above water
                 //underWaterLength > 0 under water
+                //underWaterLength > 1000 nothing exist under water, just camera far plane
                 half  underWaterLength = GetUnderWaterLength(screenUV, i.depth_distance);
-                
-                float2 uvOffset = underWaterLength < 0 ? i.normal.zx * half2(0.02, 0.15) : i.normal.zx * saturate(i.depth_distance.x * _DistortScale); 
-                screenUV += uvOffset;
+                                
+                //float2 uvOffset = (underWaterLength < 0 || underWaterLength > 1000) ? i.normal.zx * half2(0.02, 0.15) : i.normal.zx * saturate(i.depth_distance.x * _DistortScale); 
+                //screenUV += uvOffset;
 
-                col = underWaterLength < 0 ? tex2D(_ReflectionTex, screenUV) : GetAbsorbColor(screenUV, underWaterLength); 
-               
+                col = (underWaterLength < 0 || underWaterLength > 1000)? tex2D(_ReflectionTex, screenUV) : GetAbsorbColor(screenUV, underWaterLength);
+                
                 col.w *= 0.8f;  
                 return col;
             }
