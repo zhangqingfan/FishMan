@@ -170,6 +170,7 @@ MonoBehaviour:
   setting: {fileID: 11400000, guid: f1510f84ddd0ac946a397bb2c40d649f, type: 2}
   segmentsPerEdge: 10
   length: 78
+  depth: 20
   seaMeshPrefab: {fileID: 7168705476046234756, guid: 06e6bd08c028f51488665b08908cb89a,
     type: 3}
   mat: {fileID: 2100000, guid: e0118334d7916744d92387c236619e82, type: 2}
@@ -189,7 +190,7 @@ MonoBehaviour:
   reflectMaterial: {fileID: 0}
   reflectLayerMask:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 0
 --- !u!1 &330585543
 GameObject:
   m_ObjectHideFlags: 0
@@ -276,8 +277,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.044326566, y: 0.87886465, z: -0.083299376, w: -0.46764657}
-  m_LocalPosition: {x: 0.9717064, y: 2.6795297, z: 11.223721}
+  m_LocalRotation: {x: -0.08797389, y: 0.8671844, z: -0.16532728, w: -0.46143124}
+  m_LocalPosition: {x: 3.5, y: 3.9, z: 12.9}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

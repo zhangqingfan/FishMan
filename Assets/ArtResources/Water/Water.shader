@@ -3,25 +3,27 @@
     Properties
     {
         _AbsorbScale("Absorb Scale", Range(0, 1)) = 0.5
-        _DepthScale("Depth Scale", Range(10, 30)) = 20
         _DistortScale("Distort Scale", Range(0, 1)) = 0.1
+
+        _SurfaceColor ("_SurfaceColor", Color) = (1, 1, 1, 1) 
+        _DeepColor ("_DeepColor", Color) = (1, 1, 1, 1) 
     }
     SubShader
     {
-        Tags { "Queue"="Transparent"  }
+        Tags { "Queue"="Transparent" }
         LOD 100
 
         Pass
         {
-            ZWrite Off
-            //Blend SrcAlpha OneMinusSrcAlpha
-
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
             
             #include "UnityCG.cginc"
+            #include "AutoLight.cginc"
+
             #include "GerstnerWave.cginc"
+            #include "UnityLightingCommon.cginc"
 
             sampler2D _ReflectionTex;
             //float4 _ReflectionTex_ST;
@@ -30,21 +32,27 @@
             sampler2D _CameraOpaqueTexture;
 
             float _AbsorbScale;
-            float _DepthScale;
             float _DistortScale;
-
+            int _WaterDepth;
+            float4 _SurfaceColor;
+            float4 _DeepColor;
+            
             half GetUnderWaterLength(float2 screenUV, float2 depth_distance)
             {
                 float depth = tex2D(_CameraDepthTexture, screenUV);
                 float linearDepth = LinearEyeDepth(depth);
-                
+
+                //exceed maximum water depth, so it is camera far plane, nothing under water. return 0 means it is the water surface.
+                if(linearDepth > _WaterDepth)
+                    return 0;    
+
                 float totalLength = linearDepth * depth_distance.y / depth_distance.x;
                 float underWaterLength = totalLength - depth_distance.y;
 
                 return underWaterLength;
             }
 
-            half4 GetAbsorbColor(float2 distortUV, half underWaterLength) 
+            half4 GetAbsorbColor(float2 distortUV, half underWaterLength)
             {
                 float4 color = tex2D(_CameraOpaqueTexture, distortUV);
                 float absorbFactor = exp(-_AbsorbScale * underWaterLength);
@@ -64,6 +72,8 @@
                 float3 normal : TEXCOORD0;
                 float4 screenPos : TEXCOORD1;
                 float2 depth_distance: TEXCOORD2;
+                float4 worldPos: TEXCOORD3;
+                SHADOW_COORDS(4) 
             };
 
             v2f vert (appdata v)
@@ -72,32 +82,63 @@
 
                 v2f o;
                 o.vertex = UnityObjectToClipPos(wave.pos); 
-                o.normal = mul(unity_ObjectToWorld, wave.normal);
+                o.normal = UnityObjectToWorldNormal(wave.normal);
                 o.screenPos = ComputeScreenPos(o.vertex);
                 
                 float4 viewPos = mul(UNITY_MATRIX_MV, wave.pos);
                 o.depth_distance.x = viewPos.z;
                 o.depth_distance.y = length(viewPos);
                 
+                o.worldPos = mul(unity_ObjectToWorld, wave.pos);
+                TRANSFER_SHADOW(o);
                 return o;
+            }
+
+            float4 GetLightColor(float4 albedo, float3 worldNormal, float3 worldPos, float shadowAtten)
+            {
+                float3 lambert = max(0, dot(worldNormal, -_WorldSpaceLightPos0));
+                float3 diffuseColor = _LightColor0.rgb * albedo * lambert;
+                return float4(worldNormal, 1);
+
+                float3 viewDir = _WorldSpaceCameraPos.xyz - worldPos;
+                float3 halfDir = normalize(_WorldSpaceLightPos0 + viewDir);
+                float3 specularColor = _LightColor0.rgb * pow(max(0, dot(worldNormal, halfDir)), 16);
+                float cc = max(0, dot(worldNormal, halfDir));
+
+                return float4(cc, cc, cc, 1);
+
+
+                fixed3 ambientColor = UNITY_LIGHTMODEL_AMBIENT.xyz * albedo;
+
+                return float4(ambientColor  + (diffuseColor + specularColor) * shadowAtten, 1);
             }
 
             fixed4 frag (v2f i) : SV_Target
             {
-                float4 col = (1, 1, 1, 1);
+                float4 col = (0, 0, 0, 1);
                 float2 screenUV = i.screenPos.xy / i.screenPos.w;
-                                
-                //underWaterLength < 0 above water
-                //underWaterLength > 0 under water
-                //underWaterLength > 1000 nothing exist under water, just camera far plane
-                half  underWaterLength = GetUnderWaterLength(screenUV, i.depth_distance);
-                                
-                //float2 uvOffset = (underWaterLength < 0 || underWaterLength > 1000) ? i.normal.zx * half2(0.02, 0.15) : i.normal.zx * saturate(i.depth_distance.x * _DistortScale); 
-                //screenUV += uvOffset;
-
-                col = (underWaterLength < 0 || underWaterLength > 1000)? tex2D(_ReflectionTex, screenUV) : GetAbsorbColor(screenUV, underWaterLength);
                 
-                col.w *= 0.8f;  
+                fixed shadow = SHADOW_ATTENUATION(i); 
+                col  = tex2D(_ReflectionTex, screenUV/* + i.normal.zx * half2(0.02, 0.15)*/);
+                col =  GetLightColor(col, i.normal, i.worldPos, shadow);
+                return col;
+
+
+                float2 distortUV = screenUV + i.normal.xz * saturate(i.depth_distance.x * _DistortScale);
+                //underWaterLength < 0 above water
+                //underWaterLength > 0 under water 
+                //underWaterLength = 0 water surface
+                half underWaterLength = GetUnderWaterLength(distortUV, i.depth_distance);
+
+                //if(underWaterLength == 0)
+                //col  tex2D(_ReflectionTex, );
+                //else
+                {
+                    //return GetAbsorbColor(distortUV, underWaterLength);
+                }
+                
+
+                
                 return col;
             }
             ENDCG

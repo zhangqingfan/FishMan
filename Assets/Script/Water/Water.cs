@@ -23,7 +23,5 @@ public partial class Water : MonoBehaviour
             WaterUpdate(setting);
             setting.isChanged = false;
         }
-
-        //
     }
 }

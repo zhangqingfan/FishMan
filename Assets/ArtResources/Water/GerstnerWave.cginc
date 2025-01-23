@@ -13,6 +13,7 @@ struct Wave
 float3 SamplePosition(float3 pos, float time)
 {
     float3 newPos = pos;
+    return newPos;
     
     for (int i = 0; i < dataCount; i++)
     {
@@ -35,11 +36,36 @@ float3 SamplePosition(float3 pos, float time)
     return newPos;
 }
 
+float3 GetOffsetPos(float radians, float3 originalPos, float time)
+{
+    float radius = 7.8;
+    float x = originalPos.x + radius * cos(radians);
+    float z = originalPos.z + radius * sin(radians);
+    float3 offsetPos = originalPos + float3(x, 0, z);
+    return SamplePosition(offsetPos, time);
+}
+
 float3 SampleNormal(float3 originalPos, float3 newPos, float time)
 {
-    float3 dx = SamplePosition((originalPos + float3(0.2, 0, 0)), time) - newPos;
-    float3 dy = SamplePosition((originalPos + float3(0, 0, 0.2)), time) - newPos;
-    return normalize(cross(dx, dy));
+    float deltaAngle = 90;
+    float3 normal = 0;
+    
+    for (int i = 0; i < 360 / deltaAngle - 1; i++)
+    {
+        float radians0 = i * deltaAngle * 3.14159 / 180.0;
+        float3 dx = GetOffsetPos(radians0, originalPos, time) - newPos;
+        
+        float radians1 = (i + 1) * deltaAngle * 3.14159 / 180.0;
+        float3 dy = GetOffsetPos(radians1, originalPos, time) - newPos;
+        
+        normal += cross(dx, dy);
+    }
+    
+    float3 dx = SamplePosition(originalPos + float3(1, 0, 0), time) - originalPos;
+    float3 dy = SamplePosition(originalPos + float3(0, 0, 1), time) - originalPos;
+
+    return cross(dy, dx);
+    return normalize(normal);
 }
 
 Wave SampleWave(float3 pos, float time)

@@ -9,6 +9,9 @@ partial class Water : MonoBehaviour
     
     [Range(10, 100)]
     public int length;
+
+    [Range(20, 60)]
+    public int depth;
     
     public GameObject seaMeshPrefab;
     public Material mat;
@@ -19,7 +22,8 @@ partial class Water : MonoBehaviour
 
     public class Grid
     {
-        public GameObject mesh;
+        public GameObject surface;
+        public GameObject bottom;
         public Vector3 offset;
     }
 
@@ -29,11 +33,13 @@ partial class Water : MonoBehaviour
         {
             for (int i = 0; i < gridList.Count; i++)
             {
-                Destroy(gridList[i].mesh);
+                Destroy(gridList[i].surface);
+                Destroy(gridList[i].bottom);
             }
             
             gridList.Clear();
             CreatePlanes(offsetList);
+            Shader.SetGlobalInt("_WaterDepth", depth);
         }
     }
 
@@ -52,6 +58,7 @@ partial class Water : MonoBehaviour
         //offsetList.Add(new Vector3(1, 0, 1));
 
         CreatePlanes(offsetList);
+        Shader.SetGlobalInt("_WaterDepth", depth);
     }
 
     void CreatePlanes(List<Vector3> offsets)
@@ -64,13 +71,18 @@ partial class Water : MonoBehaviour
 
     Grid CreatePlane(Vector3 offset)
     {
-        var mesh = Instantiate(seaMeshPrefab, transform);
-        mesh.transform.localPosition = offset * length;
-        mesh.GetComponent<SeaMesh>().CreatePlane(length, segmentsPerEdge, mat);
+        var surface = Instantiate(seaMeshPrefab, transform);
+        surface.transform.localPosition = offset * length;
+        surface.GetComponent<SeaMesh>().CreatePlane(length, segmentsPerEdge, mat);
+
+        var bottom = Instantiate(seaMeshPrefab, transform);
+        bottom.transform.localPosition = offset * length - transform.up * depth;
+        bottom.GetComponent<SeaMesh>().CreatePlane(length, 2, new Material(Shader.Find("Unlit/Color")));
 
         var grid = new Grid();
         grid.offset = offset;
-        grid.mesh = mesh;
+        grid.surface = surface;
+        grid.bottom = bottom;
 
         return grid;
     }
