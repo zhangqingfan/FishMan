@@ -45,8 +45,8 @@
                 float linearDepth = LinearEyeDepth(depth);
 
                 //exceed maximum water depth, so it is camera far plane, nothing under water. return 0 means it is the water surface.
-                if(linearDepth > _WaterDepth * _DepthScale)
-                    return 0;    
+                //if(linearDepth > 200)//)
+                 //   return 10;    
 
                 float totalLength = linearDepth * depth_distance.y / depth_distance.x;
                 float underWaterLength = totalLength - depth_distance.y;
@@ -57,10 +57,10 @@
             half4 GetAbsorbColor(float2 distortUV, half underWaterLength)
             {
                 float4 color = tex2D(_CameraOpaqueTexture, distortUV);
-                float absorbFactor = exp(-_AbsorbScale * underWaterLength);
-                absorbFactor = saturate(absorbFactor);
-
-                return color * absorbFactor;
+                float t = clamp(underWaterLength / _WaterDepth * _DepthScale, 0.0, 1.0);
+                float4 waterColor = lerp(_SurfaceColor, _DeepColor, t); 
+                //return float4(0, 1, 0, 1);
+                return color;//*  waterColor;
             }
 
             struct appdata
@@ -104,7 +104,6 @@
                 float3 viewDir = _WorldSpaceCameraPos.xyz - worldPos;
                 float3 halfDir = normalize(_WorldSpaceLightPos0 + viewDir);
                 float3 specularColor = float3(1, 1, 1) * pow(max(0, dot(worldNormal, halfDir)), 8);
-                //return float4(specularColor.xyz, 1);
                 
                 return float4((diffuseColor + specularColor) * shadowAtten, 1);
             }
@@ -115,27 +114,26 @@
                 float2 screenUV = i.screenPos.xy / i.screenPos.w;
                 
                 fixed shadow = SHADOW_ATTENUATION(i);
-                col  = tex2D(_ReflectionTex, screenUV + i.normal.zx * half2(0.02, 0.15));
+                //col  = tex2D(_ReflectionTex, screenUV + i.normal.zx * half2(0.02, 0.15));
 
-                col =  GetLightColor(col, i.normal, i.worldPos, shadow);
-                return col;
+                //col =  GetLightColor(col, i.normal, i.worldPos, shadow);
+                //return col;
+                half underWaterLength = GetUnderWaterLength(screenUV, i.depth_distance);
+                if(underWaterLength < 0)
+                {
+                    //return float4(1, 1, 1, 1);
 
-
-                float2 distortUV = screenUV + i.normal.xz * saturate(i.depth_distance.x * _DistortScale);
+                    float2 distortUV = screenUV;// + i.normal.xz * (i.depth_distance.x * _DistortScale);
+                    underWaterLength = GetUnderWaterLength(distortUV, i.depth_distance);
+                    col = GetAbsorbColor(distortUV, underWaterLength);
+                    return col;
+                }
+                               
                 //underWaterLength < 0 above water
                 //underWaterLength > 0 under water 
                 //underWaterLength = 0 water surface
-                half underWaterLength = GetUnderWaterLength(distortUV, i.depth_distance);
-
-                //if(underWaterLength == 0)
-                //col  tex2D(_ReflectionTex, );
-                //else
-                {
-                    //return GetAbsorbColor(distortUV, underWaterLength);
-                }
                 
-
-                
+                col  = tex2D(_ReflectionTex, screenUV);
                 return col;
             }
             ENDCG

@@ -173,7 +173,8 @@ MonoBehaviour:
   depth: 20
   seaMeshPrefab: {fileID: 7168705476046234756, guid: 06e6bd08c028f51488665b08908cb89a,
     type: 3}
-  mat: {fileID: 2100000, guid: e0118334d7916744d92387c236619e82, type: 2}
+  surfaceMat: {fileID: 2100000, guid: e0118334d7916744d92387c236619e82, type: 2}
+  bottomMat: {fileID: 2100000, guid: a1c88651b631ad04bb3ac5c34b758ae3, type: 2}
 --- !u!114 &29159952
 MonoBehaviour:
   m_ObjectHideFlags: 0

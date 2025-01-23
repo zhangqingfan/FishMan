@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 partial class Water : MonoBehaviour 
@@ -14,7 +13,8 @@ partial class Water : MonoBehaviour
     public int depth;
     
     public GameObject seaMeshPrefab;
-    public Material mat;
+    public Material surfaceMat;
+    public Material bottomMat;
 
     List<Grid> gridList = new List<Grid>();
     List<Vector3> offsetList = new List<Vector3>();
@@ -73,11 +73,11 @@ partial class Water : MonoBehaviour
     {
         var surface = Instantiate(seaMeshPrefab, transform);
         surface.transform.localPosition = offset * length;
-        surface.GetComponent<SeaMesh>().CreatePlane(length, segmentsPerEdge, mat);
+        surface.GetComponent<SeaMesh>().CreatePlane(length, segmentsPerEdge, surfaceMat);
 
         var bottom = Instantiate(seaMeshPrefab, transform);
         bottom.transform.localPosition = offset * length - transform.up * depth;
-        bottom.GetComponent<SeaMesh>().CreatePlane(length, 2, new Material(Shader.Find("Unlit/Color")));
+        bottom.GetComponent<SeaMesh>().CreatePlane(length, 2, bottomMat);
 
         var grid = new Grid();
         grid.offset = offset;

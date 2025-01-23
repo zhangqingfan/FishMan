@@ -91,10 +91,10 @@ Material:
     - _ClearCoatSmoothness: 0
     - _Cull: 2
     - _Cutoff: 0.5
-    - _DepthScale: 17.9
+    - _DepthScale: 1.531
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
-    - _DistortScale: 0.024
+    - _DistortScale: 0.005
     - _DstBlend: 0
     - _DstBlendAlpha: 0
     - _EnvironmentReflections: 1
