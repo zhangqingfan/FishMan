@@ -19,6 +19,7 @@ Shader "Unlit/Foam"
             #pragma vertex vert
             #pragma fragment frag
 
+            #include "GerstnerWave.cginc"
             #include "UnityCG.cginc"
 
             struct appdata
@@ -41,8 +42,11 @@ Shader "Unlit/Foam"
 
             v2f vert (appdata v)
             {
+                //也许可以抬高y位置0.1f????到时候测试看结果吧
+                Wave wave = SampleWave(v.vertex, _Time.y);
+
                 v2f o;
-                o.vertex = UnityObjectToClipPos(v.vertex);
+                o.vertex = UnityObjectToClipPos(wave.pos);
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
                 o.color = v.color;
                 return o;

@@ -2,6 +2,7 @@
 {
     Properties
     {
+        _DepthScale("Depth Scale", Range(1, 2)) = 1
         _AbsorbScale("Absorb Scale", Range(0, 1)) = 0.5
         _DistortScale("Distort Scale", Range(0, 1)) = 0.1
 
@@ -30,7 +31,8 @@
 
             sampler2D _CameraDepthTexture;
             sampler2D _CameraOpaqueTexture;
-
+            
+            float _DepthScale;
             float _AbsorbScale;
             float _DistortScale;
             int _WaterDepth;
@@ -43,7 +45,7 @@
                 float linearDepth = LinearEyeDepth(depth);
 
                 //exceed maximum water depth, so it is camera far plane, nothing under water. return 0 means it is the water surface.
-                if(linearDepth > _WaterDepth)
+                if(linearDepth > _WaterDepth * _DepthScale)
                     return 0;    
 
                 float totalLength = linearDepth * depth_distance.y / depth_distance.x;
@@ -72,7 +74,7 @@
                 float3 normal : TEXCOORD0;
                 float4 screenPos : TEXCOORD1;
                 float2 depth_distance: TEXCOORD2;
-                float4 worldPos: TEXCOORD3;
+                float3 worldPos: TEXCOORD3;
                 SHADOW_COORDS(4) 
             };
 
@@ -81,7 +83,7 @@
                 Wave wave = SampleWave(v.vertex, _Time.y);
 
                 v2f o;
-                o.vertex = UnityObjectToClipPos(wave.pos); 
+                o.vertex = UnityObjectToClipPos(wave.pos);
                 o.normal = UnityObjectToWorldNormal(wave.normal);
                 o.screenPos = ComputeScreenPos(o.vertex);
                 
@@ -96,21 +98,15 @@
 
             float4 GetLightColor(float4 albedo, float3 worldNormal, float3 worldPos, float shadowAtten)
             {
-                float3 lambert = max(0, dot(worldNormal, -_WorldSpaceLightPos0));
-                float3 diffuseColor = _LightColor0.rgb * albedo * lambert;
-                return float4(worldNormal, 1);
+                float3 diffuse = max(0, dot(worldNormal, _WorldSpaceLightPos0));
+                float3 diffuseColor = _LightColor0.rgb * albedo * diffuse;
 
                 float3 viewDir = _WorldSpaceCameraPos.xyz - worldPos;
                 float3 halfDir = normalize(_WorldSpaceLightPos0 + viewDir);
-                float3 specularColor = _LightColor0.rgb * pow(max(0, dot(worldNormal, halfDir)), 16);
-                float cc = max(0, dot(worldNormal, halfDir));
-
-                return float4(cc, cc, cc, 1);
-
-
-                fixed3 ambientColor = UNITY_LIGHTMODEL_AMBIENT.xyz * albedo;
-
-                return float4(ambientColor  + (diffuseColor + specularColor) * shadowAtten, 1);
+                float3 specularColor = float3(1, 1, 1) * pow(max(0, dot(worldNormal, halfDir)), 8);
+                //return float4(specularColor.xyz, 1);
+                
+                return float4((diffuseColor + specularColor) * shadowAtten, 1);
             }
 
             fixed4 frag (v2f i) : SV_Target
@@ -118,8 +114,9 @@
                 float4 col = (0, 0, 0, 1);
                 float2 screenUV = i.screenPos.xy / i.screenPos.w;
                 
-                fixed shadow = SHADOW_ATTENUATION(i); 
-                col  = tex2D(_ReflectionTex, screenUV/* + i.normal.zx * half2(0.02, 0.15)*/);
+                fixed shadow = SHADOW_ATTENUATION(i);
+                col  = tex2D(_ReflectionTex, screenUV + i.normal.zx * half2(0.02, 0.15));
+
                 col =  GetLightColor(col, i.normal, i.worldPos, shadow);
                 return col;
 
