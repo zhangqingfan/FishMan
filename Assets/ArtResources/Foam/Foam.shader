@@ -9,7 +9,7 @@ Shader "Unlit/Foam"
     {
         Tags { "Queue"="Transparent" }
         LOD 100
-
+          
         Pass
         {
             ZWrite Off
@@ -19,7 +19,7 @@ Shader "Unlit/Foam"
             #pragma vertex vert
             #pragma fragment frag
 
-            #include "GerstnerWave.cginc"
+            #include "../Water/GerstnerWave.cginc"
             #include "UnityCG.cginc"
 
             struct appdata

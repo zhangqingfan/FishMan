@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public partial class Water : MonoBehaviour
@@ -23,5 +21,8 @@ public partial class Water : MonoBehaviour
             WaterUpdate(setting);
             setting.isChanged = false;
         }
+
+        var vpMatrix = Camera.main.projectionMatrix * Camera.main.worldToCameraMatrix;
+        Shader.SetGlobalMatrix("_InverseVP", vpMatrix.inverse);
     }
 }
