@@ -125,7 +125,7 @@
 
             v2f vert (appdata v)
             {
-                Wave wave = SampleWave(v.vertex, _Time.y, v.uv);
+                Wave wave = SampleWave(v.vertex, _Time.y);
 
                 v2f o;
                 o.vertex = UnityObjectToClipPos(wave.pos);

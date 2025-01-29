@@ -3,6 +3,7 @@
 
 int dataCount;
 half4 waveData[20];
+float gridLength;
 
 struct Wave
 {
@@ -10,10 +11,13 @@ struct Wave
     float3 normal;
 };
 
-float3 SamplePosition(float3 pos, float time, float2 uv = float2(0, 0))
+float3 SamplePosition(float3 pos, float time)
 {
-    float3 newPos = pos;
+    float epsilon = 0.0001;
+    if (abs(pos.x) >= gridLength / 2 - epsilon || abs(pos.z) >= gridLength / 2 - epsilon)
+        return pos;
     
+    float3 newPos = pos;
     for (int i = 0; i < dataCount; i++)
     {
         float amplitude = waveData[i].x;

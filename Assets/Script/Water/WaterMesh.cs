@@ -66,8 +66,10 @@ partial class Water : MonoBehaviour
         offsetList.Add(new Vector3(1, 0, 1));
 
         CreatePlanes(offsetList);
-        Shader.SetGlobalInt("_WaterDepth", depth);
 
+        Shader.SetGlobalInt("_WaterDepth", depth);
+        Shader.SetGlobalFloat("gridLength", length);
+        
         StartCoroutine(CentralizeGameObject(goTrans));
     }
 
