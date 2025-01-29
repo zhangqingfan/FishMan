@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -50,7 +50,13 @@ public class SeaMesh : MonoBehaviour
         var uvs = new Vector2[vertex.Length];
         for (int i = 0; i < vertex.Length; i++)
         {
-            uvs[i] = new Vector2(0.5f, 0.5f);
+            uvs[i] = Vector2.zero;
+
+            //边缘点的uv统统设置成1,在Water Shader中不参与位移，保证不同的块之间没有破片
+            if (Mathf.Abs(vertex[i].x) == length / 2 || Mathf.Abs(vertex[i].z) == length / 2)
+            {
+                uvs[i] = new Vector2(1, 1);
+            }
         }
 
         mesh.vertices = vertex;

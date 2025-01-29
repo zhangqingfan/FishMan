@@ -3,12 +3,15 @@
     Properties
     {
         _DepthScale("Depth Scale", Range(0, 2)) = 1
-        _CausticsScale("Caustics Scale", Range(0, 1)) = 0.01
         _DistortScale("Distort Scale", Range(0, 5)) = 2
+        
+        _CausticsScale("Caustics Scale", Range(0, 1)) = 0.01
+        _CausticsnItensity("Caustics Itensity", Range(0, 3)) = 1
+        _CausticsTex ("Texture", 2D) = "white" {}
 
         _SurfaceColor ("_SurfaceColor", Color) = (1, 1, 1, 1) 
         _DeepColor ("_DeepColor", Color) = (1, 1, 1, 1) 
-        _CausticsTex ("Texture", 2D) = "white" {}
+        
     }
     SubShader
     {
@@ -37,6 +40,7 @@
             sampler2D _CameraOpaqueTexture;
             
             float _CausticsScale;
+            float _CausticsnItensity;
             float _DepthScale;
             float _DistortScale;
             int _WaterDepth;
@@ -86,26 +90,27 @@
 
                 //my approach
                 float3 opaqueWorldPos = GetUnderWaterWorldPos(uv, surfaceWorldPos, depth_distance);
-                fixed distance = length(surfaceWorldPos - opaqueWorldPos);                
-                //camera far plane //todo....好好想一想
-                if(opaqueWorldPos.z > 900)
+                
+                //camera far plane
+                if(length(_WorldSpaceCameraPos - opaqueWorldPos) > 500)
                     return float4(0, 0, 0, 0);
 
+                fixed distance = length(surfaceWorldPos - opaqueWorldPos);
                 float t = clamp(_DepthScale * distance / _WaterDepth, 0, 1);
-                fixed intensity = t * 5;
-                fixed scale = lerp(0.2, 1, 1 - t);
+                fixed scale = lerp(0.2, 0.8, 1 - t);
 
                 float2 causticsUV = opaqueWorldPos.xz  * scale * _CausticsScale;
                 causticsUV += 0.01 * sin(_Time.y);
 
                 float4 col = tex2D(_CausticsTex, causticsUV); 
-                col *= intensity;
+                col *= _CausticsnItensity;
                 return col;
             }
 
             struct appdata
             {
                 float4 vertex : POSITION;
+                float2 uv : TEXCOORD0;
             };
 
             struct v2f
@@ -120,7 +125,7 @@
 
             v2f vert (appdata v)
             {
-                Wave wave = SampleWave(v.vertex, _Time.y);
+                Wave wave = SampleWave(v.vertex, _Time.y, v.uv);
 
                 v2f o;
                 o.vertex = UnityObjectToClipPos(wave.pos);

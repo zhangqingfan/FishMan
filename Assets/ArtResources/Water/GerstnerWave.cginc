@@ -10,7 +10,7 @@ struct Wave
     float3 normal;
 };
 
-float3 SamplePosition(float3 pos, float time)
+float3 SamplePosition(float3 pos, float time, float2 uv = float2(0, 0))
 {
     float3 newPos = pos;
     
