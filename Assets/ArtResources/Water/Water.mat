@@ -91,8 +91,8 @@ Material:
     - _Blend: 0
     - _BlendModePreserveSpecular: 1
     - _BumpScale: 1
-    - _CausticsScale: 0.18
-    - _CausticsnItensity: 1.15
+    - _CausticsScale: 0.118
+    - _CausticsnItensity: 1.41
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
     - _Cull: 2
@@ -100,7 +100,7 @@ Material:
     - _DepthScale: 0.84
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
-    - _DistortScale: 0.92
+    - _DistortScale: 0.17
     - _DstBlend: 0
     - _DstBlendAlpha: 0
     - _EnvironmentReflections: 1
