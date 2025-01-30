@@ -158,7 +158,7 @@
                 float2 screenUV = i.screenPos.xy / i.screenPos.w;
                 fixed shadow = SHADOW_ATTENUATION(i);
 
-                return ApplyCaustics(screenUV, i.worldPos, i.depth_distance);
+                //return ApplyCaustics(screenUV, i.worldPos, i.depth_distance);
 
                 //ComputeWorldSpacePosition((screenUV, 1, UNITY_MATRIX_MV);
                 // //先不用Distort, 把图像调试正确了
@@ -167,56 +167,24 @@
                 // float linear01 = Linear01Depth(depth);
                 // //return float4(linear01, linear01, linear01, 1);
 
-                //float4 col  = tex2D(_ReflectionTex, screenUV + i.normal.zx * half2(0.02, 0.15));
-                //return LambertLight(col, i.normal, i.worldPos, shadow);
+                float4 reflectionCol  = tex2D(_ReflectionTex, screenUV + i.normal.zx * half2(0.02, 0.15));
+                //return LambertLight(reflectionCol, i.normal, i.worldPos, shadow);
                 
-                float4 underWaterColor = (1, 1, 1, 1);
                 float2 distortUV = screenUV + i.normal.zx * half2(0.02, 0.15) * i.depth_distance.x * _DistortScale;
                 
                 //underWaterLength < 0 above water
                 //underWaterLength > 0 under water 
                 float underWaterLength = GetUnderWaterLength(distortUV, i.depth_distance, i.worldPos);                
                 
-                //如果扭曲uv后采样到水面之上的物体了，这是不被允许的，所以回退
+                //如果扭曲uv后采样到水面之上的物体了，这是不被允许的，所以回退重新采样
                 float2 sampleUV = underWaterLength < 0 ? screenUV : distortUV;
                 underWaterLength = sampleUV == screenUV ? GetUnderWaterLength(screenUV, i.depth_distance, i.worldPos) : underWaterLength;
-                underWaterColor = SampleUnderWaterColor(sampleUV, underWaterLength);
-                return underWaterColor;
-                /*
-                if( underWaterLength < 0)
-                {
-                    underWaterLength = GetUnderWaterLength(screenUV, i.depth_distance);
-                    underWaterColor = SampleUnderWaterColor(screenUV, underWaterLength);
-                    return underWaterColor;
-                }
-
-                underWaterColor = SampleUnderWaterColor(distortUV, underWaterLength);
-                return underWaterColor;
-                */
-                /*
                 
-                //col  = tex2D(_ReflectionTex, screenUV + i.normal.zx * half2(0.02, 0.15));
-
-                //col =  GetLightColor(col, i.normal, i.worldPos, shadow);
-                //return col;
-                half underWaterLength = GetUnderWaterLength(screenUV, i.depth_distance);
-                if(underWaterLength < 0)
-                {
-                    //return float4(1, 1, 1, 1);
-
-                    float2 distortUV = screenUV;// );
-                    underWaterLength = GetUnderWaterLength(distortUV, i.depth_distance);
-                    col = GetAbsorbColor(distortUV, underWaterLength);
-                    return col;
-                }
-                                               
-                col  = tex2D(_ReflectionTex, screenUV);
-                return col;*/
-
+                float4 underWaterColor = SampleUnderWaterColor(sampleUV, underWaterLength);
                 
+                return underWaterColor;
             }
 
-           
             ENDCG
         }
     }

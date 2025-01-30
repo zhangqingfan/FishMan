@@ -165,7 +165,7 @@ partial class Water : MonoBehaviour
             {
                 gridList[i].offset *= -1;
                 gridList[i].root.transform.localPosition = grid.root.transform.localPosition + gridList[i].offset * length;
-                Debug.Log(gridList[i].offset);
+                //Debug.Log(gridList[i].offset);
             }
         }
         grid.offset = Vector3.zero;
