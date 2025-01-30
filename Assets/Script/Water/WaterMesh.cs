@@ -123,6 +123,7 @@ partial class Water : MonoBehaviour
             curGrid = FindGrid(trans.position);
             if (curGrid != oldGrid)
             {
+                //Debug.Log(curGrid.offset);
                 CentralizeGrid(curGrid);
                 oldGrid = curGrid;
             }
@@ -140,14 +141,33 @@ partial class Water : MonoBehaviour
         return null;
     }
 
-    //算法要好好想一想！！
     void CentralizeGrid(Grid grid)
     {
-        var moveOffset = grid.offset - Vector3.zero;
         for(int i = 0; i < gridList.Count; i++)
         {
-            gridList[i].root.transform.localPosition += moveOffset * length;
-            gridList[i].offset += moveOffset;
+            var offset = gridList[i].offset - grid.offset;
+            var dis = Mathf.Max(Mathf.Abs(offset.x), Mathf.Abs(offset.z));
+            
+            //same grid
+            if(dis == 0)
+            {
+                continue;
+            }
+
+            //adjacent grid
+            else if (dis == 1)
+            {
+                gridList[i].offset = Vector3.zero + offset;
+            }
+
+            //far grid
+            else if(dis >= 2)
+            {
+                gridList[i].offset *= -1;
+                gridList[i].root.transform.localPosition = grid.root.transform.localPosition + gridList[i].offset * length;
+                Debug.Log(gridList[i].offset);
+            }
         }
+        grid.offset = Vector3.zero;
     }
 }
