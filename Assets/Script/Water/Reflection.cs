@@ -2,6 +2,8 @@
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
+
+//注意，这里的render texture必须动态创建，和屏幕分辨率一致！！！！
 public class Reflection : MonoBehaviour
 {
     public RenderTexture renderTexture;

@@ -7,11 +7,14 @@
         
         _CausticsScale("Caustics Scale", Range(0, 1)) = 0.01
         _CausticsnItensity("Caustics Itensity", Range(0, 3)) = 1
-        _CausticsTex ("Texture", 2D) = "white" {}
+        _CausticsTex ("Caustics Texture", 2D) = "white" {}
+
+        _FresnelBias("Fresnel Bias", Range(0, 1)) = 0.02
+        _NormalBias("Normal Bias", Range(0, 1)) = 0.02
 
         _SurfaceColor ("_SurfaceColor", Color) = (1, 1, 1, 1) 
-        _DeepColor ("_DeepColor", Color) = (1, 1, 1, 1) 
-        
+        _DeepColor ("_DeepColor", Color) = (1, 1, 1, 1)
+        _NormalTex ("Normal Texture", 2D) = "white" {}
     }
     SubShader
     {
@@ -35,6 +38,8 @@
             float4 _ReflectionTex_ST;
             sampler2D _CausticsTex;
             float4 _CausticsTex_ST;
+            sampler2D _NormalTex;
+            float4 _NormalTex_ST;
 
             sampler2D _CameraDepthTexture;
             sampler2D _CameraOpaqueTexture;
@@ -47,6 +52,8 @@
             float4 _SurfaceColor;
             float4 _DeepColor;
             float4x4 _InverseVP;
+            float _FresnelBias;
+            float _NormalBias;
             
             float3 GetUnderWaterWorldPos(float2 screenUV, float3 waterWorldPos, float2 depth_distance)
             {
@@ -102,6 +109,33 @@
                 return col;
             }
 
+            float4 LambertLight(float4 albedo, float3 worldNormal, float3 worldPos, float shadowAtten)
+            {
+                float3 diffuse = max(0, dot(worldNormal, _WorldSpaceLightPos0));
+                float3 diffuseColor = _LightColor0.rgb * albedo * diffuse;
+
+                float3 viewDir = _WorldSpaceCameraPos.xyz - worldPos;
+                float3 halfDir = normalize(_WorldSpaceLightPos0 + viewDir);
+                float3 specularColor = float3(1, 1, 1) * pow(max(0, dot(worldNormal, halfDir)), 8);
+                
+                return float4((diffuseColor + specularColor) * shadowAtten, 1);
+            }
+
+            float FresnelTerm(float3 worldNormal, float3 worldPos)
+            {
+                worldNormal = normalize(worldNormal);
+                float3 viewDir = normalize(_WorldSpaceCameraPos.xyz - worldPos);
+                float fresnel = pow(1.0 - max(dot(viewDir, worldNormal), 0.0), 5.0);
+                return _FresnelBias + (1.0 - _FresnelBias) * fresnel;
+            }
+
+            float3 DistortNormal(float3 worldPos, float3 worldNormal)
+            {
+                float2 uv = worldPos.xz + _Time.y * _NormalBias;
+                float3 unpackedNormal = normalize(UnpackNormal(tex2D(_NormalTex, uv)));
+                return normalize(worldNormal + unpackedNormal);
+            }
+
             struct appdata
             {
                 float4 vertex : POSITION;
@@ -136,29 +170,10 @@
                 return o;
             }
 
-            float4 LambertLight(float4 albedo, float3 worldNormal, float3 worldPos, float shadowAtten)
-            {
-                float3 diffuse = max(0, dot(worldNormal, _WorldSpaceLightPos0));
-                float3 diffuseColor = _LightColor0.rgb * albedo * diffuse;
-
-                float3 viewDir = _WorldSpaceCameraPos.xyz - worldPos;
-                float3 halfDir = normalize(_WorldSpaceLightPos0 + viewDir);
-                float3 specularColor = float3(1, 1, 1) * pow(max(0, dot(worldNormal, halfDir)), 8);
-                
-                return float4((diffuseColor + specularColor) * shadowAtten, 1);
-            }
-
             fixed4 frag (v2f i) : SV_Target 
             {
                 float2 screenUV = i.screenPos.xy / i.screenPos.w;
                 fixed shadow = SHADOW_ATTENUATION(i);
-
-                //ComputeWorldSpacePosition((screenUV, 1, UNITY_MATRIX_MV);
-                // //先不用Distort, 把图像调试正确了
-                // float depth = tex2D(_CameraDepthTexture, screenUV);
-                // float linearDepth = LinearEyeDepth(depth);
-                // float linear01 = Linear01Depth(depth);
-                // //return float4(linear01, linear01, linear01, 1);
                 
                 float2 distortUV = screenUV + sin(_Time.y) * i.normal.zx * _DistortScale;
                 float3 underWaterWorldPos = GetUnderWaterWorldPos(distortUV, i.worldPos, i.depth_distance);
@@ -180,9 +195,11 @@
                 underWaterColor += causticsColor;
 
                 float4 reflectionColor  = tex2D(_ReflectionTex, screenUV + i.normal.zx * half2(0.02, 0.15));
-                //reflectionColor = LambertLight(reflectionColor, i.normal, i.worldPos, shadow);
-
-                return underWaterColor;
+                reflectionColor = LambertLight(reflectionColor, i.normal, i.worldPos, shadow);
+                //reflectionColor = LambertLight(reflectionColor, DistortNormal(i.worldPos, i.normal), i.worldPos, shadow);
+                
+                float4 finalColor = lerp(underWaterColor, reflectionColor, FresnelTerm(i.normal, i.worldPos));
+                return finalColor;
             }
 
             ENDCG
