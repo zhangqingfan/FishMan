@@ -33,6 +33,7 @@ partial class Water : MonoBehaviour
         public Vector3 offset;
         public GameObject surface;
         public GameObject bottom;
+        public RenderTexture texture;
     }
 
     private void OnValidate()
@@ -114,6 +115,7 @@ partial class Water : MonoBehaviour
         oldGrid = grid;
         curGrid = grid;
         CentralizeGrid(grid);
+        Shader.SetGlobalMatrix("_curGridWorldToLocal", curGrid.root.transform.worldToLocalMatrix);
 
         var delayTime = new WaitForSeconds(0.5f);
         while (true)
@@ -126,6 +128,7 @@ partial class Water : MonoBehaviour
                 //Debug.Log(curGrid.offset);
                 CentralizeGrid(curGrid);
                 oldGrid = curGrid;
+                Shader.SetGlobalMatrix("_curGridWorldToLocal", curGrid.root.transform.worldToLocalMatrix);
             }
         }
     }

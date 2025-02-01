@@ -1,4 +1,4 @@
-Shader "Unlit/Foam"
+锘縎hader "Unlit/Foam"
 {
     Properties
     {
@@ -22,6 +22,8 @@ Shader "Unlit/Foam"
             #include "../Water/GerstnerWave.cginc"
             #include "UnityCG.cginc"
 
+            float4x4 _curGridWorldToLocal;
+
             struct appdata
             {
                 float4 vertex : POSITION;
@@ -39,10 +41,13 @@ Shader "Unlit/Foam"
             sampler2D _MainTex;
             sampler2D _MaskTex;
             float4 _MainTex_ST;
+            float4x4 _WorldToLocal;
 
             v2f vert (appdata v)
             {
-                //也许可以抬高y位置0.1f????到时候测试看结果吧
+                float4 worldPos = mul(unity_ObjectToWorld, v.vertex);
+                float3 curGridLocalPos = mul(_curGridWorldToLocal, worldPos);
+                //Wave wave = SampleWave(curGridLocalPos, _Time.y);
                 Wave wave = SampleWave(v.vertex, _Time.y);
 
                 v2f o;
