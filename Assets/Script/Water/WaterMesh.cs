@@ -1,5 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using UnityEditor;
 using UnityEditor.Build.Pipeline;
 using UnityEngine;
 using static Water;
@@ -18,6 +20,7 @@ partial class Water : MonoBehaviour
     public GameObject seaMeshPrefab;
     public Material surfaceMat;
     public Material bottomMat;
+    public RenderTexture footprintRT;
     
     public Transform goTrans;
     Grid oldGrid;
@@ -25,15 +28,17 @@ partial class Water : MonoBehaviour
 
     List<Grid> gridList = new List<Grid>();
     List<Vector3> offsetList = new List<Vector3>();
+    RenderTexture[] rtArray;
+
     bool canOnValidate = false;
 
     public class Grid
     {
         public GameObject root;
         public Vector3 offset;
+        public Vector4 viewPort;
         public GameObject surface;
         public GameObject bottom;
-        public RenderTexture texture;
     }
 
     private void OnValidate()
@@ -44,11 +49,21 @@ partial class Water : MonoBehaviour
             {
                 Destroy(gridList[i].surface);
                 Destroy(gridList[i].bottom);
+                Destroy(gridList[i].root);
             }
-            
+
             gridList.Clear();
+            for(int i = 0; i < rtArray.Length; i++)
+            {
+                Destroy(rtArray[i]);
+                rtArray[i] = null;
+            }
+
             CreatePlanes(offsetList);
+
             Shader.SetGlobalInt("_WaterDepth", depth);
+            Shader.SetGlobalFloat("gridLength", length);
+            Shader.SetGlobalVectorArray("GridWorldPosArray", GetGridWorldPos());
         }
     }
 
@@ -70,7 +85,8 @@ partial class Water : MonoBehaviour
 
         Shader.SetGlobalInt("_WaterDepth", depth);
         Shader.SetGlobalFloat("gridLength", length);
-        
+        Shader.SetGlobalVectorArray("GridWorldPosArray", GetGridWorldPos());
+
         StartCoroutine(CentralizeGameObject(goTrans));
     }
 
@@ -79,6 +95,15 @@ partial class Water : MonoBehaviour
         for(int i = 0; i < offsets.Count; i++) 
         {
             gridList.Add(CreatePlane(offsets[i]));
+        }
+
+        var rtUnit = footprintRT.height / 3; //9 grids. row & col has 3 grids
+
+        for (int i = 0; i < gridList.Count; i++) 
+        {
+            var grid = gridList[i];
+            var offset = grid.offset - gridList[0].offset;
+            grid.viewPort = new Vector4(offset.x * rtUnit, offset.z * rtUnit, rtUnit, rtUnit);
         }
     }
 
@@ -106,6 +131,18 @@ partial class Water : MonoBehaviour
         return grid;
     }
 
+    List<Vector4> GetGridWorldPos()
+    {
+        List<Vector4> worldPos = new List<Vector4>();
+        for (int i = 0; i < gridList.Count; i++)
+        {
+            var gridPos = gridList[i].root.transform.position;
+            var pos = new Vector4(gridPos.x, gridPos.y, gridPos.z, 1);
+            worldPos.Add(gridPos);
+        }
+        return worldPos;
+    }
+
     IEnumerator CentralizeGameObject(Transform trans)
     {
         if(trans == null)
@@ -129,6 +166,7 @@ partial class Water : MonoBehaviour
                 CentralizeGrid(curGrid);
                 oldGrid = curGrid;
                 Shader.SetGlobalMatrix("_curGridWorldToLocal", curGrid.root.transform.worldToLocalMatrix);
+                Shader.SetGlobalVectorArray("GridWorldPosArray", GetGridWorldPos());
             }
         }
     }

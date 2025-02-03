@@ -175,6 +175,7 @@ MonoBehaviour:
     type: 3}
   surfaceMat: {fileID: 2100000, guid: e0118334d7916744d92387c236619e82, type: 2}
   bottomMat: {fileID: 2100000, guid: a1c88651b631ad04bb3ac5c34b758ae3, type: 2}
+  footprintRT: {fileID: 8400000, guid: 5be26510d0a622045b719915899b0a5e, type: 2}
   goTrans: {fileID: 2107166974}
 --- !u!114 &29159952
 MonoBehaviour:
