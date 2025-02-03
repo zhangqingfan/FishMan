@@ -32,6 +32,7 @@ public class CanonTrace : MonoBehaviour
 
     void Update()
     {
+        return;
         var showRing = PlayerController.Instance.showRing;        
         lineRenderer.enabled = showRing;
 
