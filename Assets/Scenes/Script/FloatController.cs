@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,7 +8,7 @@ public class FloatController : MonoBehaviour
     BoxCollider boxCol;
     
     public float voxelUnit = 0.1f;
-    readonly float transformDensity = 10f;
+    readonly float transformDensity = 100f;
     readonly float waterDensity = 1000f;
     
     List<Vector3> voxelList = new List<Vector3>();
@@ -42,14 +42,18 @@ public class FloatController : MonoBehaviour
 
         var volume = rb.mass / transformDensity;
         voxelFloatForce = waterDensity * Mathf.Abs(Physics.gravity.y) * (volume / voxelList.Count);
+        Debug.Log(voxelFloatForce);
     }
 
     void FixedUpdate()
     {
-        var worldHeight = Water.Instance.GetHeight(Vector3.zero);
-        AppleFloatForce(worldHeight);
+        var worldHeight = Water.Instance.GetHeight(transform.position);
+        Debug.Log(worldHeight);
+        
+        //AppleFloatForce(worldHeight);
     }
 
+    //todo...这个函数有BUG。要计算基于每个体素的水面高度，这样才可以应用物体的倾斜度。
     void AppleFloatForce(float waterHeight)
     {
         for(int i = 0; i < voxelList.Count; i++)

@@ -14,9 +14,9 @@ public partial class Water
             return 0;
         }
 
-        var localPos = grid.root.transform.InverseTransformPoint(worldPos);
+        var localPos = grid.surface.transform.InverseTransformPoint(worldPos);
         var newPos = SamplePosition(localPos, Time.time); 
-        var newWorldPos = grid.root.transform.TransformPoint(newPos);
+        var newWorldPos = grid.surface.transform.TransformPoint(newPos);
         Debug.Log(newWorldPos);
         return newWorldPos.y;
     }
