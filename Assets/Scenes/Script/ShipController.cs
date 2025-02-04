@@ -57,7 +57,7 @@ public class ShipController : MonoBehaviour
         renderCamera.transform.LookAt(transform.position);
     }
 
-    void Update()
+    void FixedUpdate()
     {
         var move = PlayerController.Instance.GetMovement();
         if(move.y < 0) 

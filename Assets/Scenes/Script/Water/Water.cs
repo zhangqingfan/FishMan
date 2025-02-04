@@ -4,6 +4,12 @@ using UnityEngine;
 public partial class Water : MonoBehaviour
 {
     public WaveSetting setting;
+    public static Water Instance;
+
+    private void Awake()
+    {
+        Instance = this;
+    }
 
     void WaterUpdate(WaveSetting setting)
     {

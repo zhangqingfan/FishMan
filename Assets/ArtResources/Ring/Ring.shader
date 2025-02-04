@@ -6,10 +6,9 @@ Shader "Unlit/Ring"
     }
     SubShader
     {
-        Tags { "Queue"="Transparent" }
+        Tags { "Queue"="Overlay" }
         LOD 100
         Cull off
-        Zwrite off
         ZTest Always
         Blend SrcAlpha One
 

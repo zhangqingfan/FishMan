@@ -7,8 +7,8 @@ public class FloatController : MonoBehaviour
     Rigidbody rb;
     BoxCollider boxCol;
     
-    public float voxelUnit = 0.2f;
-    readonly float transformDensity = 500f;
+    public float voxelUnit = 0.1f;
+    readonly float transformDensity = 10f;
     readonly float waterDensity = 1000f;
     
     List<Vector3> voxelList = new List<Vector3>();
@@ -43,9 +43,11 @@ public class FloatController : MonoBehaviour
         var volume = rb.mass / transformDensity;
         voxelFloatForce = waterDensity * Mathf.Abs(Physics.gravity.y) * (volume / voxelList.Count);
     }
+
     void FixedUpdate()
     {
-        AppleFloatForce(0);
+        var worldHeight = Water.Instance.GetHeight(Vector3.zero);
+        AppleFloatForce(worldHeight);
     }
 
     void AppleFloatForce(float waterHeight)
