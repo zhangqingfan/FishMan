@@ -39,6 +39,7 @@ public class DrawRing : MonoBehaviour
 
     private void LateUpdate()
     {
+        transform.rotation = Quaternion.identity;
         var showRing = PlayerController.Instance.showRing;
         GetComponent<MeshRenderer>().enabled = showRing;
     }

@@ -48,7 +48,7 @@ public class CanonTrace : MonoBehaviour
             //Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
             float eulerX = 0f;
-            if (Physics.Raycast(startPosition, endPosition - startPosition, out RaycastHit hitInfo, Mathf.Infinity, 1 << LayerMask.NameToLayer("Plane")))
+            if (Physics.Raycast(startPosition, endPosition - startPosition, out RaycastHit hitInfo, Mathf.Infinity, 1 << LayerMask.NameToLayer("MousePlane")))
             {
                 hitPoint = hitInfo.point;
                 var startPoint = gameObject.transform.position;
@@ -83,7 +83,7 @@ public class CanonTrace : MonoBehaviour
     void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawSphere(hitPoint, 1f);  
+        Gizmos.DrawSphere(hitPoint, 0.1f);  
     }
 
     public void CaculateInitialSpeed(float maxRange)

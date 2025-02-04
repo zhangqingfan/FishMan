@@ -43,7 +43,6 @@ public class FloatController : MonoBehaviour
         var volume = rb.mass / transformDensity;
         voxelFloatForce = waterDensity * Mathf.Abs(Physics.gravity.y) * (volume / voxelList.Count);
     }
-    
     void FixedUpdate()
     {
         AppleFloatForce(0);

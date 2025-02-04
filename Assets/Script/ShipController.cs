@@ -8,7 +8,7 @@ public class ShipController : MonoBehaviour
     public float turnAngle = 0.5f;
     [Range(10f, 50f)]
     public float mouseSpeed = 25f;
-    public Transform ring;
+    //public Transform ring;
 
     Camera renderCamera;
     Vector3 cameraEuler = new Vector3(300f, 180f, 0f);
