@@ -7,12 +7,15 @@ public class FloatController : MonoBehaviour
     Rigidbody rb;
     BoxCollider boxCol;
     
-    public float voxelUnit = 0.1f;
-    readonly float transformDensity = 100f;
+    public float voxelUnit = 0.4f;
+    readonly float transformDensity = 500f;
     readonly float waterDensity = 1000f;
     
     List<Vector3> voxelList = new List<Vector3>();
     float voxelFloatForce;
+
+    List<Vector3> forceList = new List<Vector3>();
+    List<Vector3> forcePoint = new List<Vector3>();
 
     // Start is called before the first frame update
     void Start()
@@ -43,28 +46,30 @@ public class FloatController : MonoBehaviour
         var volume = rb.mass / transformDensity;
         voxelFloatForce = waterDensity * Mathf.Abs(Physics.gravity.y) * (volume / voxelList.Count);
         Debug.Log(voxelFloatForce);
+        /*
+        var totalG = rb.mass * Mathf.Abs(Physics.gravity.y);
+        Debug.Log(totalG);
+        Debug.Log(voxelFloatForce * voxelList.Count);
+        */
     }
 
     void FixedUpdate()
     {
-        var worldHeight = Water.Instance.GetHeight(transform.position);
-        Debug.Log(worldHeight);
-        
-        //AppleFloatForce(worldHeight);
+        AppleFloatForce();
     }
 
-    //todo...这个函数有BUG。要计算基于每个体素的水面高度，这样才可以应用物体的倾斜度。
-    void AppleFloatForce(float waterHeight)
+    void AppleFloatForce()
     {
         for(int i = 0; i < voxelList.Count; i++)
         {
             var voxelWorldPos = transform.TransformPoint(voxelList[i]);
             var voxelBottom = voxelWorldPos.y - voxelUnit / 2;
+            var waterWorldHeight = Water.Instance.GetHeight(voxelWorldPos);
 
-            if (voxelBottom < waterHeight)
+            if (voxelBottom < waterWorldHeight)
             {
                 var floatforce = Vector3.zero;
-                floatforce.y += voxelFloatForce * Mathf.Clamp01((waterHeight - voxelBottom) / voxelUnit);
+                floatforce.y += voxelFloatForce * Mathf.Clamp01((waterWorldHeight - voxelBottom) / voxelUnit);
                 rb.AddForceAtPosition(floatforce, voxelWorldPos);
             }
         }

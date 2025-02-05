@@ -12,13 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 0}
   m_Name: WaveSetting
   m_EditorClassIdentifier: Assembly-CSharp::WaveSetting
-  isChanged: 1
+  isChanged: 0
   input:
-  - amplitude: 0.1
+  - amplitude: 0.5
     length: 30
     speed: 0.5
     angle: 1.1
-  - amplitude: 0.2
+  - amplitude: 0.5
     length: 20
     speed: 0.1
     angle: 3.26

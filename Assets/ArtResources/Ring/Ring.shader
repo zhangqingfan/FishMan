@@ -9,6 +9,7 @@ Shader "Unlit/Ring"
         Tags { "Queue"="Overlay" }
         LOD 100
         Cull off
+        ZWrite Off
         ZTest Always
         Blend SrcAlpha One
 

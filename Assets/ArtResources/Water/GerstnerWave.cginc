@@ -13,11 +13,13 @@ struct Wave
 
 float3 SamplePosition(float3 pos, float time)
 {
-    float epsilon = 0.0001;
-    if (abs(pos.x) >= gridLength / 2 - epsilon || abs(pos.z) >= gridLength / 2 - epsilon)
-        return pos;
-    
     float3 newPos = pos;
+    newPos.y = 0;
+    
+    float epsilon = 0.0001;
+    if (abs(newPos.x) >= gridLength / 2 - epsilon || abs(newPos.z) >= gridLength / 2 - epsilon)
+        return newPos;
+   
     for (int i = 0; i < dataCount; i++)
     {
         float amplitude = waveData[i].x;
@@ -31,7 +33,7 @@ float3 SamplePosition(float3 pos, float time)
         float omega = speed * k;
         direction = normalize(direction);
         
-        float phase = dot(pos, direction) * k - omega * time;
+        float phase = dot(newPos, direction) * k - omega * time;
         float displacement = amplitude * sin(phase);
 
         newPos.y += displacement;
