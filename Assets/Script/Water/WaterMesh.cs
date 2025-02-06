@@ -165,7 +165,7 @@ partial class Water : MonoBehaviour
                 Debug.Log("Change Grid!!!"); 
                 CentralizeGrid(curGrid);
                 oldGrid = curGrid;
-                Shader.SetGlobalMatrix("_curGridWorldToLocal", curGrid.root.transform.worldToLocalMatrix);
+                //Shader.SetGlobalMatrix("_curGridWorldToLocal", curGrid.root.transform.worldToLocalMatrix);
                 Shader.SetGlobalVectorArray("GridWorldPosArray", GetGridWorldPos());
             }
         }

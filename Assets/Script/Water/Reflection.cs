@@ -67,7 +67,15 @@ public class Reflection : MonoBehaviour
         var viewPos = reflectCamera.worldToCameraMatrix.MultiplyPoint(transform.position);
         var viewNormal = reflectCamera.worldToCameraMatrix.MultiplyVector(transform.up);
         float w = -Vector3.Dot(viewPos, viewNormal);
+
         reflectCamera.projectionMatrix = reflectCamera.CalculateObliqueMatrix(new Vector4(viewNormal.x, viewNormal.y, viewNormal.z, w));
+
+        /*
+        var newProj = reflectCamera.projectionMatrix;
+        newProj.m00 *= 0.1f;
+        newProj.m11 *= 0.1f;
+        reflectCamera.projectionMatrix = newProj;
+        */
 
         UniversalRenderPipeline.RenderSingleCamera(context, reflectCamera);
     }

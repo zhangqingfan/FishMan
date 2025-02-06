@@ -26,7 +26,7 @@ public class Foam : MonoBehaviour
         var offset = transform.position - oldPos;
         offset.y = 0;
         var speed = offset.magnitude / Time.deltaTime;
-        var curSpeed = Mathf.Lerp(oldSpeed, speed, Time.deltaTime * 2);
+        var curSpeed = Mathf.Lerp(oldSpeed, speed, Time.deltaTime);
 
         if (ps != null)
         {
