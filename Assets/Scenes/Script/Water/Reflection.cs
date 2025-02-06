@@ -34,8 +34,16 @@ public class Reflection : MonoBehaviour
         reflectCamera = go.AddComponent<Camera>();
         //reflectCamera.CopyFrom(Camera.main);  //不知道为什么不能在这里调用
         reflectCamera.enabled = false;
-        reflectCamera.targetTexture = renderTexture;
 
+        /*
+        var rt = new RenderTexture(1920 * 4, 1080 * 4, 24); //
+        rt.filterMode = FilterMode.Bilinear;
+        rt.Create();
+        reflectCamera.targetTexture = rt;
+        Shader.SetGlobalTexture("_ReflectionTex", rt);
+        */
+
+        reflectCamera.targetTexture = renderTexture;
         //reflectCamera.CopyFrom(Camera.main);  //在这里调用就可以，很奇怪！
         Shader.SetGlobalTexture("_ReflectionTex", renderTexture);
 

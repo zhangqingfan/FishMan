@@ -17,7 +17,6 @@ public class FloatController : MonoBehaviour
     List<Vector3> forceList = new List<Vector3>();
     List<Vector3> forcePoint = new List<Vector3>();
 
-    // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -45,22 +44,35 @@ public class FloatController : MonoBehaviour
 
         var volume = rb.mass / transformDensity;
         voxelFloatForce = waterDensity * Mathf.Abs(Physics.gravity.y) * (volume / voxelList.Count);
-        Debug.Log(voxelFloatForce);
-        /*
-        var totalG = rb.mass * Mathf.Abs(Physics.gravity.y);
-        Debug.Log(totalG);
-        Debug.Log(voxelFloatForce * voxelList.Count);
-        */
+
+        StartCoroutine(FloatForce());
     }
 
     void FixedUpdate()
     {
-        AppleFloatForce();
+        //optimize calculate frequency. my cpu is poor.
+        for(int i = 0; i < forcePoint.Count; i++) 
+        {
+            rb.AddForceAtPosition(forceList[i], forcePoint[i]);
+        }
     }
 
-    void AppleFloatForce()
+    IEnumerator FloatForce()
     {
-        for(int i = 0; i < voxelList.Count; i++)
+        var timeStep = new WaitForSeconds(0.05f);
+        while (true) 
+        {
+            CalculateFloatForce();
+            yield return timeStep;
+        }
+    }
+
+    void CalculateFloatForce()
+    {
+        forcePoint.Clear();
+        forceList.Clear();
+
+        for (int i = 0; i < voxelList.Count; i++)
         {
             var voxelWorldPos = transform.TransformPoint(voxelList[i]);
             var voxelBottom = voxelWorldPos.y - voxelUnit / 2;
@@ -70,7 +82,10 @@ public class FloatController : MonoBehaviour
             {
                 var floatforce = Vector3.zero;
                 floatforce.y += voxelFloatForce * Mathf.Clamp01((waterWorldHeight - voxelBottom) / voxelUnit);
-                rb.AddForceAtPosition(floatforce, voxelWorldPos);
+                //rb.AddForceAtPosition(floatforce, voxelWorldPos);
+
+                forcePoint.Add(voxelWorldPos);
+                forceList.Add(floatforce);
             }
         }
     }

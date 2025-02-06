@@ -9,6 +9,8 @@ public partial class Water : MonoBehaviour
     private void Awake()
     {
         Instance = this;
+        Debug.Log(Time.fixedDeltaTime);
+        //Time.fixedDeltaTime = 0.04f;
     }
 
     void WaterUpdate(WaveSetting setting)

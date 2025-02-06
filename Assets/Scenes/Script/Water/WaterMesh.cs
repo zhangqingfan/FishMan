@@ -162,7 +162,7 @@ partial class Water : MonoBehaviour
             curGrid = FindGrid(trans.position);
             if (curGrid != oldGrid)
             {
-                //Debug.Log(curGrid.offset);
+                Debug.Log("Change Grid!!!"); 
                 CentralizeGrid(curGrid);
                 oldGrid = curGrid;
                 Shader.SetGlobalMatrix("_curGridWorldToLocal", curGrid.root.transform.worldToLocalMatrix);

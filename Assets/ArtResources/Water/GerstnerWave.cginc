@@ -52,6 +52,10 @@ float3 GetOffsetPos(float radians, float3 originalPos, float time)
 
 float3 SampleNormal(float3 originalPos, float3 newPos, float time)
 {
+    float epsilon = 0.0001;
+    if (abs(originalPos.x) >= gridLength / 2 - epsilon || abs(originalPos.z) >= gridLength / 2 - epsilon)
+        return float3(0, 1, 0);
+    
     float deltaAngle = 90;
     float3 normal = 0;
     
