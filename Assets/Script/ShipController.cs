@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class ShipController : MonoBehaviour
 {
@@ -20,15 +20,22 @@ public class ShipController : MonoBehaviour
     float rotateY = 0f;
 
     Rigidbody rb;
+    Transform mouseClickPlaneTrans;
 
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
+        mouseClickPlaneTrans = transform.Find("MouseClickPlane");
 
         renderCamera = Camera.main;
         var rotation = Quaternion.Euler(cameraEuler);
         var direction = (rotation * Vector3.forward).normalized;
         renderCamera.transform.position = transform.position + direction * cameraDistance;
+    }
+
+    private void Update()
+    {
+        mouseClickPlaneTrans.rotation = Quaternion.identity;
     }
 
     private void LateUpdate()

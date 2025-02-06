@@ -7,15 +7,12 @@ public class FloatController : MonoBehaviour
     Rigidbody rb;
     BoxCollider boxCol;
     
-    public float voxelUnit = 0.4f;
-    readonly float transformDensity = 500f;
+    float voxelUnit = 0.8f;
+    readonly float transformDensity = 300f;
     readonly float waterDensity = 1000f;
     
     List<Vector3> voxelList = new List<Vector3>();
     float voxelFloatForce;
-
-    List<Vector3> forceList = new List<Vector3>();
-    List<Vector3> forcePoint = new List<Vector3>();
 
     void Start()
     {
@@ -27,7 +24,7 @@ public class FloatController : MonoBehaviour
         var Y = (int)(bound.size.y / voxelUnit);
         var Z = (int)(bound.size.z / voxelUnit);
 
-        for(int i = 0; i < X; i++)
+        for (int i = 0; i < X; i++)
         {
             for(int j = 0; j < Y; j++)
             {
@@ -42,36 +39,18 @@ public class FloatController : MonoBehaviour
             }
         }
 
+        //Debug.Log(voxelList.Count);
         var volume = rb.mass / transformDensity;
         voxelFloatForce = waterDensity * Mathf.Abs(Physics.gravity.y) * (volume / voxelList.Count);
-
-        StartCoroutine(FloatForce());
     }
 
     void FixedUpdate()
     {
-        //optimize calculate frequency. my cpu is poor.
-        for(int i = 0; i < forcePoint.Count; i++) 
-        {
-            rb.AddForceAtPosition(forceList[i], forcePoint[i]);
-        }
-    }
-
-    IEnumerator FloatForce()
-    {
-        var timeStep = new WaitForSeconds(0.05f);
-        while (true) 
-        {
-            CalculateFloatForce();
-            yield return timeStep;
-        }
+        CalculateFloatForce();
     }
 
     void CalculateFloatForce()
     {
-        forcePoint.Clear();
-        forceList.Clear();
-
         for (int i = 0; i < voxelList.Count; i++)
         {
             var voxelWorldPos = transform.TransformPoint(voxelList[i]);
@@ -82,10 +61,7 @@ public class FloatController : MonoBehaviour
             {
                 var floatforce = Vector3.zero;
                 floatforce.y += voxelFloatForce * Mathf.Clamp01((waterWorldHeight - voxelBottom) / voxelUnit);
-                //rb.AddForceAtPosition(floatforce, voxelWorldPos);
-
-                forcePoint.Add(voxelWorldPos);
-                forceList.Add(floatforce);
+                rb.AddForceAtPosition(floatforce, voxelWorldPos);
             }
         }
     }

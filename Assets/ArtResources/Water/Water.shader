@@ -118,7 +118,7 @@
                 float3 halfDir = normalize(_WorldSpaceLightPos0 + viewDir);
                 float3 specularColor = float3(1, 1, 1) * pow(max(0, dot(worldNormal, halfDir)), 8);
                 
-                return float4((diffuseColor + specularColor) * shadowAtten, 1);
+                return float4((diffuseColor /*+ specularColor*/) * shadowAtten, 1);
             }
 
             float FresnelTerm(float3 worldNormal, float3 worldPos)
