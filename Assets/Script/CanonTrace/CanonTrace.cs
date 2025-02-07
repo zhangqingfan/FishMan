@@ -4,6 +4,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
 
+[RequireComponent(typeof(LineRenderer))]
 public class CanonTrace : MonoBehaviour
 {
     public float timeStep = 0.05f;
@@ -20,9 +21,6 @@ public class CanonTrace : MonoBehaviour
     void Start()
     {
         lineRenderer = transform.GetComponent<LineRenderer>();
-        if (lineRenderer == null)
-            lineRenderer = transform.AddComponent<LineRenderer>();
-
         renderCamera = Camera.main;
         WorldManager.Instance.CreateObject("Ball", gameObject.transform.position, 0f); // pre-warm memory pool;
 

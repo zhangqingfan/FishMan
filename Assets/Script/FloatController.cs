@@ -39,7 +39,7 @@ public class FloatController : MonoBehaviour
             }
         }
 
-        //Debug.Log(voxelList.Count);
+        Debug.Log("voxel number: " + voxelList.Count);
         var volume = rb.mass / transformDensity;
         voxelFloatForce = waterDensity * Mathf.Abs(Physics.gravity.y) * (volume / voxelList.Count);
     }

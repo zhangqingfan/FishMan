@@ -5,7 +5,7 @@
         _DepthScale("Depth Scale", Range(0, 2)) = 1
         _DistortScale("Distort Scale", Range(0, 5)) = 1
         
-        _CausticsScale("Caustics Scale", Range(0, 1)) = 0.01
+        _CausticsScale("Caustics Scale", Range(0, 0.3)) = 0.01
         _CausticsnItensity("Caustics Itensity", Range(0, 3)) = 1
         _CausticsTex ("Caustics Texture", 2D) = "white" {}
 
@@ -118,6 +118,7 @@
                 float3 halfDir = normalize(_WorldSpaceLightPos0 + viewDir);
                 float3 specularColor = float3(1, 1, 1) * pow(max(0, dot(worldNormal, halfDir)), 8);
                 
+                //todo...here is the problem!!!造成不同色块的问题
                 return float4((diffuseColor /*+ specularColor*/) * shadowAtten, 1);
             }
 
@@ -194,7 +195,8 @@
                 float4 causticsColor = ApplyCaustics(underWaterWorldPos, underWaterLength);
                 underWaterColor += causticsColor;
 
-                float4 reflectionColor  = tex2D(_ReflectionTex, screenUV + i.normal.zx * half2(0.02, 0.15));
+                //todo...这里也有问题，会导致水面偏移主要在中心位置！！！！
+                float4 reflectionColor  = tex2D(_ReflectionTex, screenUV + i.normal.xz * half2(0.02, 0.15));
                 reflectionColor = LambertLight(reflectionColor, i.normal, i.worldPos, shadow);
                 //reflectionColor = LambertLight(reflectionColor, DistortNormal(i.worldPos, i.normal), i.worldPos, shadow);
                 

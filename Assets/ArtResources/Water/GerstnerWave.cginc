@@ -16,7 +16,7 @@ float3 SamplePosition(float3 pos, float time)
     float3 newPos = pos;
     newPos.y = 0;
     
-    float epsilon = 0.0001;
+    float epsilon = 0.001;
     if (abs(newPos.x) >= gridLength / 2 - epsilon || abs(newPos.z) >= gridLength / 2 - epsilon)
         return newPos;
    
@@ -43,7 +43,7 @@ float3 SamplePosition(float3 pos, float time)
 
 float3 GetOffsetPos(float radians, float3 originalPos, float time)
 {
-    float radius = 0.1;
+    float radius = 0.05;
     float x = originalPos.x + radius * cos(radians);
     float z = originalPos.z + radius * sin(radians);
     float3 offsetPos = originalPos + float3(x, 0, z);
@@ -52,7 +52,7 @@ float3 GetOffsetPos(float radians, float3 originalPos, float time)
 
 float3 SampleNormal(float3 originalPos, float3 newPos, float time)
 {
-    float epsilon = 0.0001;
+    float epsilon = 0.001;
     if (abs(originalPos.x) >= gridLength / 2 - epsilon || abs(originalPos.z) >= gridLength / 2 - epsilon)
         return float3(0, 1, 0);
     
