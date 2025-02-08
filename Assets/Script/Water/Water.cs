@@ -1,4 +1,5 @@
-﻿using Unity.VisualScripting;
+﻿using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public partial class Water : MonoBehaviour
@@ -6,11 +7,25 @@ public partial class Water : MonoBehaviour
     public WaveSetting setting;
     public static Water Instance;
 
+    Dictionary<Transform, ParticleSystem> psDict = new Dictionary<Transform, ParticleSystem>();
+
     private void Awake()
     {
         Instance = this;
-        Debug.Log(Time.fixedDeltaTime);
-        //Time.fixedDeltaTime = 0.04f;
+    }
+
+    public void AddParticleSystem(Transform goTrans)
+    {
+        var ps = goTrans.GetComponent<ParticleSystem>();
+        if (ps != null) 
+        {
+            psDict[goTrans] = ps;
+        }
+    }
+
+    public void RemoveParticleSystem(Transform goTrans) 
+    {
+        psDict.Remove(goTrans);
     }
 
     void WaterUpdate(WaveSetting setting)

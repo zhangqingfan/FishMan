@@ -171,12 +171,22 @@ MonoBehaviour:
   segmentsPerEdge: 30
   length: 78
   depth: 20
+  rtMargin: 0
   seaMeshPrefab: {fileID: 7168705476046234756, guid: 06e6bd08c028f51488665b08908cb89a,
     type: 3}
   surfaceMat: {fileID: 2100000, guid: e0118334d7916744d92387c236619e82, type: 2}
   bottomMat: {fileID: 2100000, guid: a1c88651b631ad04bb3ac5c34b758ae3, type: 2}
-  footprintRT: {fileID: 8400000, guid: 5be26510d0a622045b719915899b0a5e, type: 2}
-  goTrans: {fileID: 94341965}
+  playerTrans: {fileID: 94341965}
+  trackRTList:
+  - {fileID: 8400000, guid: d8f7f85aeb7b71443bd5b7091ad0d4aa, type: 2}
+  - {fileID: 8400000, guid: 5da7ad74e944d6745addc88b002537cf, type: 2}
+  - {fileID: 8400000, guid: f68682d76d05c4e4592b96b84ee7b81c, type: 2}
+  - {fileID: 8400000, guid: 243d79b26864953439553d148bd379d1, type: 2}
+  - {fileID: 8400000, guid: e5fc55e5513196d4fa36477024f6bebe, type: 2}
+  - {fileID: 8400000, guid: 11754ed0031b4aa42af8c26f91285433, type: 2}
+  - {fileID: 8400000, guid: fa5f22d11e24b90469945ffae7d52472, type: 2}
+  - {fileID: 8400000, guid: 529b7dc6c3a157b41a9504c5e185bb22, type: 2}
+  - {fileID: 8400000, guid: f6cce10d8d41b1946ba1d774d46585b9, type: 2}
 --- !u!114 &29159952
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -206,6 +216,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 2720770165338166754, guid: f59acb6a4b28aa041bda9151cc4c0a04,
+        type: 3}
+      propertyPath: m_Materials.Array.size
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5555592887201672627, guid: f59acb6a4b28aa041bda9151cc4c0a04,
         type: 3}
