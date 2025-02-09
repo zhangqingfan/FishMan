@@ -13,13 +13,12 @@ struct Wave
 
 float3 SamplePosition(float3 pos, float time)
 {
-    float3 newPos = pos;
-    newPos.y = 0;
-    
     float epsilon = 0.001;
-    if (abs(newPos.x) >= gridLength / 2 - epsilon || abs(newPos.z) >= gridLength / 2 - epsilon)
-        return newPos;
+    if (abs(pos.x) >= gridLength / 2 - epsilon || abs(pos.z) >= gridLength / 2 - epsilon)
+        return pos;
    
+    float3 newPos = pos;
+    
     for (int i = 0; i < dataCount; i++)
     {
         float amplitude = waveData[i].x;
@@ -41,36 +40,26 @@ float3 SamplePosition(float3 pos, float time)
     return newPos;
 }
 
-float3 GetOffsetPos(float radians, float3 originalPos, float time)
-{
-    float radius = 0.05;
-    float x = originalPos.x + radius * cos(radians);
-    float z = originalPos.z + radius * sin(radians);
-    float3 offsetPos = originalPos + float3(x, 0, z);
-    return SamplePosition(offsetPos, time);
-}
-
-float3 SampleNormal(float3 originalPos, float3 newPos, float time)
+float3 CalculateNormal(float3 pos, float time)
 {
     float epsilon = 0.001;
-    if (abs(originalPos.x) >= gridLength / 2 - epsilon || abs(originalPos.z) >= gridLength / 2 - epsilon)
+    if (abs(pos.x) >= gridLength / 2 - epsilon || abs(pos.z) >= gridLength / 2 - epsilon)
         return float3(0, 1, 0);
     
-    float deltaAngle = 90;
-    float3 normal = 0;
+    float3 newPos = SamplePosition(pos, time);
     
-    for (int i = 0; i < 360 / deltaAngle - 1; i++)
-    {
-        float radians0 = i * deltaAngle * 3.14159 / 180.0;
-        float3 dx = GetOffsetPos(radians0, originalPos, time) - newPos;
-        
-        float radians1 = (i + 1) * deltaAngle * 3.14159 / 180.0;
-        float3 dy = GetOffsetPos(radians1, originalPos, time) - newPos;
-        
-        float3 crossN = cross(dx, dy);
-        crossN.y = abs(crossN.y); //unity axis is different from right-hand axis!!!
-        normal += crossN;
-    }
+    epsilon = 0.01f;
+    float3 posX = float3(pos.x + epsilon, 0, pos.z);
+    float3 posZ = float3(pos.x, 0, pos.z + epsilon);
+
+    float3 newPosX = SamplePosition(posX, time);
+    float3 newPosZ = SamplePosition(posZ, time);
+
+    float3 tangentX = newPosX - newPos;
+    float3 tangentZ = newPosZ - newPos;
+
+    float3 normal = cross(tangentX, tangentZ);
+    normal.y = abs(normal.y); //unity axis is different from right-hand axis!!!
     
     return normalize(normal);
 }
@@ -79,7 +68,7 @@ Wave SampleWave(float3 pos, float time)
 {
     Wave wave;
     wave.pos = SamplePosition(pos, time);
-    wave.normal = SampleNormal(pos, wave.pos, time);
+    wave.normal = CalculateNormal(pos, time);
     return wave;
 }
 

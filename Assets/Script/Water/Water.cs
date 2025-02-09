@@ -1,31 +1,41 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UIElements;
+using static Water;
 
 public partial class Water : MonoBehaviour
 {
     public WaveSetting setting;
     public static Water Instance;
-
-    Dictionary<Transform, ParticleSystem> psDict = new Dictionary<Transform, ParticleSystem>();
-
+    List<ParticleSystem> psList = new List<ParticleSystem>();
+    
     private void Awake()
     {
         Instance = this;
     }
 
-    public void AddParticleSystem(Transform goTrans)
+    public void AddParticleSystem(ParticleSystem ps)
     {
-        var ps = goTrans.GetComponent<ParticleSystem>();
-        if (ps != null) 
+        for(int i = 0; i < psList.Count; i++)
         {
-            psDict[goTrans] = ps;
+            if (psList[i] == ps)
+                return;
         }
+        psList.Add(ps);
     }
 
-    public void RemoveParticleSystem(Transform goTrans) 
+    public void RemoveParticleSystem(ParticleSystem ps) 
     {
-        psDict.Remove(goTrans);
+        for (int i = 0; i < psList.Count; i++)
+        {
+            if (psList[i] == ps)
+            {
+                psList.RemoveAt(i);
+                return;
+            }   
+        }
     }
 
     void WaterUpdate(WaveSetting setting)
@@ -49,5 +59,38 @@ public partial class Water : MonoBehaviour
         //实际没有用到
         var vpMatrix = Camera.main.projectionMatrix * Camera.main.worldToCameraMatrix;
         Shader.SetGlobalMatrix("_InverseVP", vpMatrix.inverse);
+    }
+
+    //这个函数有BUG!
+    IEnumerator RenderTrackRT()
+    {
+        HashSet<Grid> gridSet = new HashSet<Grid>();
+        var timeStep = new WaitForSeconds(0.05f);
+
+        while(true)
+        {
+            yield return timeStep;
+
+            foreach (var grid in gridSet)
+            {
+                ClearRenderTarget(grid);
+            }
+
+            gridSet.Clear();
+            
+            foreach (var ps in psList)
+            {
+                var grids = FindGridList(ps.gameObject.transform.position, trackRTScale);
+                for(int i = 0; i < grids.Count; i++)
+                {
+                    gridSet.Add(grids[i]);
+                }
+            }
+
+            foreach(var grid in gridSet)
+            {
+                UpdateTrackRT(grid, psList);
+            }
+        }
     }
 }

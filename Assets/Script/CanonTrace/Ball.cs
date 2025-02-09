@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UIElements;
 
 public class Ball : MonoBehaviour
@@ -12,7 +12,7 @@ public class Ball : MonoBehaviour
 
     void Update()
     {
-        //todo...????????
+        //todo...这里要修改！
         if(transform.position.y < WorldManager.seaHeight) 
         {
             WorldManager.Instance.CreateObject("Splash", transform.position);

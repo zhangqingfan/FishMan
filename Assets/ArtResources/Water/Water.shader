@@ -73,7 +73,7 @@
             half4 SampleUnderWaterColor(float2 uv, half underWaterLength)
             {
                 float4 color = tex2D(_CameraOpaqueTexture, uv);
-                float t = clamp(_DepthScale * underWaterLength / _WaterDepth , 0, 1);
+                float t = clamp(0.8 * _DepthScale * underWaterLength / _WaterDepth , 0, 1);
                 float4 waterColor = lerp(_SurfaceColor, _DeepColor, t); 
                 color *= waterColor;
                 return color;
@@ -101,7 +101,7 @@
                 float t = clamp(_DepthScale * underWaterLength / _WaterDepth, 0, 1);
                 fixed scale = lerp(0.2, 0.8, 1 - t);
 
-                float2 causticsUV = opaqueWorldPos.xz  * scale * _CausticsScale;
+                float2 causticsUV = opaqueWorldPos.xz * scale * _CausticsScale;
                 causticsUV += 0.01 * sin(_Time.y);
 
                 float4 col = tex2D(_CausticsTex, causticsUV); 
@@ -117,9 +117,8 @@
                 float3 viewDir = _WorldSpaceCameraPos.xyz - worldPos;
                 float3 halfDir = normalize(_WorldSpaceLightPos0 + viewDir);
                 float3 specularColor = float3(1, 1, 1) * pow(max(0, dot(worldNormal, halfDir)), 8);
-                
-                //todo...here is the problem!!!造成不同色块的问题
-                return float4((diffuseColor /*+ specularColor*/) * shadowAtten, 1);
+
+                return float4((diffuseColor + specularColor) * shadowAtten, 1);
             }
 
             float FresnelTerm(float3 worldNormal, float3 worldPos)
@@ -173,6 +172,12 @@
 
             fixed4 frag (v2f i) : SV_Target 
             {
+                return float4(i.normal.xyz, 1); 
+
+
+
+
+
                 float2 screenUV = i.screenPos.xy / i.screenPos.w;
                 fixed shadow = SHADOW_ATTENUATION(i);
                 
@@ -195,7 +200,6 @@
                 float4 causticsColor = ApplyCaustics(underWaterWorldPos, underWaterLength);
                 underWaterColor += causticsColor;
 
-                //todo...这里也有问题，会导致水面偏移主要在中心位置！！！！
                 float4 reflectionColor  = tex2D(_ReflectionTex, screenUV + i.normal.xz * half2(0.02, 0.15));
                 reflectionColor = LambertLight(reflectionColor, i.normal, i.worldPos, shadow);
                 //reflectionColor = LambertLight(reflectionColor, DistortNormal(i.worldPos, i.normal), i.worldPos, shadow);

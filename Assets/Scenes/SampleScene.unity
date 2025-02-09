@@ -171,7 +171,6 @@ MonoBehaviour:
   segmentsPerEdge: 30
   length: 78
   depth: 20
-  rtMargin: 0
   seaMeshPrefab: {fileID: 7168705476046234756, guid: 06e6bd08c028f51488665b08908cb89a,
     type: 3}
   surfaceMat: {fileID: 2100000, guid: e0118334d7916744d92387c236619e82, type: 2}
@@ -285,7 +284,11 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1068340682941798771, guid: f59acb6a4b28aa041bda9151cc4c0a04,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1547005778}
   m_SourcePrefab: {fileID: 100100000, guid: f59acb6a4b28aa041bda9151cc4c0a04, type: 3}
 --- !u!4 &94341965 stripped
 Transform:
@@ -974,6 +977,24 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1430802730}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1547005773 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1068340682941798771, guid: f59acb6a4b28aa041bda9151cc4c0a04,
+    type: 3}
+  m_PrefabInstance: {fileID: 94341964}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1547005778
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1547005773}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c7950a6bb96c3c4a89afa0eb8e5e6eb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

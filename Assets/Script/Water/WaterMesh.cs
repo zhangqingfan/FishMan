@@ -6,6 +6,7 @@ using UnityEditor.Build.Pipeline;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Rendering;
+using UnityEngine.UIElements;
 using static Water;
 
 partial class Water : MonoBehaviour 
@@ -20,7 +21,7 @@ partial class Water : MonoBehaviour
     public int depth;
 
     [Range(0, 10)]
-    public int rtMargin = 0;
+    private int rtMargin = 0;
     float trackRTScale;
 
     public GameObject seaMeshPrefab;
@@ -37,7 +38,6 @@ partial class Water : MonoBehaviour
     bool canOnValidate = false;
 
     public List<RenderTexture> trackRTList = new List<RenderTexture>();
-    List<ParticleSystem> psList = new List<ParticleSystem>();
 
     public class Grid
     {
@@ -96,6 +96,7 @@ partial class Water : MonoBehaviour
         Shader.SetGlobalVectorArray("GridWorldPosArray", GetGridWorldPos());
 
         StartCoroutine(CentralizeGameObject(playerTrans));
+        StartCoroutine(RenderTrackRT());
     }
 
     void CreatePlanes(List<Vector3> offsets)
@@ -175,10 +176,9 @@ partial class Water : MonoBehaviour
         }
     }
 
-    Grid FindGrid(Vector3 worldPos, float scale = 1.0f)
+    Grid FindGrid(Vector3 worldPos)
     {
         var halfLength = length / 2f;
-        halfLength *= scale;
 
         for (int i = 0; i < gridList.Count; i++)
         {
@@ -188,6 +188,24 @@ partial class Water : MonoBehaviour
         }
         return null;
     }
+
+    List<Grid> grids = new List<Grid>();
+    List<Grid> FindGridList(Vector3 worldPos, float scale)
+    {
+        grids.Clear();
+        var halfLength = scale * length / 2f;
+
+        for (int i = 0; i < gridList.Count; i++)
+        {
+            var localPos = gridList[i].root.transform.InverseTransformPoint(worldPos);
+            if (Mathf.Abs(localPos.x) <= halfLength && Mathf.Abs(localPos.z) <= halfLength)
+            {
+                grids.Add(gridList[i]);
+            }
+        }
+        return grids;
+    }
+
 
     void CentralizeGrid(Grid grid)
     {
@@ -231,8 +249,21 @@ partial class Water : MonoBehaviour
     Matrix4x4 GetProjectMatrix()
     {
         var halfLength = length / 2f;
+        halfLength *= trackRTScale;
+
         var P = Matrix4x4.Ortho(-trackRTScale * halfLength, trackRTScale * halfLength, -trackRTScale * halfLength, trackRTScale * halfLength, 1f, 200f);
         return P;
+    }
+
+    void ClearRenderTarget(Grid grid)
+    {
+        var cmd = CommandBufferPool.Get("clear cmd");
+
+        cmd.SetRenderTarget(grid.trackRT);
+        cmd.ClearRenderTarget(false, true, new Color(0f, 0f, 0f));
+        
+        Graphics.ExecuteCommandBuffer(cmd);
+        CommandBufferPool.Release(cmd);
     }
 
     void UpdateTrackRT(Grid grid, List<ParticleSystem> psList)
@@ -240,8 +271,9 @@ partial class Water : MonoBehaviour
         var cmd = CommandBufferPool.Get("my cmd");
         
         cmd.SetRenderTarget(grid.trackRT);
-        cmd.ClearRenderTarget(false, true, new Color(0f, 0f, 0f));
+        //cmd.ClearRenderTarget(false, true, new Color(0f, 0f, 0f));
         cmd.SetViewProjectionMatrices(GetViewMatrix(grid), GetProjectMatrix());
+
         foreach(var ps in psList) 
         {
             cmd.DrawRenderer(ps.GetComponent<ParticleSystemRenderer>(), ps.GetComponent<ParticleSystemRenderer>().sharedMaterial, 0, 0);
