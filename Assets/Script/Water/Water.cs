@@ -61,7 +61,6 @@ public partial class Water : MonoBehaviour
         Shader.SetGlobalMatrix("_InverseVP", vpMatrix.inverse);
     }
 
-    //这个函数有BUG!
     IEnumerator RenderTrackRT()
     {
         HashSet<Grid> gridSet = new HashSet<Grid>();
@@ -83,11 +82,12 @@ public partial class Water : MonoBehaviour
                 var grids = FindGridList(ps.gameObject.transform.position, trackRTScale);
                 for(int i = 0; i < grids.Count; i++)
                 {
+                    Debug.Log(grids[i].trackRT.name);
                     gridSet.Add(grids[i]);
                 }
             }
-
-            foreach(var grid in gridSet)
+            Debug.Log("11111111111111111");
+            foreach (var grid in gridSet)
             {
                 UpdateTrackRT(grid, psList);
             }

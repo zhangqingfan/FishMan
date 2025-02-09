@@ -172,11 +172,7 @@
 
             fixed4 frag (v2f i) : SV_Target 
             {
-                return float4(i.normal.xyz, 1); 
-
-
-
-
+                //return float4(i.normal.xyz, 1); 
 
                 float2 screenUV = i.screenPos.xy / i.screenPos.w;
                 fixed shadow = SHADOW_ATTENUATION(i);

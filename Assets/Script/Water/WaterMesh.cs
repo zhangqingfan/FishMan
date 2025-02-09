@@ -109,6 +109,7 @@ partial class Water : MonoBehaviour
         for(int i = 0; i < gridList.Count; i++) 
         {
             gridList[i].trackRT = trackRTList[i];
+            ClearRenderTarget(gridList[i]);
         }
     }
 
