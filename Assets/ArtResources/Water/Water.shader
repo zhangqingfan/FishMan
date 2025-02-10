@@ -41,7 +41,7 @@
             sampler2D _NormalTex;
             float4 _NormalTex_ST;
 
-            UNITY_DECLARE_DEPTH_TEXTURE(_CameraDepthTexture)
+            UNITY_DECLARE_DEPTH_TEXTURE(_CameraDepthTexture);
             //sampler2D _CameraDepthTexture;
             sampler2D _CameraOpaqueTexture;
             
@@ -82,20 +82,20 @@
                 return color;
             }
 
-            float4 ApplyCaustics(float3 underWaterWorldPos, float underWaterLength)
+            float4 ApplyCaustics(float2 uv, float3 underWaterWorldPos, float underWaterLength)
             {
-                // Unity approach to gain world position;
-                // float depth = tex2d(_cameradepthtexture, uv);
-                // #if defined(unity_reversed_z)
-                //     depth = depth;
-                // #else
-                //     depth = lerp(unity_near_clip_value, 1, depth);
-                // #endif
+                 //Unity approach to gain world position;
+                 //float depth = tex2D(_CameraDepthTexture, uv);
+                 //#if defined(unity_reversed_z)
+                 //    depth = depth;
+                 //#else
+                 //    depth = lerp(UNITY_NEAR_CLIP_VALUE, 1, depth);
+                 //#endif
    
-                // float3 opaqueworldpos = computeworldspaceposition_1(uv, depth, _inversevp);
+                 //float3 opaqueWorldPos = ComputeWorldSpacePosition_1(uv, depth, _InverseVP);
 
                 //my approach
-                float3 opaqueWorldPos = underWaterWorldPos;
+                 float3 opaqueWorldPos = underWaterWorldPos;
                 
                 //camera far plane
                 if(length(_WorldSpaceCameraPos - opaqueWorldPos) > 500)
@@ -104,7 +104,7 @@
                 float t = clamp(_DepthScale * underWaterLength / _WaterDepth, 0, 1);
                 fixed scale = lerp(0.2, 0.8, 1 - t);
 
-                float2 causticsUV = opaqueWorldPos.xz * scale * _CausticsScale;
+                float2 causticsUV = opaqueWorldPos.xz  * _CausticsScale;
                 causticsUV += 0.01 * sin(_Time.y);
 
                 float4 col = tex2D(_CausticsTex, causticsUV); 
@@ -181,7 +181,6 @@
                 fixed shadow = SHADOW_ATTENUATION(i);
                 
                 float2 distortUV = screenUV + sin(_Time.y) * i.normal.zx * _DistortScale;
-                float3 underWaterWorldPos = GetUnderWaterWorldPos(distortUV, i.worldPos, i.depth_distance);
                 
                 //underWaterLength < 0 above water
                 //underWaterLength > 0 under water 
@@ -191,12 +190,17 @@
                 if(underWaterLength < 0)
                 {
                     distortUV = screenUV;
-                    underWaterWorldPos = GetUnderWaterWorldPos(distortUV, i.worldPos, i.depth_distance);
                     underWaterLength = GetUnderWaterLength(distortUV, i.depth_distance);
                 }
 
+                //if(underWaterLength < 0)
+                //    return float4(1, 0, 0, 1);
+
+                float totalLength = underWaterLength + i.depth_distance.y;
+                float3 underWaterWorldPos = _WorldSpaceCameraPos + normalize(i.worldPos - _WorldSpaceCameraPos) * totalLength;
+                
                 float4 underWaterColor = SampleUnderWaterColor(distortUV, underWaterLength);
-                float4 causticsColor = ApplyCaustics(underWaterWorldPos, underWaterLength);
+                float4 causticsColor = ApplyCaustics(distortUV, underWaterWorldPos, underWaterLength);
                 underWaterColor += causticsColor;
 
                 float4 reflectionColor  = tex2D(_ReflectionTex, screenUV + i.normal.xz * half2(0.02, 0.15));
