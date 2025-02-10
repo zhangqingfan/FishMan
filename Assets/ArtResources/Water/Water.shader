@@ -70,10 +70,11 @@
                 return totalLength - aboveWaterLength;
             }
 
+            //查查这个函数的问题！！！！！要好好查，色块的问题都是这个函数，可能整体算法就有问题？？？
             half4 SampleUnderWaterColor(float2 uv, half underWaterLength)
             {
                 float4 color = tex2D(_CameraOpaqueTexture, uv);
-                float t = clamp(0.8 * _DepthScale * underWaterLength / _WaterDepth , 0, 1);
+                float t = clamp(_DepthScale * underWaterLength / _WaterDepth , 0, 1);
                 float4 waterColor = lerp(_SurfaceColor, _DeepColor, t); 
                 color *= waterColor;
                 return color;
