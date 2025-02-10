@@ -82,7 +82,7 @@
                 return color;
             }
 
-            float4 ApplyCaustics(float2 uv, float3 underWaterWorldPos, float underWaterLength)
+            float4 ApplyCaustics(float2 uv, float3 underWaterWorldPos)
             {
                  //Unity approach to gain world position;
                  //float depth = tex2D(_CameraDepthTexture, uv);
@@ -101,10 +101,7 @@
                 if(length(_WorldSpaceCameraPos - opaqueWorldPos) > 500)
                     return float4(0, 0, 0, 0);
 
-                float t = clamp(_DepthScale * underWaterLength / _WaterDepth, 0, 1);
-                fixed scale = lerp(0.2, 0.8, 1 - t);
-
-                float2 causticsUV = opaqueWorldPos.xz  * _CausticsScale;
+                float2 causticsUV = opaqueWorldPos.xz * _CausticsScale;
                 causticsUV += 0.01 * sin(_Time.y);
 
                 float4 col = tex2D(_CausticsTex, causticsUV); 
@@ -157,6 +154,21 @@
 
             v2f vert (appdata v)
             {
+                /*
+                float3 worldPos = mul(unity_ObjectToWorld, v.vertex);
+                Wave wave = SampleWave(worldPos, _Time.y);
+                v2f o;
+                o.vertex = mul(UNITY_MATRIX_VP, wave.pos);
+                o.normal = wave.normal;
+                o.screenPos = ComputeScreenPos(o.vertex);
+
+                float4 viewPos = mul(UNITY_MATRIX_V, wave.pos);
+                o.depth_distance.x = abs(viewPos.z);
+                o.depth_distance.y = length(viewPos);
+                o.worldPos = worldPos;
+                return o;
+                */
+                
                 Wave wave = SampleWave(v.vertex, _Time.y);
 
                 v2f o;
@@ -171,6 +183,7 @@
                 o.worldPos = mul(unity_ObjectToWorld, wave.pos);
                 TRANSFER_SHADOW(o);
                 return o;
+                
             }
 
             fixed4 frag (v2f i) : SV_Target 
@@ -200,14 +213,14 @@
                 float3 underWaterWorldPos = _WorldSpaceCameraPos + normalize(i.worldPos - _WorldSpaceCameraPos) * totalLength;
                 
                 float4 underWaterColor = SampleUnderWaterColor(distortUV, underWaterLength);
-                float4 causticsColor = ApplyCaustics(distortUV, underWaterWorldPos, underWaterLength);
+                float4 causticsColor = ApplyCaustics(distortUV, underWaterWorldPos);
                 underWaterColor += causticsColor;
 
                 float4 reflectionColor  = tex2D(_ReflectionTex, screenUV + i.normal.xz * half2(0.02, 0.15));
                 reflectionColor = LambertLight(reflectionColor, i.normal, i.worldPos, shadow);
                 //reflectionColor = LambertLight(reflectionColor, DistortNormal(i.worldPos, i.normal), i.worldPos, shadow);
                 
-                float4 finalColor = lerp(underWaterColor, reflectionColor, FresnelTerm(i.normal, i.worldPos));
+                float4 finalColor = lerp(underWaterColor, underWaterColor, FresnelTerm(i.normal, i.worldPos));
                 return finalColor;
             }
 
