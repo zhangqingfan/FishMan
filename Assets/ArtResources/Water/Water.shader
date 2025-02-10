@@ -41,7 +41,8 @@
             sampler2D _NormalTex;
             float4 _NormalTex_ST;
 
-            sampler2D _CameraDepthTexture;
+            UNITY_DECLARE_DEPTH_TEXTURE(_CameraDepthTexture)
+            //sampler2D _CameraDepthTexture;
             sampler2D _CameraOpaqueTexture;
             
             float _CausticsScale;
@@ -63,11 +64,12 @@
                 return _WorldSpaceCameraPos + normalize(waterWorldPos - _WorldSpaceCameraPos) * totalLength;
             }
 
-            float GetUnderWaterLength(float3 underWaterWorldPos, float3 waterWorldPos)
+            float GetUnderWaterLength(float2 screenUV, float2 depth_distance)
             {
-                float totalLength = length(underWaterWorldPos - _WorldSpaceCameraPos);
-                float aboveWaterLength = length(waterWorldPos - _WorldSpaceCameraPos);
-                return totalLength - aboveWaterLength;
+                float depth = tex2D(_CameraDepthTexture, screenUV);
+                float linearDepth = LinearEyeDepth(depth);
+                float totalLength = linearDepth * depth_distance.y / (depth_distance.x);
+                return totalLength - depth_distance.y;
             }
 
             //查查这个函数的问题！！！！！要好好查，色块的问题都是这个函数，可能整体算法就有问题？？？
@@ -183,14 +185,14 @@
                 
                 //underWaterLength < 0 above water
                 //underWaterLength > 0 under water 
-                float underWaterLength = GetUnderWaterLength(underWaterWorldPos, i.worldPos);
+                float underWaterLength = GetUnderWaterLength(distortUV, i.depth_distance);
                 
                 //如果扭曲uv后采样到水面之上的物体了，这是不被允许的，所以回退重新采样
                 if(underWaterLength < 0)
                 {
                     distortUV = screenUV;
                     underWaterWorldPos = GetUnderWaterWorldPos(distortUV, i.worldPos, i.depth_distance);
-                    underWaterLength = GetUnderWaterLength(underWaterWorldPos, i.worldPos);
+                    underWaterLength = GetUnderWaterLength(distortUV, i.depth_distance);
                 }
 
                 float4 underWaterColor = SampleUnderWaterColor(distortUV, underWaterLength);
