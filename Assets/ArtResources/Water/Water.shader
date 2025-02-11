@@ -200,7 +200,7 @@
                 underWaterColor += causticsColor;
 
                 float4 reflectionColor  = tex2D(_ReflectionTex, screenUV + i.normal.xz * half2(0.02, 0.15));
-                reflectionColor = LambertLight(reflectionColor, i.normal, i.worldPos, shadow);
+                reflectionColor = LambertLight(reflectionColor, i.normal, i.worldPos, shadow) * 0.7;
                 //reflectionColor = LambertLight(reflectionColor, DistortNormal(i.worldPos, i.normal), i.worldPos, shadow);
                 
                 float4 finalColor = lerp(underWaterColor, reflectionColor, FresnelTerm(i.normal, i.worldPos));
