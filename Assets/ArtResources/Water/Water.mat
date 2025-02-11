@@ -95,25 +95,25 @@ Material:
     - _Blend: 0
     - _BlendModePreserveSpecular: 1
     - _BumpScale: 1
-    - _CausticsScale: 0.037
-    - _CausticsnItensity: 0.4
+    - _CausticsScale: 0.049
+    - _CausticsnItensity: 1.22
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
     - _Cull: 2
     - _Cutoff: 0.5
-    - _DepthScale: 0.21
+    - _DepthScale: 0.68
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
-    - _DistortScale: 0.01
+    - _DistortScale: 0.32
     - _DstBlend: 0
     - _DstBlendAlpha: 0
     - _EnvironmentReflections: 1
-    - _FresnelBias: 0.392
+    - _FresnelBias: 0.579
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
     - _Metallic: 0
-    - _NormalBias: 0.02
+    - _NormalBias: 10
     - _OcclusionStrength: 1
     - _Parallax: 0.005
     - _QueueOffset: 0
