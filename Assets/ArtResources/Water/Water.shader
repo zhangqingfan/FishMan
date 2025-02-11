@@ -102,7 +102,7 @@
                     return float4(0, 0, 0, 0);
 
                 float2 causticsUV = opaqueWorldPos.xz * _CausticsScale;
-                causticsUV += 0.01 * sin(_Time.y);
+                causticsUV += 0.1 * sin(_Time.y);
 
                 float4 col = tex2D(_CausticsTex, causticsUV); 
                 col *= _CausticsnItensity;
