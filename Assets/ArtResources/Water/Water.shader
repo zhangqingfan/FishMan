@@ -153,22 +153,7 @@
             };
 
             v2f vert (appdata v)
-            {
-                /*
-                float3 worldPos = mul(unity_ObjectToWorld, v.vertex);
-                Wave wave = SampleWave(worldPos, _Time.y);
-                v2f o;
-                o.vertex = mul(UNITY_MATRIX_VP, wave.pos);
-                o.normal = wave.normal;
-                o.screenPos = ComputeScreenPos(o.vertex);
-
-                float4 viewPos = mul(UNITY_MATRIX_V, wave.pos);
-                o.depth_distance.x = abs(viewPos.z);
-                o.depth_distance.y = length(viewPos);
-                o.worldPos = worldPos;
-                return o;
-                */
-                
+            {   
                 Wave wave = SampleWave(v.vertex, _Time.y);
 
                 v2f o;
@@ -176,11 +161,11 @@
                 o.normal = UnityObjectToWorldNormal(wave.normal);
                 o.screenPos = ComputeScreenPos(o.vertex);
                 
-                float4 viewPos = mul(UNITY_MATRIX_MV, wave.pos);
+                float3 viewPos = UnityObjectToViewPos(wave.pos);
                 o.depth_distance.x = abs(viewPos.z);   // 摄像机空间, 视线所指的方向Z坐标是负数!!!!!
                 o.depth_distance.y = length(viewPos);
                 
-                o.worldPos = mul(unity_ObjectToWorld, wave.pos);
+                o.worldPos = mul(unity_ObjectToWorld, float4(wave.pos.xyz, 1));
                 TRANSFER_SHADOW(o);
                 return o;
                 
