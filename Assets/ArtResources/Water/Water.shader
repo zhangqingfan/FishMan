@@ -72,7 +72,6 @@
                 return totalLength - depth_distance.y;
             }
 
-            //查查这个函数的问题！！！！！要好好查，色块的问题都是这个函数，可能整体算法就有问题？？？
             half4 SampleUnderWaterColor(float2 uv, half underWaterLength)
             {
                 float4 color = tex2D(_CameraOpaqueTexture, uv);
@@ -200,7 +199,7 @@
                 underWaterColor += causticsColor;
 
                 float4 reflectionColor  = tex2D(_ReflectionTex, screenUV + i.normal.xz * half2(0.02, 0.15));
-                reflectionColor = LambertLight(reflectionColor, i.normal, i.worldPos, shadow) * 0.7;
+                reflectionColor = LambertLight(reflectionColor, i.normal, i.worldPos, shadow) * 0.9;
                 //reflectionColor = LambertLight(reflectionColor, DistortNormal(i.worldPos, i.normal), i.worldPos, shadow);
                 
                 float4 finalColor = lerp(underWaterColor, reflectionColor, FresnelTerm(i.normal, i.worldPos));
