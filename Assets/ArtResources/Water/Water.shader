@@ -125,7 +125,7 @@
             {
                 worldNormal = normalize(worldNormal);
                 float3 viewDir = normalize(_WorldSpaceCameraPos.xyz - worldPos);
-                float fresnel = pow(1.0 - max(dot(viewDir, worldNormal), 0.0), 5.0);
+                float fresnel = pow(1.0 - max(dot(viewDir, worldNormal), 0.0), 64.0);
                 return _FresnelBias + (1.0 - _FresnelBias) * fresnel;
             }
 
@@ -173,8 +173,6 @@
 
             fixed4 frag (v2f i) : SV_Target 
             {
-                //return float4(i.normal.xyz, 1); 
-
                 float2 screenUV = i.screenPos.xy / i.screenPos.w;
                 fixed shadow = SHADOW_ATTENUATION(i);
                 
@@ -205,7 +203,7 @@
                 reflectionColor = LambertLight(reflectionColor, i.normal, i.worldPos, shadow);
                 //reflectionColor = LambertLight(reflectionColor, DistortNormal(i.worldPos, i.normal), i.worldPos, shadow);
                 
-                float4 finalColor = lerp(underWaterColor, underWaterColor, FresnelTerm(i.normal, i.worldPos));
+                float4 finalColor = lerp(underWaterColor, reflectionColor, FresnelTerm(i.normal, i.worldPos));
                 return finalColor;
             }
 
