@@ -64,7 +64,7 @@ partial class Water : MonoBehaviour
             CreatePlanes(offsetList);
 
             Shader.SetGlobalInt("_WaterDepth", depth);
-            Shader.SetGlobalFloat("gridLength", length);
+            Shader.SetGlobalFloat("_GridLength", length);
             Shader.SetGlobalVectorArray("GridWorldPosArray", GetGridWorldPos());
         }
     }
@@ -91,8 +91,9 @@ partial class Water : MonoBehaviour
         CreatePlanes(offsetList);
         trackRTScale = 1.0f + (float)(rtMargin / (length * 0.5f));
 
+        Shader.SetGlobalFloat("_TrackRTScale", trackRTScale);
         Shader.SetGlobalInt("_WaterDepth", depth);
-        Shader.SetGlobalFloat("gridLength", length);
+        Shader.SetGlobalFloat("_GridLength", length);
         Shader.SetGlobalVectorArray("GridWorldPosArray", GetGridWorldPos());
 
         StartCoroutine(CentralizeGameObject(playerTrans));
@@ -252,7 +253,7 @@ partial class Water : MonoBehaviour
         var halfLength = length / 2f;
         halfLength *= trackRTScale;
 
-        var P = Matrix4x4.Ortho(-trackRTScale * halfLength, trackRTScale * halfLength, -trackRTScale * halfLength, trackRTScale * halfLength, 1f, 200f);
+        var P = Matrix4x4.Ortho(-halfLength, halfLength, -halfLength, halfLength, 1f, 200f);
         return P;
     }
 
