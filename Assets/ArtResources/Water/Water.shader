@@ -32,6 +32,7 @@
             #include "UnityPBSLighting.cginc"
 
             #include "GerstnerWave.cginc"
+            #include "WaterRT.cginc"
             #include "UnityLightingCommon.cginc"
 
             sampler2D _ReflectionTex;
@@ -138,7 +139,6 @@
             struct appdata
             {
                 float4 vertex : POSITION;
-                float2 uv : TEXCOORD0;
             };
 
             struct v2f
@@ -148,7 +148,8 @@
                 float4 screenPos : TEXCOORD1;
                 float2 depth_distance: TEXCOORD2;
                 float3 worldPos: TEXCOORD3;
-                SHADOW_COORDS(4) 
+                float4 localPos: TEXCOORD4; //w: grid index
+                SHADOW_COORDS(5) 
             };
 
             v2f vert (appdata v)
@@ -165,6 +166,8 @@
                 o.depth_distance.y = length(viewPos);
                 
                 o.worldPos = mul(unity_ObjectToWorld, float4(wave.pos.xyz, 1));
+                o.localPos.xyz = wave.pos.xyz;
+                o.localPos.w = FindSelfGridIndex(o.worldPos);
                 TRANSFER_SHADOW(o);
                 return o;
                 
@@ -204,6 +207,8 @@
                 
                 float4 finalColor = lerp(underWaterColor, reflectionColor, FresnelTerm(i.normal, i.worldPos));
                 return finalColor;
+
+                GetTrackRenderTexture(1);
             }
 
             ENDCG

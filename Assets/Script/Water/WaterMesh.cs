@@ -138,9 +138,10 @@ partial class Water : MonoBehaviour
         return grid;
     }
 
+
+    List<Vector4> worldPos = new List<Vector4>();
     List<Vector4> GetGridWorldPos()
     {
-        List<Vector4> worldPos = new List<Vector4>();
         for (int i = 0; i < gridList.Count; i++)
         {
             var gridPos = gridList[i].root.transform.position;

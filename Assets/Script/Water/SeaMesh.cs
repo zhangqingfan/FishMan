@@ -40,51 +40,25 @@ public class SeaMesh : MonoBehaviour
                 var up = (i + 1) * (segmentsPerEdge + 1) + j;
                 var diagonal = (i + 1) * (segmentsPerEdge + 1) + j + 1;
 
-                if(i % 2 == 0)
+                if(Mathf.Abs(j - i) % 2 == 0)
                 {
-                    if(j % 2 == 0)
-                    {
-                        triangles[k] = self;
-                        triangles[k + 1] = right;
-                        triangles[k + 2] = diagonal;
+                    triangles[k] = self;
+                    triangles[k + 1] = right;
+                    triangles[k + 2] = diagonal;
 
-                        triangles[k + 3] = self;
-                        triangles[k + 4] = diagonal;
-                        triangles[k + 5] = up;
-                    }
-                    else
-                    {
-                        triangles[k] = self;
-                        triangles[k + 1] = right;
-                        triangles[k + 2] = up;
-
-                        triangles[k + 3] = up;
-                        triangles[k + 4] = right;
-                        triangles[k + 5] = diagonal;
-                    }
+                    triangles[k + 3] = self;
+                    triangles[k + 4] = diagonal;
+                    triangles[k + 5] = up;
                 }
                 else
                 {
-                    if (j % 2 == 0)
-                    {
-                        triangles[k] = self;
-                        triangles[k + 1] = right;
-                        triangles[k + 2] = up;
+                    triangles[k] = self;
+                    triangles[k + 1] = right;
+                    triangles[k + 2] = up;
 
-                        triangles[k + 3] = up;
-                        triangles[k + 4] = right;
-                        triangles[k + 5] = diagonal;
-                    }
-                    else
-                    {
-                        triangles[k] = self;
-                        triangles[k + 1] = diagonal;
-                        triangles[k + 2] = up;
-
-                        triangles[k + 3] = self;
-                        triangles[k + 4] = right;
-                        triangles[k + 5] = diagonal;
-                    }
+                    triangles[k + 3] = up;
+                    triangles[k + 4] = right;
+                    triangles[k + 5] = diagonal;
                 }
 
                 k += 6;
