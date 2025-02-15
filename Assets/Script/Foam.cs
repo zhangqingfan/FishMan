@@ -31,8 +31,8 @@ public class Foam : MonoBehaviour
         if (ps != null)
         {
             var e = ps.emission;
-            //e.rateOverTime = curSpeed;
-            e.rateOverTime = 100; //BUG!!!!
+            e.rateOverTime = curSpeed;
+            //e.rateOverTime = 100; //BUG!!!!
         }
 
         oldSpeed = curSpeed;

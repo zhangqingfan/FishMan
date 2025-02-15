@@ -27,7 +27,9 @@ partial class Water : MonoBehaviour
     public GameObject seaMeshPrefab;
     public Material surfaceMat;
     public Material bottomMat;
-    
+
+    float GridHalfLength;
+
     public Transform playerTrans;
     Grid oldGrid;
     Grid curGrid;
@@ -110,7 +112,10 @@ partial class Water : MonoBehaviour
         for(int i = 0; i < gridList.Count; i++) 
         {
             gridList[i].trackRT = trackRTList[i];
-            ClearRenderTarget(gridList[i]);
+            ClearRenderTarget(gridList[i].trackRT);
+            string rtName = $"_RT{i}";
+            Shader.SetGlobalTexture(rtName, gridList[i].trackRT);
+            Debug.Log(rtName);
         }
     }
 
@@ -197,11 +202,12 @@ partial class Water : MonoBehaviour
     {
         grids.Clear();
         var halfLength = scale * length / 2f;
+        float epsilon = 0.001f;
 
         for (int i = 0; i < gridList.Count; i++)
         {
             var localPos = gridList[i].root.transform.InverseTransformPoint(worldPos);
-            if (Mathf.Abs(localPos.x) <= halfLength && Mathf.Abs(localPos.z) <= halfLength)
+            if (Mathf.Abs(localPos.x) <= halfLength + epsilon && Mathf.Abs(localPos.z) <= halfLength + epsilon)
             {
                 grids.Add(gridList[i]);
             }
@@ -258,11 +264,11 @@ partial class Water : MonoBehaviour
         return P;
     }
 
-    void ClearRenderTarget(Grid grid)
+    void ClearRenderTarget(RenderTexture rt)
     {
         var cmd = CommandBufferPool.Get("clear cmd");
 
-        cmd.SetRenderTarget(grid.trackRT);
+        cmd.SetRenderTarget(rt);
         cmd.ClearRenderTarget(false, true, new Color(0f, 0f, 0f));
         
         Graphics.ExecuteCommandBuffer(cmd);
@@ -274,7 +280,7 @@ partial class Water : MonoBehaviour
         var cmd = CommandBufferPool.Get("my cmd");
         
         cmd.SetRenderTarget(grid.trackRT);
-        //cmd.ClearRenderTarget(false, true, new Color(0f, 0f, 0f));
+        //cmd.ClearRenderTarget(false, true, new Color(1f, 0f, 0f));
         cmd.SetViewProjectionMatrices(GetViewMatrix(grid), GetProjectMatrix());
 
         foreach(var ps in psList) 

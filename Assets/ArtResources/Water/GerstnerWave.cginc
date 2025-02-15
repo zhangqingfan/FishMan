@@ -13,6 +13,10 @@ struct Wave
 
 float3 SamplePosition(float3 pos, float time)
 {
+    //bug，todo....
+    return pos;
+    
+    
     float epsilon = 0.001;
     if (abs(pos.x) >= gridLength / 2 - epsilon || abs(pos.z) >= gridLength / 2 - epsilon)
         return pos;

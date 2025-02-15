@@ -148,14 +148,14 @@
                 float4 screenPos : TEXCOORD1;
                 float2 depth_distance: TEXCOORD2;
                 float3 worldPos: TEXCOORD3;
-                float4 localPos: TEXCOORD4; //w: grid index
+                float4 localPos: TEXCOORD4; //w:grid index
                 SHADOW_COORDS(5) 
             };
 
             v2f vert (appdata v)
             {   
                 Wave wave = SampleWave(v.vertex, _Time.y);
-
+                
                 v2f o;
                 o.vertex = UnityObjectToClipPos(wave.pos);
                 o.normal = UnityObjectToWorldNormal(wave.normal);
@@ -167,14 +167,40 @@
                 
                 o.worldPos = mul(unity_ObjectToWorld, float4(wave.pos.xyz, 1));
                 o.localPos.xyz = wave.pos.xyz;
-                o.localPos.w = FindSelfGridIndex(o.worldPos);
+                o.localPos.w = FindSelfGridIndex(o.worldPos);;
+
                 TRANSFER_SHADOW(o);
                 return o;
-                
             }
 
             fixed4 frag (v2f i) : SV_Target 
             {
+
+
+                /*
+                if(i.localPos.w == 4)
+                {
+                    float3 col = SampleTrackRT(4, i.localPos.xyz);
+
+                    float epsilon = 1 * _GridLength / 512;
+                    float3 posX = float3(i.localPos.x + epsilon, 0, i.localPos.z);
+                    float3 posZ = float3(i.localPos.x, 0, i.localPos.z + epsilon);
+
+                    float3 newPosX = SampleTrackRT(4, posX);
+                    float3 newPosZ = SampleTrackRT(4, posZ);
+
+                    float3 tangentX = newPosX - col;
+                    float3 tangentZ = newPosZ - col;
+
+                    float3 nowCross = cross(float3(0,1,1), float3(0,1,0));
+                    nowCross = normalize(nowCross);
+                    return float4(nowCross.xyz, 1);
+                }*/
+                
+                //i.normal += CalculateTrackRTNormal(i.localPos.w, i.localPos.xyz);
+                //i.normal = normalize(i.normal);
+                
+
                 float2 screenUV = i.screenPos.xy / i.screenPos.w;
                 fixed shadow = SHADOW_ATTENUATION(i);
                 
@@ -207,8 +233,6 @@
                 
                 float4 finalColor = lerp(underWaterColor, reflectionColor, FresnelTerm(i.normal, i.worldPos));
                 return finalColor;
-
-                GetTrackRenderTexture(1);
             }
 
             ENDCG

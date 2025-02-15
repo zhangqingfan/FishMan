@@ -32,6 +32,10 @@ float4 _RT7_ST;
 sampler2D _RT8;
 float4 _RT8_ST;
 
+float GridHalfLength()
+{
+    return _GridLength * _TrackRTScale * 0.5;
+}
 
 int FindSelfGridIndex(float3 worldPos)
 {
@@ -41,60 +45,53 @@ int FindSelfGridIndex(float3 worldPos)
         half disZ = abs(worldPos.z - GridWorldPosArray[i].z);
         
         float epsilon = 0.001;
-        float halfLength = _GridLength * _TrackRTScale * 0.5;
-        if (disX <= halfLength + epsilon && disZ <= halfLength + epsilon)
+        if (disX <= GridHalfLength() + epsilon && disZ <= GridHalfLength() + epsilon)
             return i;
     }
     return -1;
 }
 
-sampler2D GetTrackRenderTexture(int i)
+float SampleTrackRT(int gridIndex, float3 localPos)
 {
-    if(i == 0)
-        return _RT0;
+    float2 uv = ((localPos.xz / GridHalfLength()) + 1) * 0.5;
+    float result = 0;
+
+    if(gridIndex == 0)
+        result = tex2Dlod(_RT0, float4(uv, 0, 0)).y;
+    else if (gridIndex == 1)
+        result = tex2Dlod(_RT1, float4(uv, 0, 0)).y;
+    else if (gridIndex == 2)
+        result = tex2Dlod(_RT2, float4(uv, 0, 0)).y;
+    else if (gridIndex == 3)
+        result = tex2Dlod(_RT3, float4(uv, 0, 0)).y;
+    else if (gridIndex == 4)
+        result = tex2Dlod(_RT4, float4(uv, 0, 0)).y;
+    else if (gridIndex == 5)
+        result = tex2Dlod(_RT5, float4(uv, 0, 0)).y;
+    else if (gridIndex == 6)
+        result = tex2Dlod(_RT6, float4(uv, 0, 0)).y;
+    else if (gridIndex == 7)
+        result = tex2Dlod(_RT7, float4(uv, 0, 0)).y;
+    else if (gridIndex == 8)
+        result = tex2Dlod(_RT8, float4(uv, 0, 0)).y;
     
-    else if (i == 1)
-        return _RT1;
-    
-    else if (i == 2)
-        return _RT2;
-    
-    else if (i == 3)
-        return _RT3;
-    
-    else if (i == 4)
-        return _RT4;
-    
-    else if (i == 5)
-        return _RT5;
-    
-    else if (i == 6)
-        return _RT6;
-    
-    else if (i == 7)
-        return _RT7;
-    
-    else if (i == 8)
-        return _RT8;
+    return result * 1;
 }
 
-float3 SampleTrackRT(float3 worldPos, float3 localPos)
+float3 CalculateTrackRTNormal(int gridIndex, float3 localPos)
 {
-    float halfLength = _GridLength * 0.5;
-    float2 uv = ((localPos / (halfLength * _TrackRTScale)) + 1) * 0.5;
+    float3 rtPos = SampleTrackRT(gridIndex, localPos);
     
-    int index = FindSelfGridIndex(worldPos);
-    sampler2D trackRT = GetTrackRenderTexture(index);
+    float epsilon = 0 * _GridLength / 512;
+    float3 posX = SampleTrackRT(gridIndex, localPos + float3(epsilon, 0, 0));
+    float3 posZ = SampleTrackRT(gridIndex, localPos + float3(0, 0, epsilon));
     
-    return float3(0, tex2D(trackRT, uv).y, 0);
+    float3 tangentX = posX - rtPos;
+    float3 tangentZ = posZ - rtPos;
+    
+    float3 normal = cross(tangentX, tangentZ);
+    normal.y = (normal.y); //unity axis is different from right-hand axis!!!
+    
+    return normalize(normal);
 }
-
-float3 CalculateTrackRTNormal(float3 pos)
-{
-    
-    
-    
-    return float3(0, 0, 0);
-}
-
 #endif  

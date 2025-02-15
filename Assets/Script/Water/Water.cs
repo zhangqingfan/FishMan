@@ -72,7 +72,7 @@ public partial class Water : MonoBehaviour
 
             foreach (var grid in gridSet)
             {
-                ClearRenderTarget(grid);
+                //ClearRenderTarget(grid.trackRT);
             }
 
             gridSet.Clear();
