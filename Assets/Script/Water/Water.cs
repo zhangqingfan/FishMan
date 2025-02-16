@@ -82,11 +82,11 @@ public partial class Water : MonoBehaviour
                 var grids = FindGridList(ps.gameObject.transform.position, trackRTScale);
                 for(int i = 0; i < grids.Count; i++)
                 {
-                    Debug.Log(grids[i].trackRT.name);
+                    //Debug.Log(grids[i].trackRT.name);
                     gridSet.Add(grids[i]);
                 }
             }
-            Debug.Log("11111111111111111");
+            //Debug.Log("11111111111111111");
             foreach (var grid in gridSet)
             {
                 UpdateTrackRT(grid, psList);

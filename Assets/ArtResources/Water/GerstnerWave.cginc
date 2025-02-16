@@ -1,9 +1,10 @@
 ﻿#ifndef GERSTNER_WAVE 
 #define GERSTNER_WAVE  
 
+#include "WaterRT.cginc"
+
 int dataCount;
 half4 waveData[20];
-float gridLength;
 
 struct Wave
 {
@@ -12,13 +13,9 @@ struct Wave
 };
 
 float3 SamplePosition(float3 pos, float time)
-{
-    //bug，todo....
-    return pos;
-    
-    
+{   
     float epsilon = 0.001;
-    if (abs(pos.x) >= gridLength / 2 - epsilon || abs(pos.z) >= gridLength / 2 - epsilon)
+    if (abs(pos.x) >= _GridLength / 2 - epsilon || abs(pos.z) >= _GridLength / 2 - epsilon)
         return pos;
    
     float3 newPos = pos;
@@ -47,7 +44,7 @@ float3 SamplePosition(float3 pos, float time)
 float3 CalculateNormal(float3 pos, float time)
 {
     float epsilon = 0.001;
-    if (abs(pos.x) >= gridLength / 2 - epsilon || abs(pos.z) >= gridLength / 2 - epsilon)
+    if (abs(pos.x) >= _GridLength / 2 - epsilon || abs(pos.z) >= _GridLength / 2 - epsilon)
         return float3(0, 1, 0);
     
     float3 newPos = SamplePosition(pos, time);

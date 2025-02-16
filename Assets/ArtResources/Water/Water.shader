@@ -200,7 +200,6 @@
                 //i.normal += CalculateTrackRTNormal(i.localPos.w, i.localPos.xyz);
                 //i.normal = normalize(i.normal);
                 
-
                 float2 screenUV = i.screenPos.xy / i.screenPos.w;
                 fixed shadow = SHADOW_ATTENUATION(i);
                 

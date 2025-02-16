@@ -23,7 +23,7 @@
             #include "../Water/GerstnerWave.cginc"
             #include "UnityCG.cginc"
 
-            float4x4 _curGridWorldToLocal;
+            float4x4 GridWorldToLocal[9];
 
             struct appdata
             {
@@ -40,20 +40,22 @@
             };
 
             sampler2D _MainTex;
-            sampler2D _MaskTex;
             float4 _MainTex_ST;
-            float4x4 _WorldToLocal;
+
+            sampler2D _MaskTex;
+            float4 _MaskTex_ST;
 
             v2f vert (appdata v)
             {
                 float4 worldPos = mul(unity_ObjectToWorld, v.vertex);
-                float3 curGridLocalPos = mul(_curGridWorldToLocal, worldPos);
-                Wave wave = SampleWave(curGridLocalPos, _Time.y);
-                //Wave wave = SampleWave(v.vertex, _Time.y);
-                wave.pos.y += 0.5f;
+                int index = FindSelfGridIndex(worldPos.xyz);
+                float3 localPos = mul(GridWorldToLocal[index], worldPos).xyz;
+                
+                float3 gerstnerPos = SamplePosition(localPos, _Time.y);
+                v.vertex.y = gerstnerPos.y + 0.2f;
 
                 v2f o;
-                o.vertex = UnityObjectToClipPos(wave.pos);
+                o.vertex = UnityObjectToClipPos(v.vertex);
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
                 o.color = v.color;
                 return o;

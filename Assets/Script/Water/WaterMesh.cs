@@ -96,7 +96,9 @@ partial class Water : MonoBehaviour
         Shader.SetGlobalFloat("_TrackRTScale", trackRTScale);
         Shader.SetGlobalInt("_WaterDepth", depth);
         Shader.SetGlobalFloat("_GridLength", length);
-        Shader.SetGlobalVectorArray("GridWorldPosArray", GetGridWorldPos());
+        
+        //先注释掉试试看？？
+        //Shader.SetGlobalVectorArray("GridWorldPosArray", GetGridWorldPos());
 
         StartCoroutine(CentralizeGameObject(playerTrans));
         StartCoroutine(RenderTrackRT());
@@ -147,40 +149,46 @@ partial class Water : MonoBehaviour
     List<Vector4> worldPos = new List<Vector4>();
     List<Vector4> GetGridWorldPos()
     {
+        worldPos.Clear();
         for (int i = 0; i < gridList.Count; i++)
         {
-            var gridPos = gridList[i].root.transform.position;
+            var gridPos = gridList[i].surface.transform.position;
             var pos = new Vector4(gridPos.x, gridPos.y, gridPos.z, 1);
             worldPos.Add(gridPos);
         }
         return worldPos;
     }
 
+    List<Matrix4x4> world2Local = new List<Matrix4x4>();
+    List<Matrix4x4> GetGridWorld2Local()
+    {
+        world2Local.Clear();
+        for (int i = 0; i < gridList.Count; i++)
+        {
+            var trans = gridList[i].surface.transform;
+            world2Local.Add(trans.worldToLocalMatrix);
+        }
+        return world2Local;
+    }
+
     IEnumerator CentralizeGameObject(Transform trans)
     {
-        if(trans == null)
-            yield break;
-
-        var grid = FindGrid(trans.position);
-        oldGrid = grid;
-        curGrid = grid;
-        CentralizeGrid(grid);
-        Shader.SetGlobalMatrix("_curGridWorldToLocal", curGrid.root.transform.worldToLocalMatrix);
-
+        oldGrid = null;
         var timeStep = new WaitForSeconds(0.5f);
+        
         while (true)
         {
-            yield return timeStep;
-
             curGrid = FindGrid(trans.position);
             if (curGrid != oldGrid)
             {
                 Debug.Log("Change Grid!!!"); 
                 CentralizeGrid(curGrid);
                 oldGrid = curGrid;
-                //Shader.SetGlobalMatrix("_curGridWorldToLocal", curGrid.root.transform.worldToLocalMatrix);
+                Shader.SetGlobalMatrixArray("GridWorldToLocal", GetGridWorld2Local());
                 Shader.SetGlobalVectorArray("GridWorldPosArray", GetGridWorldPos());
             }
+
+            yield return timeStep;
         }
     }
 
@@ -280,7 +288,7 @@ partial class Water : MonoBehaviour
         var cmd = CommandBufferPool.Get("my cmd");
         
         cmd.SetRenderTarget(grid.trackRT);
-        //cmd.ClearRenderTarget(false, true, new Color(1f, 0f, 0f));
+        //cmd.ClearRenderTarget(false, true, new Color(0f, 0f, 0f));
         cmd.SetViewProjectionMatrices(GetViewMatrix(grid), GetProjectMatrix());
 
         foreach(var ps in psList) 

@@ -2,6 +2,7 @@
 #define WATER_RT  
 
 half4 GridWorldPosArray[9];
+
 float _GridLength;
 float _TrackRTScale;
 
@@ -34,7 +35,7 @@ float4 _RT8_ST;
 
 float GridHalfLength()
 {
-    return _GridLength * _TrackRTScale * 0.5;
+    return _GridLength * 0.5;
 }
 
 int FindSelfGridIndex(float3 worldPos)
