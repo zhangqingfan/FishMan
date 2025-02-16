@@ -22,13 +22,10 @@ partial class Water : MonoBehaviour
 
     [Range(0, 10)]
     private int rtMargin = 0;
-    float trackRTScale;
 
     public GameObject seaMeshPrefab;
     public Material surfaceMat;
     public Material bottomMat;
-
-    float GridHalfLength;
 
     public Transform playerTrans;
     Grid oldGrid;
@@ -91,9 +88,6 @@ partial class Water : MonoBehaviour
         offsetList.Add(new Vector3(1, 0, 1));
 
         CreatePlanes(offsetList);
-        trackRTScale = 1.0f + (float)(rtMargin / (length * 0.5f));
-
-        Shader.SetGlobalFloat("_TrackRTScale", trackRTScale);
         Shader.SetGlobalInt("_WaterDepth", depth);
         Shader.SetGlobalFloat("_GridLength", length);
         
@@ -194,8 +188,7 @@ partial class Water : MonoBehaviour
 
     Grid FindGrid(Vector3 worldPos)
     {
-        var halfLength = length / 2f;
-
+        var halfLength = length * 0.5f;
         for (int i = 0; i < gridList.Count; i++)
         {
             var localPos = gridList[i].root.transform.InverseTransformPoint(worldPos);
@@ -206,16 +199,14 @@ partial class Water : MonoBehaviour
     }
 
     List<Grid> grids = new List<Grid>();
-    List<Grid> FindGridList(Vector3 worldPos, float scale)
+    List<Grid> FindGridMarginList(Vector3 worldPos)
     {
         grids.Clear();
-        var halfLength = scale * length / 2f;
-        float epsilon = 0.001f;
-
+        var halfLength = rtMargin + length * 0.5f;
         for (int i = 0; i < gridList.Count; i++)
         {
             var localPos = gridList[i].root.transform.InverseTransformPoint(worldPos);
-            if (Mathf.Abs(localPos.x) <= halfLength + epsilon && Mathf.Abs(localPos.z) <= halfLength + epsilon)
+            if (Mathf.Abs(localPos.x) <= halfLength && Mathf.Abs(localPos.z) <= halfLength)
             {
                 grids.Add(gridList[i]);
             }
@@ -257,7 +248,7 @@ partial class Water : MonoBehaviour
     Matrix4x4 GetViewMatrix(Grid grid)
     {
         var V = Matrix4x4.Scale(new Vector3(1, 1, -1)) * 
-                Matrix4x4.TRS(grid.root.transform.position + grid.root.transform.up * 100f, 
+                Matrix4x4.TRS(grid.surface.transform.position + grid.surface.transform.up * 100f, 
                               Quaternion.AngleAxis(90f, grid.root.transform.right), 
                               Vector3.one).inverse;
         return V;
@@ -265,9 +256,7 @@ partial class Water : MonoBehaviour
 
     Matrix4x4 GetProjectMatrix()
     {
-        var halfLength = length / 2f;
-        halfLength *= trackRTScale;
-
+        var halfLength = length * 0.5f;
         var P = Matrix4x4.Ortho(-halfLength, halfLength, -halfLength, halfLength, 1f, 200f);
         return P;
     }

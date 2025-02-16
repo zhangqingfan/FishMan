@@ -2,9 +2,7 @@
 #define WATER_RT  
 
 half4 GridWorldPosArray[9];
-
 float _GridLength;
-float _TrackRTScale;
 
 sampler2D _RT0;
 float4 _RT0_ST;
@@ -45,8 +43,7 @@ int FindSelfGridIndex(float3 worldPos)
         half disX = abs(worldPos.x - GridWorldPosArray[i].x);
         half disZ = abs(worldPos.z - GridWorldPosArray[i].z);
         
-        float epsilon = 0.001;
-        if (disX <= GridHalfLength() + epsilon && disZ <= GridHalfLength() + epsilon)
+        if (disX <= GridHalfLength() && disZ <= GridHalfLength())
             return i;
     }
     return -1;

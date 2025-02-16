@@ -72,6 +72,7 @@ public partial class Water : MonoBehaviour
 
             foreach (var grid in gridSet)
             {
+                //bug!ceshi yong !
                 //ClearRenderTarget(grid.trackRT);
             }
 
@@ -79,14 +80,14 @@ public partial class Water : MonoBehaviour
             
             foreach (var ps in psList)
             {
-                var grids = FindGridList(ps.gameObject.transform.position, trackRTScale);
+                var grids = FindGridMarginList(ps.gameObject.transform.position);
                 for(int i = 0; i < grids.Count; i++)
                 {
                     //Debug.Log(grids[i].trackRT.name);
                     gridSet.Add(grids[i]);
                 }
             }
-            //Debug.Log("11111111111111111");
+
             foreach (var grid in gridSet)
             {
                 UpdateTrackRT(grid, psList);

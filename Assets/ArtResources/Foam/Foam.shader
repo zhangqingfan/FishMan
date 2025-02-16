@@ -52,7 +52,7 @@
                 float3 localPos = mul(GridWorldToLocal[index], worldPos).xyz;
                 
                 float3 gerstnerPos = SamplePosition(localPos, _Time.y);
-                v.vertex.y = gerstnerPos.y + 0.2f;
+                v.vertex.y = gerstnerPos.y + 0.4f;
 
                 v2f o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
