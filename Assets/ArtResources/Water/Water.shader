@@ -15,6 +15,8 @@
         _SurfaceColor ("_SurfaceColor", Color) = (1, 1, 1, 1) 
         _DeepColor ("_DeepColor", Color) = (1, 1, 1, 1)
         _NormalTex ("Normal Texture", 2D) = "white" {}
+
+        _FoamMask ("FoamMask", 2D) = "white" {}
     }
     SubShader
     {
@@ -33,6 +35,7 @@
 
             #include "GerstnerWave.cginc"
             #include "WaterRT.cginc"
+            #include "WaterFoam.cginc"
             #include "UnityLightingCommon.cginc"
 
             sampler2D _ReflectionTex;
