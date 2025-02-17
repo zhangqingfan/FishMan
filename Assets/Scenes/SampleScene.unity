@@ -221,6 +221,16 @@ PrefabInstance:
       propertyPath: m_Materials.Array.size
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4901602582655435358, guid: f59acb6a4b28aa041bda9151cc4c0a04,
+        type: 3}
+      propertyPath: InitialModule.startLifetime.scalar
+      value: 3.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4901602582655435358, guid: f59acb6a4b28aa041bda9151cc4c0a04,
+        type: 3}
+      propertyPath: InitialModule.startLifetime.minScalar
+      value: 1.5
+      objectReference: {fileID: 0}
     - target: {fileID: 5555592887201672627, guid: f59acb6a4b28aa041bda9151cc4c0a04,
         type: 3}
       propertyPath: m_LocalPosition.x
