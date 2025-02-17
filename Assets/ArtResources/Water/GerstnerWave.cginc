@@ -49,7 +49,7 @@ float3 CalculateNormal(float3 pos, float time)
     
     float3 newPos = SamplePosition(pos, time);
     
-    epsilon = 0.1f;
+    epsilon = 0.05f;
     float3 posX = float3(pos.x + epsilon, 0, pos.z);
     float3 posZ = float3(pos.x, 0, pos.z + epsilon);
 

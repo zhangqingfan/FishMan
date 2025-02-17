@@ -4,6 +4,9 @@
 sampler2D _FoamMask;
 float4 _FoamMask_ST;
 
+sampler2D _ContactFoamMask;
+float4 _ContactFoamMask_ST;
+
 float FoamRemap(float origFrom, float origTo, float targetFrom, float targetTo, float value)
 {
     return lerp(targetFrom, targetTo, (value - origFrom) / (origTo - origFrom));
@@ -48,16 +51,34 @@ float3 GetFoamAlbedo(float2 uv, float coverage)
     alpha *= sharpness;
     alpha = saturate(alpha);
 
-	// detail in alpha
     float distanceFieldInAlpha = lerp(macroDistanceField, microDistanceField, 0.5f) * 0.45f;
     distanceFieldInAlpha = 1.0f - distanceFieldInAlpha;
     float noiseInAlpha = pow(foamNoise, 0.3f);
-
+    
 	// fade
     float fadeOverTime = pow(1.0 - foamTime, 2);
-
-    float3 albedo = alpha * distanceFieldInAlpha * noiseInAlpha * fadeOverTime /* + foamBubble.r * 0.8 * data.coverage.x*/;
-
-    return albedo;
+    return fadeOverTime * alpha * distanceFieldInAlpha * noiseInAlpha;
 }
+
+float WaveFoamCoverage(float waveHeight, float3 normal)
+{
+    float heightFactor = pow(saturate(waveHeight / 1), 1.2);
+    float stepFactor = 1.0 - normal.y;
+    return heightFactor * stepFactor;
+}
+
+float ContactFoam(float2 worldUV, float waterDepth)
+{
+    //return 0;
+    
+    float2 uv = worldUV * 0.5;
+    float3 contactTexture = tex2D(_ContactFoamMask, uv);
+
+    float contactValue = dot(contactTexture, float3(1, 1, 1));
+    float distanceFactor = (1 - saturate(abs(waterDepth) / 20));
+
+    contactValue = contactValue * pow(distanceFactor, 20);
+    return contactValue;
+}
+
 #endif

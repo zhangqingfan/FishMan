@@ -3,7 +3,7 @@
     Properties
     {
         _DepthScale("Depth Scale", Range(0, 2)) = 1
-        _DistortScale("Distort Scale", Range(0, 5)) = 1
+        _DistortScale("Distort Scale", Range(0, 1)) = 1
         
         _CausticsScale("Caustics Scale", Range(0, 0.3)) = 0.01
         _CausticsnItensity("Caustics Itensity", Range(0, 3)) = 1
@@ -17,6 +17,10 @@
         _NormalTex ("Normal Texture", 2D) = "white" {}
 
         _FoamMask ("FoamMask", 2D) = "white" {}
+        _FoamItensity("FoamItensity", Range(1, 500)) = 1
+
+        _ContactFoamMask ("ContactFoamMask", 2D) = "white" {}
+        _Contactnsity("Contactnsity", Range(0, 10)) = 0.25
     }
     SubShader
     {
@@ -59,7 +63,9 @@
             float4x4 _InverseVP;
             float _FresnelBias;
             float _NormalBias;
-            
+            float _FoamItensity;
+            float _Contactnsity;
+
             float3 GetUnderWaterWorldPos(float2 screenUV, float3 waterWorldPos, float2 depth_distance)
             {
                 float depth = tex2D(_CameraDepthTexture, screenUV);
@@ -178,8 +184,6 @@
 
             fixed4 frag (v2f i) : SV_Target 
             {
-
-
                 /*
                 if(i.localPos.w == 4)
                 {
@@ -206,8 +210,11 @@
                 float2 screenUV = i.screenPos.xy / i.screenPos.w;
                 fixed shadow = SHADOW_ATTENUATION(i);
                 
-                float2 distortUV = screenUV + sin(_Time.y) * i.normal.zx * _DistortScale;
-                
+                //bug!!!
+                //float2 distortUV = mul(UNITY_MATRIX_VP, float4(i.normal.xyz, 1)).xz;
+                float2 distortUV = sin(_Time.y) * i.normal.zx * _DistortScale;
+                distortUV += screenUV;
+
                 //underWaterLength < 0 above water
                 //underWaterLength > 0 under water 
                 float underWaterLength = GetUnderWaterLength(distortUV, i.depth_distance);
@@ -234,6 +241,11 @@
                 //reflectionColor = LambertLight(reflectionColor, DistortNormal(i.worldPos, i.normal), i.worldPos, shadow);
                 
                 float4 finalColor = lerp(underWaterColor, reflectionColor, FresnelTerm(i.normal, i.worldPos));
+
+                float coverage = WaveFoamCoverage(i.localPos.y, normalize(i.normal)) * _FoamItensity +
+                                 ContactFoam(i.worldPos.xz, underWaterLength) * _Contactnsity;
+
+                finalColor += float4(GetFoamAlbedo(i.worldPos.xz, coverage).xyz, 1);
                 return finalColor;
             }
 
