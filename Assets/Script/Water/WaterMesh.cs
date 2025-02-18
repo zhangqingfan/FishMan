@@ -165,6 +165,18 @@ partial class Water : MonoBehaviour
         return world2Local;
     }
 
+    List<Matrix4x4> local2World = new List<Matrix4x4>();
+    List<Matrix4x4> GetGridLocal2World()
+    {
+        local2World.Clear();
+        for (int i = 0; i < gridList.Count; i++)
+        {
+            var trans = gridList[i].surface.transform;
+            local2World.Add(trans.localToWorldMatrix);
+        }
+        return local2World;
+    }
+
     IEnumerator CentralizeGameObject(Transform trans)
     {
         oldGrid = null;
@@ -173,12 +185,15 @@ partial class Water : MonoBehaviour
         while (true)
         {
             curGrid = FindGrid(trans.position);
+
             if (curGrid != oldGrid)
             {
                 Debug.Log("Change Grid!!!"); 
                 CentralizeGrid(curGrid);
                 oldGrid = curGrid;
+
                 Shader.SetGlobalMatrixArray("GridWorldToLocal", GetGridWorld2Local());
+                Shader.SetGlobalMatrixArray("GridLocalToWorld", GetGridLocal2World());
                 Shader.SetGlobalVectorArray("GridWorldPosArray", GetGridWorldPos());
             }
 
