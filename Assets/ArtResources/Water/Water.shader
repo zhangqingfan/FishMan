@@ -17,7 +17,7 @@
         _NormalTex ("Normal Texture", 2D) = "white" {}
 
         _FoamMask ("FoamMask", 2D) = "white" {}
-        _FoamItensity("FoamItensity", Range(1, 500)) = 1
+        _FoamItensity("FoamItensity", Range(1, 10)) = 1
 
         _ContactFoamMask ("ContactFoamMask", 2D) = "white" {}
         _Contactnsity("Contactnsity", Range(0, 10)) = 0.25
