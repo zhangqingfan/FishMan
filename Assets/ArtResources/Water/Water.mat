@@ -119,7 +119,7 @@ Material:
     - _EnvironmentReflections: 1
     - _FoamItensity: 10
     - _FoamTest: 1
-    - _FresnelBias: 0.51
+    - _FresnelBias: 0.659
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
