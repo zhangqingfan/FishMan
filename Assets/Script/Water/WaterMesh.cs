@@ -11,7 +11,7 @@ using static Water;
 
 partial class Water : MonoBehaviour 
 {
-    [Range(2, 30)]
+    //[Range(30, 500)]
     public int segmentsPerEdge;
     
     [Range(10, 100)]
@@ -138,7 +138,6 @@ partial class Water : MonoBehaviour
 
         return grid;
     }
-
 
     List<Vector4> worldPos = new List<Vector4>();
     List<Vector4> GetGridWorldPos()
