@@ -64,7 +64,7 @@ public partial class Water : MonoBehaviour
     IEnumerator RenderTrackRT()
     {
         HashSet<Grid> gridSet = new HashSet<Grid>();
-        var timeStep = new WaitForSeconds(0.05f);
+        var timeStep = new WaitForSeconds(0.02f);
 
         while(true)
         {
@@ -72,8 +72,7 @@ public partial class Water : MonoBehaviour
 
             foreach (var grid in gridSet)
             {
-                //bug!ceshi yong !
-                //ClearRenderTarget(grid.trackRT);
+                ClearRenderTarget(grid.trackRT);
             }
 
             gridSet.Clear();

@@ -158,7 +158,7 @@
                 float2 depth_distance: TEXCOORD2;
                 float3 worldPos: TEXCOORD3;
                 float4 localPos: TEXCOORD4; //w:grid index
-                float offsetY: TEXCOORD5;
+                float originalY: TEXCOORD5; //not used.
                 SHADOW_COORDS(6)
             };
 
@@ -168,7 +168,7 @@
                 float4 worldPos = mul(unity_ObjectToWorld, float4(wave.pos.xyz, 1));
                 int gridIndex = FindSelfGridIndex(worldPos.xyz);
                 float offsetY = SampleTrackRT(gridIndex, wave.pos);
-                wave.pos.y += offsetY;
+                wave.pos.y -= offsetY;
                 
                 v2f o;
                 o.vertex = UnityObjectToClipPos(wave.pos);
@@ -183,7 +183,8 @@
                 o.localPos.xyz = wave.pos.xyz;
                 o.localPos.w = gridIndex;
                 
-                o.offsetY = offsetY;
+                o.originalY = wave.pos.y + offsetY;
+
                 TRANSFER_SHADOW(o);
                 return o;
             }
@@ -228,7 +229,7 @@
                 
                 float4 finalColor = lerp(underWaterColor, reflectionColor, FresnelTerm(i.normal, i.worldPos));
 
-                float coverage = WaveFoamCoverage(i.localPos.y - i.offsetY, normalize(i.normal)) * _FoamItensity +
+                float coverage = WaveFoamCoverage(i.localPos.y, normalize(i.normal)) * _FoamItensity +
                                  ContactFoam(i.worldPos.xz, underWaterLength) * _Contactnsity;
 
                 finalColor += float4(GetFoamAlbedo(i.worldPos.xz, coverage).xyz, 1);

@@ -52,12 +52,12 @@
 
                 float3 localPos = mul(GridWorldToLocal[index], worldPos).xyz;
                 localPos = SamplePosition(localPos, _Time.y);
-                localPos.y += SampleTrackRT(index, localPos);
+                localPos.y -= SampleTrackRT(index, localPos);
 
                 worldPos = mul(GridLocalToWorld[index], float4(localPos.xyz, 1));
 
                 v.vertex.y = mul(unity_WorldToObject, worldPos).y;
-                v.vertex.y += 0.3f;
+                v.vertex.y += 0.2f;
 
                 v2f o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
