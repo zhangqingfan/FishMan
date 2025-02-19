@@ -17,7 +17,7 @@
         _NormalTex ("Normal Texture", 2D) = "white" {}
 
         _FoamMask ("FoamMask", 2D) = "white" {}
-        _FoamItensity("FoamItensity", Range(1, 10)) = 1
+        _FoamItensity("FoamItensity", Range(1, 1000)) = 1
 
         _ContactFoamMask ("ContactFoamMask", 2D) = "white" {}
         _Contactnsity("Contactnsity", Range(0, 10)) = 0.25
@@ -158,12 +158,17 @@
                 float2 depth_distance: TEXCOORD2;
                 float3 worldPos: TEXCOORD3;
                 float4 localPos: TEXCOORD4; //w:grid index
-                SHADOW_COORDS(5) 
+                float offsetY: TEXCOORD5;
+                SHADOW_COORDS(6)
             };
 
             v2f vert (appdata v)
             {   
                 Wave wave = SampleWave(v.vertex, _Time.y);
+                float4 worldPos = mul(unity_ObjectToWorld, float4(wave.pos.xyz, 1));
+                int gridIndex = FindSelfGridIndex(worldPos.xyz);
+                float offsetY = SampleTrackRT(gridIndex, wave.pos);
+                wave.pos.y += offsetY;
                 
                 v2f o;
                 o.vertex = UnityObjectToClipPos(wave.pos);
@@ -174,38 +179,19 @@
                 o.depth_distance.x = abs(viewPos.z);   // 摄像机空间, 视线所指的方向Z坐标是负数!!!!!
                 o.depth_distance.y = length(viewPos);
                 
-                o.worldPos = mul(unity_ObjectToWorld, float4(wave.pos.xyz, 1));
+                o.worldPos = mul(unity_ObjectToWorld, float4(wave.pos.xyz, 1)).xyz;
                 o.localPos.xyz = wave.pos.xyz;
-                o.localPos.w = FindSelfGridIndex(o.worldPos);;
-
+                o.localPos.w = gridIndex;
+                
+                o.offsetY = offsetY;
                 TRANSFER_SHADOW(o);
                 return o;
             }
 
             fixed4 frag (v2f i) : SV_Target 
-            {
-                /*
-                if(i.localPos.w == 4)
-                {
-                    float3 col = SampleTrackRT(4, i.localPos.xyz);
-
-                    float epsilon = 1 * _GridLength / 512;
-                    float3 posX = float3(i.localPos.x + epsilon, 0, i.localPos.z);
-                    float3 posZ = float3(i.localPos.x, 0, i.localPos.z + epsilon);
-
-                    float3 newPosX = SampleTrackRT(4, posX);
-                    float3 newPosZ = SampleTrackRT(4, posZ);
-
-                    float3 tangentX = newPosX - col;
-                    float3 tangentZ = newPosZ - col;
-
-                    float3 nowCross = cross(float3(0,1,1), float3(0,1,0));
-                    nowCross = normalize(nowCross);
-                    return float4(nowCross.xyz, 1);
-                }*/
-                
-                //i.normal += CalculateTrackRTNormal(i.localPos.w, i.localPos.xyz);
-                //i.normal = normalize(i.normal);
+            {   
+                i.normal += CalculateTrackRTNormal(i.localPos.w, i.localPos.xyz);
+                i.normal = normalize(i.normal);
                 
                 float2 screenUV = i.screenPos.xy / i.screenPos.w;
                 fixed shadow = SHADOW_ATTENUATION(i);
@@ -242,7 +228,7 @@
                 
                 float4 finalColor = lerp(underWaterColor, reflectionColor, FresnelTerm(i.normal, i.worldPos));
 
-                float coverage = WaveFoamCoverage(i.localPos.y, normalize(i.normal)) * _FoamItensity +
+                float coverage = WaveFoamCoverage(i.localPos.y - i.offsetY, normalize(i.normal)) * _FoamItensity +
                                  ContactFoam(i.worldPos.xz, underWaterLength) * _Contactnsity;
 
                 finalColor += float4(GetFoamAlbedo(i.worldPos.xz, coverage).xyz, 1);

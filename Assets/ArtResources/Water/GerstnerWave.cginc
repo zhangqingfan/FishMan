@@ -14,6 +14,9 @@ struct Wave
 
 float3 SamplePosition(float3 pos, float time)
 {   
+    //return pos;
+    
+    
     float epsilon = 0.001;
     if (abs(pos.x) >= _GridLength / 2 - epsilon || abs(pos.z) >= _GridLength / 2 - epsilon)
         return pos;

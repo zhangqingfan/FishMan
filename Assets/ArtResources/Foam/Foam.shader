@@ -13,7 +13,6 @@
         Pass
         {
             ZWrite Off
-            //ZTest Always
             Blend one one
 
             CGPROGRAM
@@ -53,6 +52,8 @@
 
                 float3 localPos = mul(GridWorldToLocal[index], worldPos).xyz;
                 localPos = SamplePosition(localPos, _Time.y);
+                localPos.y += SampleTrackRT(index, localPos);
+
                 worldPos = mul(GridLocalToWorld[index], float4(localPos.xyz, 1));
 
                 v.vertex.y = mul(unity_WorldToObject, worldPos).y;

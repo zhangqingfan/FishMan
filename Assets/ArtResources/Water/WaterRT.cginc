@@ -78,18 +78,22 @@ float SampleTrackRT(int gridIndex, float3 localPos)
 
 float3 CalculateTrackRTNormal(int gridIndex, float3 localPos)
 {
-    float3 rtPos = SampleTrackRT(gridIndex, localPos);
+    float epsilon = 2 * _GridLength / 512;
+    float3 offsetX = localPos + float3(epsilon, 0, 0);
+    float3 offsetZ = localPos + float3(0, 0, epsilon);
     
-    float epsilon = 0 * _GridLength / 512;
-    float3 posX = SampleTrackRT(gridIndex, localPos + float3(epsilon, 0, 0));
-    float3 posZ = SampleTrackRT(gridIndex, localPos + float3(0, 0, epsilon));
+    offsetX.y += SampleTrackRT(gridIndex, offsetX);
+    offsetZ.y += SampleTrackRT(gridIndex, offsetZ);
     
-    float3 tangentX = posX - rtPos;
-    float3 tangentZ = posZ - rtPos;
+    float3 tangentX = offsetX - localPos;
+    float3 tangentZ = offsetZ - localPos;
+    
+    if (length(tangentX - tangentZ) <= 0.0001)
+        return float3(0, 0, 0);
     
     float3 normal = cross(tangentX, tangentZ);
-    normal.y = (normal.y); //unity axis is different from right-hand axis!!!
-    
+    normal.y = abs(normal.y);
     return normalize(normal);
 }
+
 #endif  
