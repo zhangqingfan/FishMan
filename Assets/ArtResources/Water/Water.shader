@@ -152,7 +152,7 @@
 
             struct v2f
             {
-                float4 vertex : POSITION;
+                float4 pos : POSITION;
                 float3 normal : TEXCOORD0;
                 float4 screenPos : TEXCOORD1;
                 float2 depth_distance: TEXCOORD2;
@@ -171,9 +171,9 @@
                 wave.pos.y -= offsetY;
                 
                 v2f o;
-                o.vertex = UnityObjectToClipPos(wave.pos);
+                o.pos = UnityObjectToClipPos(wave.pos);
                 o.normal = UnityObjectToWorldNormal(wave.normal);
-                o.screenPos = ComputeScreenPos(o.vertex);
+                o.screenPos = ComputeScreenPos(o.pos);
                 
                 float3 viewPos = UnityObjectToViewPos(wave.pos);
                 o.depth_distance.x = abs(viewPos.z);   // 摄像机空间, 视线所指的方向Z坐标是负数!!!!!
