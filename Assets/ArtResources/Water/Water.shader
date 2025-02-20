@@ -191,7 +191,9 @@
             fixed4 frag (v2f i) : SV_Target 
             {   
                 float3 trackNormal = CalculateTrackRTNormal(i.localPos.w, i.localPos.xyz);
-                if(length(trackNormal) > 0.01) //find a valid value
+                //return float4(trackNormal.xyz, 1);
+
+                if(length(trackNormal) > 0.1) //find a valid value
                 {
                     i.normal = trackNormal;
                     i.normal = normalize(i.normal);

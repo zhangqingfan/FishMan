@@ -85,12 +85,12 @@ float3 CalculateTrackRTNormal(int gridIndex, float3 localPos)
     offsetX.y += SampleTrackRT(gridIndex, offsetX);
     offsetZ.y += SampleTrackRT(gridIndex, offsetZ);
     
-    float3 tangentX = offsetX - localPos;
-    float3 tangentZ = offsetZ - localPos;
-    
-    if (length(tangentX - tangentZ) <= 0.0001)
+    if (offsetX.y == offsetZ.y && offsetX.y == localPos.y)
         return float3(0, 0, 0);
     
+    float3 tangentX = offsetX - localPos;
+    float3 tangentZ = offsetZ - localPos;
+        
     float3 normal = cross(tangentX, tangentZ);
     normal.y = abs(normal.y);
     return normalize(normal);
