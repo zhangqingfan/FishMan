@@ -191,12 +191,15 @@
             fixed4 frag (v2f i) : SV_Target 
             {   
                 float3 trackNormal = CalculateTrackRTNormal(i.localPos.w, i.localPos.xyz);
-                if(length(trackNormal) > 0.001) //find a valid value
+                if(length(trackNormal) > 0.01) //find a valid value
                 {
                     i.normal = trackNormal;
                     i.normal = normalize(i.normal);
                 }
                 
+                //i.normal += trackNormal;
+                //i.normal = normalize(i.normal);
+
                 float2 screenUV = i.screenPos.xy / i.screenPos.w;
                 fixed shadow = SHADOW_ATTENUATION(i);
                 

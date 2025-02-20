@@ -21,7 +21,7 @@ partial class Water : MonoBehaviour
     public int depth;
 
     [Range(0, 10)]
-    private int rtMargin = 0;
+    private int rtMargin = 40;
 
     public GameObject seaMeshPrefab;
     public Material surfaceMat;
