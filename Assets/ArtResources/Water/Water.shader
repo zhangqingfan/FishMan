@@ -24,7 +24,7 @@
     }
     SubShader
     {
-        Tags { "Queue"="Transparent" }
+        Tags { "Queue"="Transparent" "LightMode" = "UniversalForward" }
         LOD 100
 
         Pass
@@ -35,7 +35,6 @@
             
             #include "UnityCG.cginc"
             #include "AutoLight.cginc"
-            #include "UnityPBSLighting.cginc"
 
             #include "GerstnerWave.cginc"
             #include "WaterRT.cginc"

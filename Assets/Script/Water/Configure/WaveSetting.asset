@@ -15,7 +15,7 @@ MonoBehaviour:
   isChanged: 0
   input:
   - amplitude: 0.1
-    length: 8
+    length: 10
     speed: 2
     angle: 1.1
   - amplitude: 0.1
@@ -23,10 +23,10 @@ MonoBehaviour:
     speed: 3
     angle: 3.26
   - amplitude: 0.2
-    length: 8
+    length: 12
     speed: 2
     angle: 2.15
   - amplitude: 0.1
-    length: 6
+    length: 9
     speed: 2
     angle: 4.71

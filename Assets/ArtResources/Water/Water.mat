@@ -117,7 +117,7 @@ Material:
     - _DstBlend: 0
     - _DstBlendAlpha: 0
     - _EnvironmentReflections: 1
-    - _FoamItensity: 10
+    - _FoamItensity: 600
     - _FoamTest: 1
     - _FresnelBias: 0.659
     - _GlossMapScale: 0
