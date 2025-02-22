@@ -79,6 +79,9 @@ float SampleTrackRT(int gridIndex, float3 localPos)
 float3 CalculateTrackRTNormal(int gridIndex, float3 localPos)
 {
     float epsilon = 2 * _GridLength / 512;
+    if (abs(localPos.x) >= _GridLength / 2 - epsilon || abs(localPos.z) >= _GridLength / 2 - epsilon)
+        return float3(0, 1, 0);
+    
     float3 offsetX = localPos + float3(epsilon, 0, 0);
     float3 offsetZ = localPos + float3(0, 0, epsilon);
     
