@@ -51,7 +51,7 @@ int FindSelfGridIndex(float3 worldPos)
 
 float SampleTrackRT(int gridIndex, float3 localPos)
 {
-    float2 uv = ((localPos.xz / GridHalfLength()) + 1) * 0.5;
+    float2 uv = ((localPos.xz / GridHalfLength()) + 1) * 0.5;        
     float result = 0;
 
     if(gridIndex == 0)

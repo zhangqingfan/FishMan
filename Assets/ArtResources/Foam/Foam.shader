@@ -56,8 +56,8 @@
 
                 worldPos = mul(GridLocalToWorld[index], float4(localPos.xyz, 1));
 
-                v.vertex.y = mul(unity_WorldToObject, worldPos).y;
-                v.vertex.y += 0.2f;
+                //v.vertex.y = mul(unity_WorldToObject, worldPos).y;
+                v.vertex.y += 0.4f;
 
                 v2f o;
                 o.vertex = UnityObjectToClipPos(v.vertex);

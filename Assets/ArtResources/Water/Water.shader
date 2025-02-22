@@ -157,7 +157,7 @@
                 float2 depth_distance: TEXCOORD2;
                 float3 worldPos: TEXCOORD3;
                 float4 localPos: TEXCOORD4; //w:grid index
-                float originalY: TEXCOORD5; //not used.
+                //float originalY: TEXCOORD5; //not used.
                 SHADOW_COORDS(6)
             };
 
@@ -166,7 +166,11 @@
                 Wave wave = SampleWave(v.vertex, _Time.y);
                 float4 worldPos = mul(unity_ObjectToWorld, float4(wave.pos.xyz, 1));
                 int gridIndex = FindSelfGridIndex(worldPos.xyz);
-                float offsetY = SampleTrackRT(gridIndex, wave.pos);
+                float offsetY = 0;
+                if(length(wave.pos.xyz - v.vertex.xyz) > 0)
+                {
+                    offsetY = SampleTrackRT(gridIndex, wave.pos);
+                }
                 wave.pos.y -= offsetY;
                 
                 v2f o;
@@ -182,7 +186,7 @@
                 o.localPos.xyz = wave.pos.xyz;
                 o.localPos.w = gridIndex;
                 
-                o.originalY = wave.pos.y + offsetY;
+                //o.originalY = wave.pos.y + offsetY;
 
                 TRANSFER_SHADOW(o);
                 return o;
@@ -193,14 +197,11 @@
                 float3 trackNormal = CalculateTrackRTNormal(i.localPos.w, i.localPos.xyz);
                 //return float4(trackNormal.xyz, 1);
 
-                if(length(trackNormal) > 0.1) //find a valid value
+                if(length(trackNormal) > 0) //find a valid value
                 {
                     i.normal = trackNormal;
                     i.normal = normalize(i.normal);
                 }
-                
-                //i.normal += trackNormal;
-                //i.normal = normalize(i.normal);
 
                 float2 screenUV = i.screenPos.xy / i.screenPos.w;
                 fixed shadow = SHADOW_ATTENUATION(i);
@@ -220,9 +221,6 @@
                     distortUV = screenUV;
                     underWaterLength = GetUnderWaterLength(distortUV, i.depth_distance);
                 }
-
-                //if(underWaterLength < 0)
-                //    return float4(1, 0, 0, 1);
 
                 float totalLength = underWaterLength + i.depth_distance.y;
                 float3 underWaterWorldPos = _WorldSpaceCameraPos + normalize(i.worldPos - _WorldSpaceCameraPos) * totalLength;

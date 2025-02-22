@@ -16,7 +16,6 @@ float3 SamplePosition(float3 pos, float time)
 {   
     //return pos;
     
-    
     float epsilon = 0.001;
     if (abs(pos.x) >= _GridLength / 2 - epsilon || abs(pos.z) >= _GridLength / 2 - epsilon)
         return pos;
@@ -40,7 +39,7 @@ float3 SamplePosition(float3 pos, float time)
         float displacement = amplitude * sin(phase);
 
         newPos.y += displacement;
-        newPos.xz += amplitude * direction.xz * cos(phase);
+        //newPos.xz += amplitude * direction.xz * cos(phase);
     }
     
     return newPos;
