@@ -43,20 +43,25 @@ float3 SamplePosition(float3 pos, float time)
 float3 CalculateNormal(float3 pos, float time)
 {    
     float3 newPos = SamplePosition(pos, time);
+    newPos = mul(unity_ObjectToWorld, float4(newPos.xyz, 1));
     
     float epsilon = 0.05f;
     float3 posX = float3(pos.x + epsilon, 0, pos.z);
     float3 posZ = float3(pos.x, 0, pos.z + epsilon);
 
     float3 newPosX = SamplePosition(posX, time);
+    newPosX = mul(unity_ObjectToWorld, float4(newPosX.xyz, 1));
+    
     float3 newPosZ = SamplePosition(posZ, time);
-
+    newPosZ = mul(unity_ObjectToWorld, float4(newPosZ.xyz, 1));
+    
     float3 tangentX = newPosX - newPos;
     float3 tangentZ = newPosZ - newPos;
 
     float3 normal = cross(tangentX, tangentZ);
     normal.y = abs(normal.y); //unity axis is different from right-hand axis!!!
     
+    normal = normalize(mul((float3x3) unity_WorldToObject, normal));
     return normalize(normal);
 }
 

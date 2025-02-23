@@ -199,8 +199,8 @@
 
                 if(length(trackNormal) > 0) //find a valid value
                 {
-                    i.normal = trackNormal;
-                    i.normal = normalize(i.normal);
+                    //i.normal = trackNormal;
+                    //i.normal = normalize(i.normal);
                 }
 
                 float2 screenUV = i.screenPos.xy / i.screenPos.w;
