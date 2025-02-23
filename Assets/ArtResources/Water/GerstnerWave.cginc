@@ -13,14 +13,8 @@ struct Wave
 };
 
 float3 SamplePosition(float3 pos, float time)
-{   
-    //return pos;
-    
-    float epsilon = 0.001;
-    if (abs(pos.x) >= _GridLength / 2 - epsilon || abs(pos.z) >= _GridLength / 2 - epsilon)
-        return pos;
-   
-    float3 newPos = pos;
+{      
+    float3 newPos = mul(unity_ObjectToWorld, float4(pos.xyz, 1));
     
     for (int i = 0; i < dataCount; i++)
     {
@@ -42,18 +36,15 @@ float3 SamplePosition(float3 pos, float time)
         //newPos.xz += amplitude * direction.xz * cos(phase);
     }
     
+    newPos = mul(unity_WorldToObject, float4(newPos.xyz, 1));
     return newPos;
 }
 
 float3 CalculateNormal(float3 pos, float time)
-{
-    float epsilon = 0.001;
-    if (abs(pos.x) >= _GridLength / 2 - epsilon || abs(pos.z) >= _GridLength / 2 - epsilon)
-        return float3(0, 1, 0);
-    
+{    
     float3 newPos = SamplePosition(pos, time);
     
-    epsilon = 0.05f;
+    float epsilon = 0.05f;
     float3 posX = float3(pos.x + epsilon, 0, pos.z);
     float3 posZ = float3(pos.x, 0, pos.z + epsilon);
 
