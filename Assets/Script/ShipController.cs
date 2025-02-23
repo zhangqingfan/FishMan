@@ -47,7 +47,7 @@ public class ShipController : MonoBehaviour
             {
                 cameraEuler.x += mouseOffset.y * mouseSpeed * Time.deltaTime;
                 cameraEuler.y += mouseOffset.x * mouseSpeed * Time.deltaTime;
-                cameraEuler.x = Mathf.Clamp(cameraEuler.x, 290f, 340f);
+                cameraEuler.x = Mathf.Clamp(cameraEuler.x, 290f, 320f);
             }
         }
 

@@ -3,7 +3,7 @@
     Properties
     {
         _DepthScale("Depth Scale", Range(0, 2)) = 1
-        _DistortScale("Distort Scale", Range(0, 1)) = 1
+        _DistortScale("Distort Scale", Range(0, 0.2)) = 1
         
         _CausticsScale("Caustics Scale", Range(0, 0.3)) = 0.01
         _CausticsnItensity("Caustics Itensity", Range(0, 3)) = 1
@@ -133,8 +133,9 @@
             {
                 worldNormal = normalize(worldNormal);
                 float3 viewDir = normalize(_WorldSpaceCameraPos.xyz - worldPos);
-                float fresnel = pow(1.0 - max(dot(viewDir, worldNormal), 0.0), 64.0);
-                return _FresnelBias + (1.0 - _FresnelBias) * fresnel;
+                float fresnel = pow(1.0 - dot(viewDir, worldNormal), _FresnelBias);
+                //return _FresnelBias + (1.0 - _FresnelBias) * fresnel;
+                return saturate(fresnel);
             }
 
             float3 DistortNormal(float3 worldPos, float3 worldNormal)
