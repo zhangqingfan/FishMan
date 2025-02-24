@@ -1,6 +1,7 @@
 ﻿#ifndef WATER_RT
 #define WATER_RT  
 
+
 half4 GridWorldPosArray[9];
 float _GridLength;
 
@@ -30,6 +31,7 @@ float4 _RT7_ST;
 
 sampler2D _RT8;
 float4 _RT8_ST;
+
 
 float GridHalfLength()
 {
@@ -76,6 +78,7 @@ float SampleTrackRT(int gridIndex, float3 localPos)
     return result * 1;
 }
 
+//todo...这里要调整一下！
 float3 CalculateTrackRTNormal(int gridIndex, float3 localPos)
 {
     float epsilon = 2 * _GridLength / 512;

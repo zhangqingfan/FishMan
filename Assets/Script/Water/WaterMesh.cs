@@ -14,7 +14,7 @@ partial class Water : MonoBehaviour
     //[Range(30, 500)]
     public int segmentsPerEdge;
     
-    [Range(50, 200)]
+    [Range(150, 500)]
     public int length;
 
     [Range(20, 60)]

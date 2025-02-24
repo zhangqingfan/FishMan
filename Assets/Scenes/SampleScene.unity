@@ -168,8 +168,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   setting: {fileID: 11400000, guid: f1510f84ddd0ac946a397bb2c40d649f, type: 2}
-  segmentsPerEdge: 160
-  length: 160
+  segmentsPerEdge: 250
+  length: 300
   depth: 20
   seaMeshPrefab: {fileID: 7168705476046234756, guid: 06e6bd08c028f51488665b08908cb89a,
     type: 3}
