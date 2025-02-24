@@ -15,9 +15,6 @@ public class FishFlockManager : MonoBehaviour
     [Range(10, 100)]
     public int spawnRadius = 60;
 
-    [Range(0.1f, 1.5f)]
-    public float spawnHeightScale = 0.5f;
-
     [Serialize]
     public List<Transform> sharks = new List<Transform>();
 
@@ -48,11 +45,10 @@ public class FishFlockManager : MonoBehaviour
         var flock = go.AddComponent<FishFlock>();
         flock.number = fishNumber;
         flock.spawnRadius = spawnRadius;
-        flock.spawnHeightScale = spawnHeightScale;
         flock.fishPrefab = fishPrefab; 
 
         var pos = UnityEngine.Random.onUnitSphere * spawnRadius;
-        pos.y *= spawnHeightScale;
+        pos.y = Mathf.Clamp(pos.y, WorldManager.fishHeight, WorldManager.fishHeight - Water.depth);
         flock.flockPosition = pos + gameObject.transform.position;
         flock.sharkTrans = sharks;
         flock.CreateFishes();
@@ -72,8 +68,7 @@ public class FishFlockManager : MonoBehaviour
                     continue;
 
                 var pos = UnityEngine.Random.onUnitSphere * spawnRadius;
-                pos.y = WorldManager.fishHeight - spawnRadius;
-                pos.y *= spawnHeightScale;
+                pos.y = Mathf.Clamp(pos.y, WorldManager.fishHeight, WorldManager.fishHeight - Water.depth);
                 fishFlockTargets[i] = pos + gameObject.transform.position;
             }
         }

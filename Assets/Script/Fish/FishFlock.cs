@@ -141,7 +141,7 @@ public class FishFlock : MonoBehaviour
             var fish = jobFish.fishArray[i];
 
             fish.position = pos + flockPosition;
-            fish.position.y = fish.position.y > WorldManager.fishHeight ? WorldManager.fishHeight : fish.position.y;
+            fish.position.y = Mathf.Clamp(fish.position.y, WorldManager.fishHeight, WorldManager.fishHeight - 15f);
             fish.rotation = Quaternion.identity;
             fish.speed = jobFish.minSpeed;
             fish.nextUpdateTime = 0;
@@ -172,7 +172,7 @@ public class FishFlock : MonoBehaviour
         var fishMesh = fishPrefab.GetComponent<MeshFilter>().sharedMesh;
         var renderParams = new RenderParams(fishPrefab.GetComponent<Renderer>().sharedMaterial);
         var fishInstanceMatrixs = new Matrix4x4[jobFish.fishArray.Length];
-        var scale = new Vector3(1.3f, 1.3f, 1.3f);
+        var scale = new Vector3(1.4f, 1.4f, 1.4f);
 
         Debug.Log("GPU Instancing state: " + fishPrefab.GetComponent<Renderer>().sharedMaterial.enableInstancing);
 

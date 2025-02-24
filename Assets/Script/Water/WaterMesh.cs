@@ -17,8 +17,7 @@ partial class Water : MonoBehaviour
     [Range(150, 500)]
     public int length;
 
-    [Range(20, 60)]
-    public int depth;
+    public readonly static int depth = 20;
 
     [Range(0, 10)]
     private int rtMargin = 40;
