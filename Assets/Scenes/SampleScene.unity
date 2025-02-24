@@ -1369,6 +1369,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2789030170224310243}
+  - component: {fileID: 5708410255225274947}
   m_Layer: 0
   m_Name: Environment
   m_TagString: Untagged
@@ -1376,6 +1377,25 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &5708410255225274947
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5708410255225274946}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8418833d16cdcb41a0c91d75b340ccb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  flockCount: 1
+  fishNumber: 500
+  spawnRadius: 60
+  spawnHeightScale: 0.5
+  sharks: []
+  fishPrefab: {fileID: 4276648904083818682, guid: db9b9482ae9f241619015119784ced70,
+    type: 3}
 --- !u!1001 &7387649454103362643
 PrefabInstance:
   m_ObjectHideFlags: 0

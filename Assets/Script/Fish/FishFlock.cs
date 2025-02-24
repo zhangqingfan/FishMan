@@ -172,7 +172,7 @@ public class FishFlock : MonoBehaviour
         var fishMesh = fishPrefab.GetComponent<MeshFilter>().sharedMesh;
         var renderParams = new RenderParams(fishPrefab.GetComponent<Renderer>().sharedMaterial);
         var fishInstanceMatrixs = new Matrix4x4[jobFish.fishArray.Length];
-        var scale = new Vector3(1, 1, 1);
+        var scale = new Vector3(1.3f, 1.3f, 1.3f);
 
         Debug.Log("GPU Instancing state: " + fishPrefab.GetComponent<Renderer>().sharedMaterial.enableInstancing);
 

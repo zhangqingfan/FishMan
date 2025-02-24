@@ -10,7 +10,7 @@ public class WorldManager : MonoBehaviour
     Dictionary<string, AsyncOperationHandle<GameObject>> addressHandles = new Dictionary<string, AsyncOperationHandle<GameObject>>();
     Dictionary<string, Queue<GameObject>> goPool = new Dictionary<string, Queue<GameObject>>();
     public static WorldManager Instance;
-    public static readonly float fishHeight = -10f;
+    public static readonly float fishHeight = -1f;
     public static readonly float seaHeight = 0f;
 
     private void Awake()
