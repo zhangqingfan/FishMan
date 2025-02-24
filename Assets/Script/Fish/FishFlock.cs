@@ -55,7 +55,7 @@ public class FishFlock : MonoBehaviour
             var fish = fishArray[index];
 
             fish.position += (fish.rotation * Vector3.forward).normalized * fish.speed * deltaTime;
-            fish.position.y =  fish.position.y > WorldManager.fishHeight ? WorldManager.fishHeight : fish.position.y;
+            fish.position.y = fish.position.y > WorldManager.fishHeight ? WorldManager.fishHeight : fish.position.y;
             //Debug.Log(fish.position.y);
             var direction = Quaternion.LookRotation((fish.target - fish.position).normalized);
             fish.rotation = Quaternion.RotateTowards(fish.rotation, direction, 0.5f);
