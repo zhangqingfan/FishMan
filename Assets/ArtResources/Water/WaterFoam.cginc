@@ -1,11 +1,13 @@
 ﻿#ifndef WATER_FOAM  
 #define WATER_FOAM
 
+CBUFFER_START(UnityPerMaterial)
 sampler2D _FoamMask;
 float4 _FoamMask_ST;
 
 sampler2D _ContactFoamMask;
 float4 _ContactFoamMask_ST;
+CBUFFER_END
 
 float FoamRemap(float origFrom, float origTo, float targetFrom, float targetTo, float value)
 {

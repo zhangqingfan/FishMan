@@ -1,7 +1,6 @@
 ﻿#ifndef WATER_RT
 #define WATER_RT  
 
-
 half4 GridWorldPosArray[9];
 float _GridLength;
 

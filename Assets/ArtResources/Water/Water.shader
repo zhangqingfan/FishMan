@@ -41,8 +41,9 @@
             #include "WaterFoam.cginc"
             #include "UnityLightingCommon.cginc"
 
-            CBUFFER_START(UnityPerMaterial)
+            int _WaterDepth;
 
+            CBUFFER_START(UnityPerMaterial)
             sampler2D _ReflectionTex;
             float4 _ReflectionTex_ST;
             sampler2D _CausticsTex;
@@ -58,7 +59,6 @@
             float _CausticsnItensity;
             float _DepthScale;
             float _DistortScale;
-            int _WaterDepth;
             float4 _SurfaceColor;
             float4 _DeepColor;
             float4x4 _InverseVP;
@@ -66,7 +66,6 @@
             float _NormalBias;
             float _FoamItensity;
             float _Contactnsity;
-
             CBUFFER_END
 
             float3 GetUnderWaterWorldPos(float2 screenUV, float3 waterWorldPos, float2 depth_distance)
