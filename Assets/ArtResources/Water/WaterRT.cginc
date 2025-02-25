@@ -1,7 +1,7 @@
 ﻿#ifndef WATER_RT
 #define WATER_RT  
 
-half4 GridWorldPosArray[9];
+float4 GridWorldPosArray[9];
 float _GridLength;
 
 sampler2D _RT0;
