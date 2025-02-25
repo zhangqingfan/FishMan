@@ -15,7 +15,7 @@ public class CanonTrace : MonoBehaviour
     Camera renderCamera;
     Vector3 hitPoint;
 
-    float fireCD = 2f;
+    float fireCD = 1f;
     float passedFireTime = 0f;
 
     void Start()
@@ -30,11 +30,11 @@ public class CanonTrace : MonoBehaviour
 
     void Update()
     {
-        return;
-        var showRing = PlayerController.Instance.showRing;        
-        lineRenderer.enabled = showRing;
+        //return;
+        lineRenderer.enabled = PlayerController.Instance.showRing;
+        float eulerX = 0f;
 
-        if (showRing == true)
+        if (PlayerController.Instance.showRing == true)
         {
             var screenPosition = Input.mousePosition;
             screenPosition.z = 1f;
@@ -45,43 +45,43 @@ public class CanonTrace : MonoBehaviour
 
             //Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-            float eulerX = 0f;
+            
             if (Physics.Raycast(startPosition, endPosition - startPosition, out RaycastHit hitInfo, Mathf.Infinity, 1 << LayerMask.NameToLayer("MousePlane")))
             {
                 hitPoint = hitInfo.point;
                 var startPoint = gameObject.transform.position;
                 var offset = hitPoint - startPoint;
-                
-                //todo...ÐÞ¸ÄÕâÀï
+     
                 var rotation = Quaternion.LookRotation(offset);
-
                 gameObject.transform.rotation = rotation;// Quaternion.Euler(euler);
-
                 eulerX = CalculateLaunchAngle(offset.magnitude);                
                 DrawTrajectory(eulerX);
                 //Debug.Log(offset.magnitude + " / " + eulerX );
             }
+        }
 
-            if(true && passedFireTime >= fireCD)
+        if (PlayerController.Instance.fire == true)
+        {
+            if (passedFireTime >= fireCD)
             {
-                //Debug.Log(eulerX);
+                Debug.Log(passedFireTime);
                 var ball = WorldManager.Instance.CreateObject("Ball", gameObject.transform.position, -1f);
                 var velocity = gameObject.transform.rotation * Quaternion.Euler(-eulerX, 0, 0) * Vector3.forward;
                 velocity = velocity.normalized * initialSpeed;
                 //velocity = transform.TransformDirection(velocity);
                 ball.GetComponent<Ball>().AddVelocity(velocity);
 
+                PlayerController.Instance.fire = false;
                 passedFireTime = 0f;
             }
-
-            passedFireTime += Time.deltaTime;
         }
+        passedFireTime += Time.deltaTime;
     }
 
     void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawSphere(hitPoint, 0.1f);  
+        Gizmos.DrawSphere(hitPoint, 0.5f);  
     }
 
     public void CaculateInitialSpeed(float maxRange)
@@ -111,9 +111,11 @@ public class CanonTrace : MonoBehaviour
 
         lineRenderer.positionCount = positionList.Count;
         lineRenderer.SetPositions(positionList.ToArray());
-        lineRenderer.startWidth = 0.1f;  
-        lineRenderer.endWidth = 0.1f;    
-        lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
+        lineRenderer.startWidth = 0.3f;  
+        lineRenderer.endWidth = 0.3f;
+        lineRenderer.startColor = Color.white;
+        lineRenderer.endColor = Color.red;
+        //lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
     }
 
     public float CalculateLaunchAngle(float targetDistance)
