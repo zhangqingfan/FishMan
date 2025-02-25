@@ -25,6 +25,7 @@ partial class Water : MonoBehaviour
     public GameObject seaMeshPrefab;
     public Material surfaceMat;
     public Material bottomMat;
+    public GameObject environmentPrefab;
 
     public Transform playerTrans;
     Grid oldGrid;
@@ -76,41 +77,45 @@ partial class Water : MonoBehaviour
 
         canOnValidate = true;
 
-        //offsetList.Add(new Vector3(-1, 0, -1));
-        //offsetList.Add(new Vector3(-1, 0, 0));
-        //offsetList.Add(new Vector3(-1, 0, 1));
-        //offsetList.Add(new Vector3(0, 0, -1));
+        offsetList.Add(new Vector3(-1, 0, -1));
+        offsetList.Add(new Vector3(-1, 0, 0));
+        offsetList.Add(new Vector3(-1, 0, 1));
+        offsetList.Add(new Vector3(0, 0, -1));
         offsetList.Add(new Vector3(0, 0, 0));
-        //offsetList.Add(new Vector3(0, 0, 1));
-        //offsetList.Add(new Vector3(1, 0, -1));
-        //offsetList.Add(new Vector3(1, 0, 0));
-        //offsetList.Add(new Vector3(1, 0, 1));
+        offsetList.Add(new Vector3(0, 0, 1));
+        offsetList.Add(new Vector3(1, 0, -1));
+        offsetList.Add(new Vector3(1, 0, 0));
+        offsetList.Add(new Vector3(1, 0, 1));
 
         CreatePlanes(offsetList);
         Shader.SetGlobalInt("_WaterDepth", depth);
         Shader.SetGlobalFloat("_GridLength", length);
         
-        //先注释掉试试看？？
-        //Shader.SetGlobalVectorArray("GridWorldPosArray", GetGridWorldPos());
-
         StartCoroutine(CentralizeGameObject(playerTrans));
         StartCoroutine(RenderTrackRT());
     }
 
     void CreatePlanes(List<Vector3> offsets)
     {
-        for(int i = 0; i < offsets.Count; i++)  
+        for (int i = 0; i < offsets.Count; i++)
         {
             gridList.Add(CreatePlane(offsets[i]));
         }
 
-        for(int i = 0; i < gridList.Count; i++) 
+        for (int i = 0; i < gridList.Count; i++)
         {
             gridList[i].trackRT = trackRTList[i];
             ClearRenderTarget(gridList[i].trackRT);
             string rtName = $"_RT{i}";
             Shader.SetGlobalTexture(rtName, gridList[i].trackRT);
             Debug.Log(rtName);
+        }
+
+        for (int i = 0; i < gridList.Count; i++)
+        {
+            var enviroment = Instantiate(environmentPrefab, gridList[i].root.transform);
+            enviroment.transform.localPosition = Vector3.zero;
+            enviroment.transform.localRotation = Quaternion.identity;
         }
     }
 
