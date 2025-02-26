@@ -15,7 +15,7 @@ public class CanonTrace : MonoBehaviour
     Camera renderCamera;
     Vector3 hitPoint;
 
-    float fireCD = 1f;
+    float fireCD = 2f;
     float passedFireTime = 0f;
 
     void Start()
@@ -45,7 +45,6 @@ public class CanonTrace : MonoBehaviour
 
             //Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-            
             if (Physics.Raycast(startPosition, endPosition - startPosition, out RaycastHit hitInfo, Mathf.Infinity, 1 << LayerMask.NameToLayer("MousePlane")))
             {
                 hitPoint = hitInfo.point;
@@ -57,24 +56,19 @@ public class CanonTrace : MonoBehaviour
                 eulerX = CalculateLaunchAngle(offset.magnitude);                
                 DrawTrajectory(eulerX);
                 //Debug.Log(offset.magnitude + " / " + eulerX );
+
+                if (passedFireTime >= fireCD)
+                {
+                    var ball = WorldManager.Instance.CreateObject("Ball", gameObject.transform.position, -1f);
+                    var velocity = gameObject.transform.rotation * Quaternion.Euler(-eulerX, 0, 0) * Vector3.forward;
+                    velocity = velocity.normalized * initialSpeed;
+                    //velocity = transform.TransformDirection(velocity);
+                    ball.GetComponent<Ball>().AddVelocity(velocity);
+                    passedFireTime = 0f;
+                }
             }
         }
 
-        if (PlayerController.Instance.fire == true)
-        {
-            if (passedFireTime >= fireCD)
-            {
-                Debug.Log(passedFireTime);
-                var ball = WorldManager.Instance.CreateObject("Ball", gameObject.transform.position, -1f);
-                var velocity = gameObject.transform.rotation * Quaternion.Euler(-eulerX, 0, 0) * Vector3.forward;
-                velocity = velocity.normalized * initialSpeed;
-                //velocity = transform.TransformDirection(velocity);
-                ball.GetComponent<Ball>().AddVelocity(velocity);
-
-                PlayerController.Instance.fire = false;
-                passedFireTime = 0f;
-            }
-        }
         passedFireTime += Time.deltaTime;
     }
 

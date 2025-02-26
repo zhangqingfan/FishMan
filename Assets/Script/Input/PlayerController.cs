@@ -13,8 +13,6 @@ public class PlayerController : MonoBehaviour
 
     [HideInInspector]
     public bool showRing = false;
-    [HideInInspector]
-    public bool fire = false;
 
     private void Awake()
     {
@@ -75,14 +73,13 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    //todo 这里要修改
     public IEnumerator MonitorLeftClick()
     {
         while (true)
         {
             yield return null;
 
-            if (isHold == true)
+            if (controller.PC.RightClick.ReadValue<float>() > 0)
             {
                 showRing = false;
                 continue;
@@ -90,23 +87,7 @@ public class PlayerController : MonoBehaviour
 
             if (controller.PC.LeftClick.ReadValue<float>() > 0)
             {
-                if(showRing == false)
-                {
-                    showRing = true;
-                    continue;
-                }
-
-                if(showRing == true)
-                {
-                    //Debug.Log("fire!");
-                    fire = true;
-                    continue;
-                }
-            }
-
-            if (controller.PC.RightClick.ReadValue<float>() > 0)
-            {
-                showRing = false;
+                showRing = true;
                 continue;
             }
         }

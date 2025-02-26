@@ -36,6 +36,7 @@ public class WorldManager : MonoBehaviour
 
         if (goPool[name].Count == 0)
         {
+            Debug.Log("wrong!222");
             GameObject go = Instantiate(addressHandles[name].Result, position, Quaternion.identity);
             goPool[name].Enqueue(go);
         }
@@ -44,8 +45,11 @@ public class WorldManager : MonoBehaviour
         obj.transform.position = position;
 
         if(time >= 0)
+        {
+            Debug.Log("StartCoroutine");
             StartCoroutine(ShowObject(name, obj, time));
-        
+        }
+
         return obj;
     }
 
@@ -56,6 +60,7 @@ public class WorldManager : MonoBehaviour
             gameObject.SetActive(true);
             yield return new WaitForSeconds(time);
         }
+        Debug.Log("abc");
         ReleaseObject(name, gameObject);
     }
 
@@ -65,8 +70,9 @@ public class WorldManager : MonoBehaviour
         {
             Debug.Log("Memory pool does not contain " + name);
             return;
-        }            
+        }
 
+        Debug.Log("release!" + gameObject);
         gameObject.SetActive(false);
         goPool[name].Enqueue(gameObject);
     }
