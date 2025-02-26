@@ -1,36 +1,31 @@
 using System.Collections.Generic;
-using System.Net.NetworkInformation;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.UIElements;
 
-[RequireComponent(typeof(LineRenderer))]
 public class CanonTrace : MonoBehaviour
 {
     public float timeStep = 0.05f;
-    
+
     float initialSpeed;
     float g = -Physics.gravity.y;
     LineRenderer lineRenderer;
     Camera renderCamera;
     Vector3 hitPoint;
 
-    float fireCD = 2f;
+    float fireCD = 5f;
     float passedFireTime = 0f;
 
     void Start()
     {
         lineRenderer = transform.GetComponent<LineRenderer>();
         renderCamera = Camera.main;
-        WorldManager.Instance.CreateObject("Ball", gameObject.transform.position, 0f); // pre-warm memory pool;
-
         var radius = transform.parent.GetComponentInChildren<DrawRing>().scale;
         CaculateInitialSpeed(radius);
+
+        WorldManager.Instance.CreateObject("Ball", gameObject.transform.position, 0f); // pre-warm memory pool;
     }
 
     void Update()
     {
-        //return;
         lineRenderer.enabled = PlayerController.Instance.showRing;
         float eulerX = 0f;
 
@@ -50,10 +45,10 @@ public class CanonTrace : MonoBehaviour
                 hitPoint = hitInfo.point;
                 var startPoint = gameObject.transform.position;
                 var offset = hitPoint - startPoint;
-     
+
                 var rotation = Quaternion.LookRotation(offset);
                 gameObject.transform.rotation = rotation;// Quaternion.Euler(euler);
-                eulerX = CalculateLaunchAngle(offset.magnitude);                
+                eulerX = CalculateLaunchAngle(offset.magnitude);
                 DrawTrajectory(eulerX);
                 //Debug.Log(offset.magnitude + " / " + eulerX );
 
@@ -64,6 +59,7 @@ public class CanonTrace : MonoBehaviour
                     velocity = velocity.normalized * initialSpeed;
                     //velocity = transform.TransformDirection(velocity);
                     ball.GetComponent<Ball>().AddVelocity(velocity);
+                      
                     passedFireTime = 0f;
                 }
             }
@@ -105,11 +101,8 @@ public class CanonTrace : MonoBehaviour
 
         lineRenderer.positionCount = positionList.Count;
         lineRenderer.SetPositions(positionList.ToArray());
-        lineRenderer.startWidth = 0.3f;  
-        lineRenderer.endWidth = 0.3f;
-        lineRenderer.startColor = Color.white;
-        lineRenderer.endColor = Color.red;
-        //lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
+        lineRenderer.startWidth = 0.1f;  
+        lineRenderer.endWidth = 0.2f;
     }
 
     public float CalculateLaunchAngle(float targetDistance)

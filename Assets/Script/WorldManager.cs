@@ -36,17 +36,16 @@ public class WorldManager : MonoBehaviour
 
         if (goPool[name].Count == 0)
         {
-            Debug.Log("wrong!222");
             GameObject go = Instantiate(addressHandles[name].Result, position, Quaternion.identity);
             goPool[name].Enqueue(go);
         }
 
         var obj = goPool[name].Dequeue();
         obj.transform.position = position;
+        obj.SetActive(true);
 
         if(time >= 0)
         {
-            Debug.Log("StartCoroutine");
             StartCoroutine(ShowObject(name, obj, time));
         }
 
@@ -55,12 +54,10 @@ public class WorldManager : MonoBehaviour
 
     IEnumerator ShowObject(string name, GameObject gameObject, float time)
     {
-        if (time >= 0f)
+        if (time >= 0)
         {
-            gameObject.SetActive(true);
             yield return new WaitForSeconds(time);
         }
-        Debug.Log("abc");
         ReleaseObject(name, gameObject);
     }
 
@@ -72,9 +69,9 @@ public class WorldManager : MonoBehaviour
             return;
         }
 
-        Debug.Log("release!" + gameObject);
         gameObject.SetActive(false);
         goPool[name].Enqueue(gameObject);
+        Debug.Log(goPool[name].Count);
     }
 
     bool LoadFromAA(string name, Vector3 position, float time = 5f)
