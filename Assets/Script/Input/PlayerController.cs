@@ -14,6 +14,9 @@ public class PlayerController : MonoBehaviour
     [HideInInspector]
     public bool showRing = false;
 
+    [HideInInspector]
+    public bool fire = false;
+
     private void Awake()
     {
         Instance = this;
@@ -87,8 +90,13 @@ public class PlayerController : MonoBehaviour
 
             if (controller.PC.LeftClick.ReadValue<float>() > 0)
             {
-                showRing = true;
-                continue;
+                if(showRing == false)
+                {
+                    showRing = true;
+                    continue;
+                }
+
+                fire = true;
             }
         }
     }

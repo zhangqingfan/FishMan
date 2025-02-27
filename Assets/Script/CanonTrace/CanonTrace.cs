@@ -11,7 +11,7 @@ public class CanonTrace : MonoBehaviour
     Camera renderCamera;
     Vector3 hitPoint;
 
-    float fireCD = 5f;
+    float fireCD = 2f;
     float passedFireTime = 0f;
 
     void Start()
@@ -21,7 +21,7 @@ public class CanonTrace : MonoBehaviour
         var radius = transform.parent.GetComponentInChildren<DrawRing>().scale;
         CaculateInitialSpeed(radius);
 
-        WorldManager.Instance.CreateObject("Ball", gameObject.transform.position, 0f); // pre-warm memory pool;
+        WorldManager.Instance.CreateObject("Grenade", gameObject.transform.position, 0f); // pre-warm memory pool;
     }
 
     void Update()
@@ -29,7 +29,7 @@ public class CanonTrace : MonoBehaviour
         lineRenderer.enabled = PlayerController.Instance.showRing;
         float eulerX = 0f;
 
-        if (PlayerController.Instance.showRing == true)
+        if (lineRenderer.enabled == true)
         {
             var screenPosition = Input.mousePosition;
             screenPosition.z = 1f;
@@ -52,19 +52,23 @@ public class CanonTrace : MonoBehaviour
                 DrawTrajectory(eulerX);
                 //Debug.Log(offset.magnitude + " / " + eulerX );
 
-                if (passedFireTime >= fireCD)
+                if (PlayerController.Instance.fire == true)
                 {
-                    var ball = WorldManager.Instance.CreateObject("Ball", gameObject.transform.position, -1f);
-                    var velocity = gameObject.transform.rotation * Quaternion.Euler(-eulerX, 0, 0) * Vector3.forward;
-                    velocity = velocity.normalized * initialSpeed;
-                    //velocity = transform.TransformDirection(velocity);
-                    ball.GetComponent<Ball>().AddVelocity(velocity);
-                      
-                    passedFireTime = 0f;
+                    PlayerController.Instance.fire = false;
+
+                    if(passedFireTime >= fireCD)
+                    {
+                        var ball = WorldManager.Instance.CreateObject("Grenade", gameObject.transform.position, 10f);
+                        var velocity = gameObject.transform.rotation * Quaternion.Euler(-eulerX, 0, 0) * Vector3.forward;
+                        velocity = velocity.normalized * initialSpeed;
+                        //velocity = transform.TransformDirection(velocity);
+                        ball.GetComponent<Ball>().AddVelocity(velocity);
+
+                        passedFireTime = 0f;
+                    }
                 }
             }
         }
-
         passedFireTime += Time.deltaTime;
     }
 
