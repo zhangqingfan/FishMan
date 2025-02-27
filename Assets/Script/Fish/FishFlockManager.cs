@@ -48,7 +48,7 @@ public class FishFlockManager : MonoBehaviour
         flock.fishPrefab = fishPrefab; 
 
         var pos = UnityEngine.Random.onUnitSphere * spawnRadius;
-        pos.y = Mathf.Clamp(pos.y, WorldManager.fishHeight, WorldManager.fishHeight - Water.depth);
+        pos.y = Water.depth * -0.5f;
         flock.localPosition = pos;
         flock.sharkTrans = sharks;
         flock.CreateFishes(fishNumber, spawnRadius);
@@ -68,7 +68,7 @@ public class FishFlockManager : MonoBehaviour
                     continue;
 
                 var pos = UnityEngine.Random.onUnitSphere * spawnRadius;
-                pos.y = Mathf.Clamp(pos.y, WorldManager.fishHeight, WorldManager.fishHeight - Water.depth);
+                pos.y = -Water.depth * -0.5f;
                 localFlockTargets[i] = pos;
             }
         }

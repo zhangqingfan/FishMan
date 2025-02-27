@@ -89,24 +89,6 @@ public class SteerBehaviour : MonoBehaviour
         steerVelocity = desireVelocity;
     }
 
-    IEnumerator WanderCoroutine(float wanderTime, Transform targetTrans)
-    {
-        //TODO...
-
-
-        var passTime = 0f;
-        while (true)
-        {
-            yield return null;
-
-            passTime += Time.deltaTime;
-            if (passTime >= wanderTime)
-                break;
-
-            Arrive(targetTrans.position);
-        }
-    }
-
     public void Pursue(Vector3 target, Vector3 targetVelocity)
     {
         var dir = target - transform.position;
