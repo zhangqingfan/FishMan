@@ -17,6 +17,7 @@ partial class Water : MonoBehaviour
     [Range(150, 500)]
     public int length;
 
+    [HideInInspector]
     public readonly static int depth = 20;
 
     [Range(0, 10)]
@@ -77,15 +78,15 @@ partial class Water : MonoBehaviour
 
         canOnValidate = true;
 
-        offsetList.Add(new Vector3(-1, 0, -1));
-        offsetList.Add(new Vector3(-1, 0, 0));
-        offsetList.Add(new Vector3(-1, 0, 1));
-        offsetList.Add(new Vector3(0, 0, -1));
+        //offsetList.Add(new Vector3(-1, 0, -1));
+        //offsetList.Add(new Vector3(-1, 0, 0));
+        //offsetList.Add(new Vector3(-1, 0, 1));
+        //offsetList.Add(new Vector3(0, 0, -1));
         offsetList.Add(new Vector3(0, 0, 0));
-        offsetList.Add(new Vector3(0, 0, 1));
-        offsetList.Add(new Vector3(1, 0, -1));
-        offsetList.Add(new Vector3(1, 0, 0));
-        offsetList.Add(new Vector3(1, 0, 1));
+        //offsetList.Add(new Vector3(0, 0, 1));
+        //offsetList.Add(new Vector3(1, 0, -1));
+        //offsetList.Add(new Vector3(1, 0, 0));
+        //offsetList.Add(new Vector3(1, 0, 1));
 
         CreatePlanes(offsetList);
         Shader.SetGlobalInt("_WaterDepth", depth);
