@@ -16,7 +16,7 @@ public class Ball : MonoBehaviour
     {
         StartCoroutine(SpawnSplash());
         var emissionModule = ps.emission;
-        emissionModule.rateOverTime = 120;
+        emissionModule.rateOverTime = 100;
     }
 
     private void OnDisable()
