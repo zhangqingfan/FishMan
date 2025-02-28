@@ -13,7 +13,7 @@ public class PathFinding : MonoBehaviour
     public GameObject startGo;
     public GameObject endGo;
     public LayerMask layer;
-    [Range(10, 100)]
+    [Range(100, 200)]
     public int maxConnectLength = 100;
     [HideInInspector]
     public WayPoint[] wayPoints;
