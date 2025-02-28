@@ -111,9 +111,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c8418833d16cdcb41a0c91d75b340ccb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  flockCount: 1
-  fishNumber: 1
-  spawnRadius: 60
+  flockCount: 5
+  fishNumber: 50
+  spawnRadius: 100
   sharks: []
   fishPrefab: {fileID: 4276648904083818682, guid: db9b9482ae9f241619015119784ced70,
     type: 3}
@@ -203,7 +203,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &6179114396445377782
 Transform:
   m_ObjectHideFlags: 0

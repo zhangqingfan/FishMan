@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -26,6 +27,11 @@ public class FishFlockManager : MonoBehaviour
     {
         fishFlocks = new FishFlock[flockCount];
         localFlockTargets = new Vector3[flockCount];
+        var sharkArray = FindObjectsOfType<Shark>();
+        for(int i = 0; i < sharkArray.Length; i++)
+        {
+            sharks.Add(sharkArray[i].transform);
+        }
 
         for (int i = 0; i < flockCount; i++) 
         {
@@ -50,7 +56,7 @@ public class FishFlockManager : MonoBehaviour
         var pos = UnityEngine.Random.onUnitSphere * spawnRadius;
         pos.y = Water.depth * -0.5f;
         flock.localPosition = pos;
-        flock.sharkTrans = sharks;
+        //flock.sharkTrans = sharks; //bug...todo...
         flock.CreateFishes(fishNumber, spawnRadius);
 
         return flock;
@@ -68,7 +74,7 @@ public class FishFlockManager : MonoBehaviour
                     continue;
 
                 var pos = UnityEngine.Random.onUnitSphere * spawnRadius;
-                pos.y = -Water.depth * -0.5f;
+                pos.y = Water.depth * -0.5f;
                 localFlockTargets[i] = pos;
             }
         }
