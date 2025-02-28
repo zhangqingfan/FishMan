@@ -56,7 +56,7 @@ public class FishFlockManager : MonoBehaviour
         var pos = UnityEngine.Random.onUnitSphere * spawnRadius;
         pos.y = Water.depth * -0.5f;
         flock.localPosition = pos;
-        //flock.sharkTrans = sharks; //bug...todo...
+        flock.sharkTrans = sharks;
         flock.CreateFishes(fishNumber, spawnRadius);
 
         return flock;

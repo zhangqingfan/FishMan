@@ -42,7 +42,7 @@ public struct JobFish : IJobParallelFor
         var fish = fishArray[index];
 
         fish.localPosition += (fish.localRotation * Vector3.forward).normalized * fish.speed * deltaTime;
-        fish.localPosition.y = Mathf.Clamp(fish.localPosition.y, WorldManager.fishHeight, Water.depth);
+        fish.localPosition.y = Mathf.Clamp(fish.localPosition.y, -Water.depth, WorldManager.fishHeight);
         //Debug.Log(fish.position.y);
         var direction = Quaternion.LookRotation((fish.localTarget - fish.localPosition).normalized);
         fish.localRotation = Quaternion.RotateTowards(fish.localRotation, direction, 0.5f);
@@ -130,7 +130,7 @@ public class FishFlock : MonoBehaviour
             var fish = jobFish.fishArray[i];
 
             fish.localPosition = pos + localPosition;
-            fish.localPosition.y = Mathf.Clamp(fish.localPosition.y, WorldManager.fishHeight, Water.depth);
+            fish.localPosition.y = Mathf.Clamp(fish.localPosition.y, -Water.depth, WorldManager.fishHeight);
             fish.localRotation = Quaternion.identity;
             fish.speed = jobFish.minSpeed;
             fish.nextUpdateTime = 0;

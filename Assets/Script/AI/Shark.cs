@@ -42,7 +42,7 @@ public class SharkWander : BehaviourTree.Node
     {
         var localTargetPos = Random.onUnitSphere * 50f + originalLocalPos;
         var worldTargetPos = targetTrans.parent.transform.TransformPoint(localTargetPos);
-        worldTargetPos.y = Mathf.Clamp(worldTargetPos.y, WorldManager.fishHeight, 1.5f - Water.depth);
+        worldTargetPos.y = Mathf.Clamp(worldTargetPos.y, 1.5f - Water.depth, WorldManager.fishHeight);
         
         targetTrans.position = worldTargetPos;
         var wanderTime = Random.Range(2f, 10f);
