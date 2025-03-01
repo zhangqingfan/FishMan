@@ -783,6 +783,7 @@ GameObject:
   - component: {fileID: 640475852}
   - component: {fileID: 640475851}
   - component: {fileID: 640475853}
+  - component: {fileID: 640475854}
   m_Layer: 0
   m_Name: WorldManager
   m_TagString: Untagged
@@ -832,6 +833,18 @@ MonoBehaviour:
   isHold: 0
   showRing: 0
   fire: 0
+--- !u!114 &640475854
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 640475850}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76e035402a10dd54b92f34d7a157c77f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &668407912
 GameObject:
   m_ObjectHideFlags: 0

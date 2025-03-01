@@ -169,7 +169,7 @@
                 Wave wave = SampleWave(v.vertex, _Time.y);
                 float4 worldPos = mul(unity_ObjectToWorld, float4(wave.pos.xyz, 1));
                 int gridIndex = FindSelfGridIndex(worldPos.xyz);
-                wave.pos.y -= SampleTrackRT(gridIndex, wave.pos);
+                wave.pos.y -= SampleTrackRT(gridIndex, wave.pos) * 4;
                 
                 v2f o;
                 o.pos = UnityObjectToClipPos(wave.pos);
