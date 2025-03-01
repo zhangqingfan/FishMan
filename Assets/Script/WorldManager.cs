@@ -71,7 +71,7 @@ public class WorldManager : MonoBehaviour
 
         gameObject.SetActive(false);
         goPool[name].Enqueue(gameObject);
-        Debug.Log(goPool[name].Count);
+        //Debug.Log(goPool[name].Count);
     }
 
     bool LoadFromAA(string name, Vector3 position, float time = 5f)
