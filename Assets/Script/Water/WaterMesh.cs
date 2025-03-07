@@ -1,13 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using UnityEditor;
-using UnityEditor.Build.Pipeline;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Rendering;
-using UnityEngine.UIElements;
-using static Water;
 
 partial class Water : MonoBehaviour 
 {

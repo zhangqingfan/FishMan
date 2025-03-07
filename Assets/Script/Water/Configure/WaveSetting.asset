@@ -9,24 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
+  m_Script: {fileID: 11500000, guid: ecb7cf970e893de4bbc1c494f6687733, type: 3}
   m_Name: WaveSetting
   m_EditorClassIdentifier: Assembly-CSharp::WaveSetting
   isChanged: 1
-  input:
-  - amplitude: 0.1
-    length: 10
-    speed: 1.1
-    angle: 1.1
-  - amplitude: 0.1
-    length: 8
-    speed: 0.3
-    angle: 3.26
-  - amplitude: 0.2
-    length: 12
-    speed: 0.2
-    angle: 2.15
-  - amplitude: 0.1
-    length: 9
-    speed: 0.9
-    angle: 4.71
+  input: []

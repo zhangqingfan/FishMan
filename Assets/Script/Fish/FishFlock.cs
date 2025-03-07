@@ -86,7 +86,6 @@ public struct JobFish : IJobParallelFor
             var pos = new Vector3(2 * random.NextFloat() - 1f, 2 * random.NextFloat() - 1f, 2 * random.NextFloat() - 1f).normalized;
             pos *= spawnRadius;
             fish.localTarget = pos + localFlockPosition;
-            fish.localTarget.y *= Mathf.Clamp01(Water.depth / spawnRadius); //re-map to water depth. //BUG,必须修复！！这么做就没有负数值了！所以鱼群全在水面！！
             fish.speed = random.NextFloat(minSpeed, maxSpeed);
         }
 
@@ -120,7 +119,7 @@ public class FishFlock : MonoBehaviour
             localFlockPosition = localPosition,
             dangerRadius = 15f,
             minSpeed = 2f,
-            maxSpeed = 8f,
+            maxSpeed = 6f,
             sharks = new NativeArray<Vector3>(sharkTrans.Count, Allocator.Persistent),
         };
 

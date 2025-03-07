@@ -3,7 +3,7 @@
     Properties
     {
         _DepthScale("Depth Scale", Range(0, 2)) = 1
-        _DistortScale("Distort Scale", Range(0, 0.2)) = 1
+        _DistortScale("Distort Scale", Range(0, 0.5)) = 0.1
         
         _CausticsScale("Caustics Scale", Range(0, 0.3)) = 0.01
         _CausticsnItensity("Caustics Itensity", Range(0, 3)) = 1
