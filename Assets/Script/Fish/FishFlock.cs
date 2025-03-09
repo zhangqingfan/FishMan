@@ -84,7 +84,9 @@ public struct JobFish : IJobParallelFor
         if (random.NextFloat() < 6.0f)
         {
             var pos = new Vector3(2 * random.NextFloat() - 1f, 2 * random.NextFloat() - 1f, 2 * random.NextFloat() - 1f).normalized;
-            pos *= spawnRadius;
+            pos.x *= spawnRadius;
+            pos.z *= spawnRadius;
+            pos.y *= (Water.depth * 0.5f);
             fish.localTarget = pos + localFlockPosition;
             fish.speed = random.NextFloat(minSpeed, maxSpeed);
         }

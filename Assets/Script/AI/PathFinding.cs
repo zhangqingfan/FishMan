@@ -66,7 +66,7 @@ public class PathFinding : MonoBehaviour
         return point;
     }
 
-    public List<Vector3> FindPath(Vector3 startPos, Vector3 endPos)
+    public List<WayPoint> FindPath(Vector3 startPos, Vector3 endPos)
     {
         var beginWayPoint = FindNearestWayPoint(startPos);
         var endWayPoint = FindNearestWayPoint(endPos);
@@ -89,7 +89,7 @@ public class PathFinding : MonoBehaviour
                 return null;
 
             if (curWayPoint == endWayPoint)
-                return BuildPath(endPos, endWayPoint);
+                return BuildPath(endWayPoint);
                 
             openSet.Remove(curWayPoint);
             closeSet.Add(curWayPoint );
@@ -119,22 +119,21 @@ public class PathFinding : MonoBehaviour
         return null;
     }
 
-    List<Vector3> BuildPath(Vector3 endPos, WayPoint endWayPoint)
+    List<WayPoint> BuildPath(WayPoint endWayPoint)
     {
-        if(endPos == null || endWayPoint == null || endWayPoint.Position == null)
+        if(endWayPoint == null || endWayPoint.Position == null)
             return null;
 
-        var path = new List<Vector3>();
+        var path = new List<WayPoint>();
 
         do
         {
-            path.Add(endWayPoint.Position);
+            path.Add(endWayPoint);
             endWayPoint = endWayPoint.parentWayPoint;
         }
         while (endWayPoint != null);
 
         path.Reverse();
-        path.Add(endPos);
         return path;
     }
 
@@ -179,7 +178,7 @@ public class PathFinding : MonoBehaviour
         var path = FindPath(startPosition, endPosition);
         for (int i = 0; i < path.Count - 1; i++)
         {
-            Debug.DrawLine(path[i], path[i + 1], Color.green, 10f);
+            Debug.DrawLine(path[i].transform.position, path[i + 1].transform.position, Color.green, 10f);
         }
     }
 #endif
