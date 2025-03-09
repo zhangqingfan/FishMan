@@ -25,7 +25,7 @@ public struct JobFish : IJobParallelFor
     public Vector3 localFlockPosition;
     public float deltaTime;
     public NativeArray<Fish> fishArray;
-    public NativeArray<Vector3> sharks;
+    public NativeArray<Vector3> sharkLocalPos;
 
     public float dangerRadius;
     public float minSpeed;
@@ -55,7 +55,7 @@ public struct JobFish : IJobParallelFor
         var fish = fishArray[index];
 
         Vector3 escape = Vector3.zero;
-        foreach (var shark in sharks)
+        foreach (var shark in sharkLocalPos)
         {
             var dir = fish.localPosition - shark;
             var weight = dir.magnitude - dangerRadius;
@@ -120,7 +120,7 @@ public class FishFlock : MonoBehaviour
             dangerRadius = 15f,
             minSpeed = 2f,
             maxSpeed = 6f,
-            sharks = new NativeArray<Vector3>(sharkTrans.Count, Allocator.Persistent),
+            sharkLocalPos = new NativeArray<Vector3>(sharkTrans.Count, Allocator.Persistent),
         };
 
         for (int i = 0; i < number; i++) 
@@ -146,8 +146,7 @@ public class FishFlock : MonoBehaviour
     {
         for(int i = 0; i < sharkTrans.Count; i++) 
         {
-            //bug...这里必须要修改！！！转成局部坐标！！
-            jobFish.sharks[i] = sharkTrans[i].position;
+            jobFish.sharkLocalPos[i] = gameObject.transform.InverseTransformPoint(sharkTrans[i].position);
             //Debug.Log(jobFish.sharks[i]);
         }
 
@@ -185,6 +184,6 @@ public class FishFlock : MonoBehaviour
     void Dispose()
     {
         if(jobFish.fishArray != null) {  jobFish.fishArray.Dispose(); }
-        if(jobFish.sharks != null) { jobFish.sharks.Dispose(); }
+        if(jobFish.sharkLocalPos != null) { jobFish.sharkLocalPos.Dispose(); }
     }
 }
