@@ -5,7 +5,6 @@ using UnityEngine;
 public class CollisionSensor : MonoBehaviour
 {
     public LayerMask collisionLayer;
-    public float avoidFactor = 4;
     int deltaSensorAngle = 20;
    
     BoxCollider boxCollider;
@@ -14,7 +13,7 @@ public class CollisionSensor : MonoBehaviour
     void Start()
     { 
         boxCollider = GetComponent<BoxCollider>();
-        avoidDistance = avoidFactor * boxCollider.size.z;
+        avoidDistance = boxCollider.size.z;
     }
 
     public bool AvoidCollision(Vector3 velocity, out Vector3 newVelocity)
@@ -33,6 +32,7 @@ public class CollisionSensor : MonoBehaviour
         for (int i = 1; i <= loopCount / 2; i++) 
         {
             var curDir = Quaternion.Euler(0, i * deltaSensorAngle, 0) * velocity;
+            curDir.y = 0;
             //Debug.DrawLine(transform.position, transform.position + curDir, Color.cyan);
             if (DetectCollision(curDir) == false)
             {
@@ -42,6 +42,7 @@ public class CollisionSensor : MonoBehaviour
             }
 
             curDir = Quaternion.Euler(0, -1 * i * deltaSensorAngle, 0) * velocity;
+            curDir.y = 0;
             //Debug.DrawLine(transform.position, transform.position + curDir, Color.cyan);
             if (DetectCollision(curDir) == false)
             {

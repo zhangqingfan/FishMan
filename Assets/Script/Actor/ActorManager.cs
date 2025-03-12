@@ -4,6 +4,7 @@ using UnityEngine;
 [RequireComponent(typeof(SteerBehaviour))]
 public class Actor : MonoBehaviour
 {
+    [HideInInspector]
     public SteerBehaviour steerBehaviour;
 
     private void OnEnable()

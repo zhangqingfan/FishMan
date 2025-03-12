@@ -33,7 +33,7 @@ public class SteerBehaviour : MonoBehaviour
          var result = collisionSensor.AvoidCollision(rb.velocity, out var newVelocity);
          if(result == true)
           {
-            rb.velocity = newVelocity.normalized * maxSpeed * 0.5f;
+             rb.velocity = newVelocity.normalized * maxSpeed * 0.5f;
             //rb.velocity = Vector3.Lerp(rb.velocity, newVelocity.normalized * maxSpeed, Time.deltaTime);
         }
 
