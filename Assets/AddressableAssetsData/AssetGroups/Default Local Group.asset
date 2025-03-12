@@ -37,11 +37,6 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: cac40f2939499744283a1fa7623e3d0e
-    m_Address: Assets/ArtResources/Water/Water.shader
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 7f012e8ac92147e448780cd4d3320a02, type: 2}
   m_SchemaSet:
