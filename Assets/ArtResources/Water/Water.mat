@@ -110,7 +110,7 @@ Material:
     - _Contactnsity: 6.9
     - _Cull: 2
     - _Cutoff: 0.5
-    - _DepthScale: 0.75
+    - _DepthScale: 0.7
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
     - _DistortScale: 0.02
