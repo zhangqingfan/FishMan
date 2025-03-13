@@ -128,6 +128,6 @@ public class NpcShip : Actor
     void Update()
     {
         shipAI.Update();
-        Debug.Log(transform.position);
+        //Debug.Log(transform.position);
     }
 }

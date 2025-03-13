@@ -14,6 +14,7 @@ public partial class Water : MonoBehaviour
     private void Awake()
     {
         Instance = this;
+        WaterUpdate(setting);
     }
 
     public void AddParticleSystem(ParticleSystem ps)
@@ -41,11 +42,8 @@ public partial class Water : MonoBehaviour
     void WaterUpdate(WaveSetting setting)
     {
         var count = setting.input.Count;
-        if(count > 0) 
-        {
-            Shader.SetGlobalInt("dataCount", count);
-            Shader.SetGlobalVectorArray("waveData", setting.GetWaveData());
-        }
+        Shader.SetGlobalInt("dataCount", count);
+        Shader.SetGlobalVectorArray("waveData", setting.GetWaveData());
     }
 
     void Update()
