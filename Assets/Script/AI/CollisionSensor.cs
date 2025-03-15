@@ -17,38 +17,33 @@ public class CollisionSensor : MonoBehaviour
         avoidDistance = boxCollider.size.z;
     }
 
-    public bool AvoidCollision(Vector3 velocity, out Vector3 newVelocity)
+    public bool AvoidCollision(Vector3 velocity, out Vector3 newDir)
     {
-        newVelocity = Vector3.zero;
-
+        newDir = Vector3.zero;
         if (DetectCollision(velocity) == false)
         {
-            newVelocity = velocity;
             return false;
         }
 
-        var speed = velocity.magnitude;
         var loopCount =  360 / deltaSensorAngle;
 
         for (int i = 1; i <= loopCount / 2; i++) 
         {
             var curDir = Quaternion.Euler(0, i * deltaSensorAngle, 0) * velocity;
             curDir.y = 0;
-            //Debug.DrawLine(transform.position, transform.position + curDir, Color.cyan);
             if (DetectCollision(curDir) == false)
             {
-                newVelocity = curDir.normalized * speed;
-                Debug.DrawLine(transform.position, transform.position + newVelocity * 2, Color.yellow, 10f);
+                newDir = curDir.normalized;
+                Debug.DrawLine(transform.position, transform.position + newDir * 2, Color.yellow, 10f);
                 break;
             }
 
             curDir = Quaternion.Euler(0, -1 * i * deltaSensorAngle, 0) * velocity;
             curDir.y = 0;
-            //Debug.DrawLine(transform.position, transform.position + curDir, Color.cyan);
             if (DetectCollision(curDir) == false)
             {
-                newVelocity = curDir.normalized * speed;                
-                Debug.DrawLine(transform.position, transform.position + newVelocity * 2, Color.yellow, 10f);
+                newDir = curDir.normalized;                
+                Debug.DrawLine(transform.position, transform.position + newDir * 2, Color.yellow, 10f);
                 break;
             }
         }
