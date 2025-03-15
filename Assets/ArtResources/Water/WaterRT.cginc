@@ -1,7 +1,7 @@
 ﻿#ifndef WATER_RT
 #define WATER_RT  
 
-half4 GridWorldPosArray[9];
+float4 GridWorldPosArray[9];
 float _GridLength;
 
 sampler2D _RT0;
@@ -31,6 +31,7 @@ float4 _RT7_ST;
 sampler2D _RT8;
 float4 _RT8_ST;
 
+
 float GridHalfLength()
 {
     return _GridLength * 0.5;
@@ -51,7 +52,7 @@ int FindSelfGridIndex(float3 worldPos)
 
 float SampleTrackRT(int gridIndex, float3 localPos)
 {
-    float2 uv = ((localPos.xz / GridHalfLength()) + 1) * 0.5;
+    float2 uv = ((localPos.xz / GridHalfLength()) + 1) * 0.5;        
     float result = 0;
 
     if(gridIndex == 0)
@@ -76,20 +77,28 @@ float SampleTrackRT(int gridIndex, float3 localPos)
     return result * 1;
 }
 
+//todo...这里要调整一下！
 float3 CalculateTrackRTNormal(int gridIndex, float3 localPos)
 {
-    float3 rtPos = SampleTrackRT(gridIndex, localPos);
+    float epsilon = 2 * _GridLength / 512;
+    if (abs(localPos.x) >= _GridLength / 2 - epsilon || abs(localPos.z) >= _GridLength / 2 - epsilon)
+        return float3(0, 1, 0);
     
-    float epsilon = 0 * _GridLength / 512;
-    float3 posX = SampleTrackRT(gridIndex, localPos + float3(epsilon, 0, 0));
-    float3 posZ = SampleTrackRT(gridIndex, localPos + float3(0, 0, epsilon));
+    float3 offsetX = localPos + float3(epsilon, 0, 0);
+    float3 offsetZ = localPos + float3(0, 0, epsilon);
     
-    float3 tangentX = posX - rtPos;
-    float3 tangentZ = posZ - rtPos;
+    offsetX.y += SampleTrackRT(gridIndex, offsetX);
+    offsetZ.y += SampleTrackRT(gridIndex, offsetZ);
     
+    if (offsetX.y == offsetZ.y && offsetX.y == localPos.y)
+        return float3(0, 0, 0);
+    
+    float3 tangentX = offsetX - localPos;
+    float3 tangentZ = offsetZ - localPos;
+        
     float3 normal = cross(tangentX, tangentZ);
-    normal.y = (normal.y); //unity axis is different from right-hand axis!!!
-    
+    normal.y = abs(normal.y);
     return normalize(normal);
 }
+
 #endif  

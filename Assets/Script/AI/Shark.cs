@@ -1,6 +1,5 @@
 using BehaviourTree;
 using System.Collections;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public class SharkAI : BehaviourTree.Node
@@ -10,12 +9,9 @@ public class SharkAI : BehaviourTree.Node
     {
         selector = new Selector();
         var wander = new SharkWander(shark);
-        var pursue = new SharkPursue(shark);
-        selector.nodeList.Add(pursue);
+        //var pursue = new SharkPursue(shark);
+        //selector.nodeList.Add(pursue);
         selector.nodeList.Add(wander);
-
-        //not necessary;
-        nodeList.Add(selector);
     }
 
     public void Update()
@@ -30,11 +26,41 @@ public class SharkAI : BehaviourTree.Node
 public class SharkWander : BehaviourTree.Node
 {
     Shark shark;
-    public SharkWander(Shark shark) { this.shark = shark; }
-
+    Transform targetTrans;
+    Vector3 originalLocalPos;
+    public SharkWander(Shark shark) 
+    { 
+        this.shark = shark;
+        originalLocalPos = shark.transform.localPosition;
+        targetTrans = new GameObject("Shark Target").transform;
+        targetTrans.SetParent(shark.transform.parent);
+        targetTrans.transform.localPosition = originalLocalPos;
+    }
+    
     public override IEnumerator Exec()
     {
-        shark.steerBehaviour.Wander(true);
+        var localTargetPos = Random.onUnitSphere * 50f + originalLocalPos;
+        var worldTargetPos = targetTrans.parent.transform.TransformPoint(localTargetPos);
+        worldTargetPos.y = Mathf.Clamp(worldTargetPos.y, 1.5f - Water.depth, WorldManager.fishHeight);
+        
+        targetTrans.position = worldTargetPos;
+        var wanderTime = Random.Range(2f, 10f);
+        var passTime = 0f;
+
+        while (true)
+        {
+            yield return null;
+      
+            if(passTime < wanderTime)
+            {
+                passTime += Time.deltaTime;
+                shark.steerBehaviour.Arrive(targetTrans.position);
+                continue;
+            }
+            
+            break;
+        }
+
         result = ExecResult.Success;
         yield break;
     }
@@ -65,7 +91,7 @@ public class SharkPursue: BehaviourTree.Node
             {
                 if (actor != shark)
                 {
-                    shark.steerBehaviour.Wander(false);
+                    //shark.steerBehaviour.Wander(false);
                     continue;
                 }
             }

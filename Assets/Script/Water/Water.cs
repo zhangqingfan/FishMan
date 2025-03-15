@@ -14,6 +14,7 @@ public partial class Water : MonoBehaviour
     private void Awake()
     {
         Instance = this;
+        WaterUpdate(setting);
     }
 
     public void AddParticleSystem(ParticleSystem ps)
@@ -41,11 +42,8 @@ public partial class Water : MonoBehaviour
     void WaterUpdate(WaveSetting setting)
     {
         var count = setting.input.Count;
-        if(count > 0) 
-        {
-            Shader.SetGlobalInt("dataCount", count);
-            Shader.SetGlobalVectorArray("waveData", setting.GetWaveData());
-        }
+        Shader.SetGlobalInt("dataCount", count);
+        Shader.SetGlobalVectorArray("waveData", setting.GetWaveData());
     }
 
     void Update()
@@ -64,7 +62,7 @@ public partial class Water : MonoBehaviour
     IEnumerator RenderTrackRT()
     {
         HashSet<Grid> gridSet = new HashSet<Grid>();
-        var timeStep = new WaitForSeconds(0.05f);
+        var timeStep = new WaitForSeconds(0.02f);
 
         while(true)
         {
@@ -72,8 +70,7 @@ public partial class Water : MonoBehaviour
 
             foreach (var grid in gridSet)
             {
-                //bug!ceshi yong !
-                //ClearRenderTarget(grid.trackRT);
+                ClearRenderTarget(grid.trackRT); 
             }
 
             gridSet.Clear();

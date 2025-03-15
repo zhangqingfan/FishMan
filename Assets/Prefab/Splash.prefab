@@ -19564,6 +19564,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3610132680943811834}
+  - component: {fileID: -3004447706146673631}
   m_Layer: 0
   m_Name: Splash
   m_TagString: Untagged
@@ -19587,3 +19588,15 @@ Transform:
   - {fileID: 1656799820483200149}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &-3004447706146673631
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7426411289582057576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c7950a6bb96c3c4a89afa0eb8e5e6eb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

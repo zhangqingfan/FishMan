@@ -34,7 +34,7 @@ public class Greeting : Node
 
     public Greeting(NpcShip npcShip)
     {
-        playerShip = GameObject.Find("Ship").transform;
+        playerShip = GameObject.Find("Player").transform;
         this.npcShip = npcShip;
         renderCamera = Camera.main;
     }
@@ -70,7 +70,7 @@ public class Greeting : Node
 public class ShipWander : Node
 {
     NpcShip npcShip;
-    List<Vector3> wayPoints = new List<Vector3> ();
+    List<WayPoint> wayPoints = new List<WayPoint> ();
     int curIndex = 0;
 
     public ShipWander(NpcShip npcShip)
@@ -103,9 +103,9 @@ public class ShipWander : Node
                 Debug.Log(p);
         }
 
-        npcShip.steerBehaviour.Arrive(wayPoints[curIndex]);
+        npcShip.steerBehaviour.Arrive(wayPoints[curIndex].transform.position);
 
-        var dis = Vector3.Distance(npcShip.gameObject.transform.position, wayPoints[curIndex]);
+        var dis = Vector3.Distance(npcShip.gameObject.transform.position, wayPoints[curIndex].transform.position);
         if(dis < 1.0f)
             curIndex++;
         
@@ -128,6 +128,6 @@ public class NpcShip : Actor
     void Update()
     {
         shipAI.Update();
-        Debug.Log(transform.position);
+        //Debug.Log(transform.position);
     }
 }

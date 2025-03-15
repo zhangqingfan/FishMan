@@ -1,14 +1,10 @@
 using System.Collections.Generic;
-using System.Net.NetworkInformation;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.UIElements;
 
-[RequireComponent(typeof(LineRenderer))]
 public class CanonTrace : MonoBehaviour
 {
     public float timeStep = 0.05f;
-    
+
     float initialSpeed;
     float g = -Physics.gravity.y;
     LineRenderer lineRenderer;
@@ -22,19 +18,18 @@ public class CanonTrace : MonoBehaviour
     {
         lineRenderer = transform.GetComponent<LineRenderer>();
         renderCamera = Camera.main;
-        WorldManager.Instance.CreateObject("Ball", gameObject.transform.position, 0f); // pre-warm memory pool;
-
         var radius = transform.parent.GetComponentInChildren<DrawRing>().scale;
         CaculateInitialSpeed(radius);
+
+        WorldManager.Instance.CreateObject("Grenade", gameObject.transform.position, 0f); // pre-warm memory pool;
     }
 
     void Update()
     {
-        return;
-        var showRing = PlayerController.Instance.showRing;        
-        lineRenderer.enabled = showRing;
+        lineRenderer.enabled = PlayerController.Instance.showRing;
+        float eulerX = 0f;
 
-        if (showRing == true)
+        if (lineRenderer.enabled == true)
         {
             var screenPosition = Input.mousePosition;
             screenPosition.z = 1f;
@@ -45,43 +40,42 @@ public class CanonTrace : MonoBehaviour
 
             //Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-            float eulerX = 0f;
             if (Physics.Raycast(startPosition, endPosition - startPosition, out RaycastHit hitInfo, Mathf.Infinity, 1 << LayerMask.NameToLayer("MousePlane")))
             {
                 hitPoint = hitInfo.point;
                 var startPoint = gameObject.transform.position;
                 var offset = hitPoint - startPoint;
-                
-                //todo...ÐÞ¸ÄÕâÀï
+
                 var rotation = Quaternion.LookRotation(offset);
-
                 gameObject.transform.rotation = rotation;// Quaternion.Euler(euler);
-
-                eulerX = CalculateLaunchAngle(offset.magnitude);                
+                eulerX = CalculateLaunchAngle(offset.magnitude);
                 DrawTrajectory(eulerX);
                 //Debug.Log(offset.magnitude + " / " + eulerX );
+
+                if (PlayerController.Instance.fire == true)
+                {
+                    PlayerController.Instance.fire = false;
+
+                    if(passedFireTime >= fireCD)
+                    {
+                        var ball = WorldManager.Instance.CreateObject("Grenade", gameObject.transform.position, 10f);
+                        var velocity = gameObject.transform.rotation * Quaternion.Euler(-eulerX, 0, 0) * Vector3.forward;
+                        velocity = velocity.normalized * initialSpeed;
+                        //velocity = transform.TransformDirection(velocity);
+                        ball.GetComponent<Ball>().AddVelocity(velocity);
+
+                        passedFireTime = 0f;
+                    }
+                }
             }
-
-            if(true && passedFireTime >= fireCD)
-            {
-                //Debug.Log(eulerX);
-                var ball = WorldManager.Instance.CreateObject("Ball", gameObject.transform.position, -1f);
-                var velocity = gameObject.transform.rotation * Quaternion.Euler(-eulerX, 0, 0) * Vector3.forward;
-                velocity = velocity.normalized * initialSpeed;
-                //velocity = transform.TransformDirection(velocity);
-                ball.GetComponent<Ball>().AddVelocity(velocity);
-
-                passedFireTime = 0f;
-            }
-
-            passedFireTime += Time.deltaTime;
         }
+        passedFireTime += Time.deltaTime;
     }
 
     void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawSphere(hitPoint, 0.1f);  
+        Gizmos.DrawSphere(hitPoint, 0.5f);  
     }
 
     public void CaculateInitialSpeed(float maxRange)
@@ -112,8 +106,7 @@ public class CanonTrace : MonoBehaviour
         lineRenderer.positionCount = positionList.Count;
         lineRenderer.SetPositions(positionList.ToArray());
         lineRenderer.startWidth = 0.1f;  
-        lineRenderer.endWidth = 0.1f;    
-        lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
+        lineRenderer.endWidth = 0.2f;
     }
 
     public float CalculateLaunchAngle(float targetDistance)

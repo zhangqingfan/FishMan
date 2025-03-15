@@ -32,8 +32,8 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: c24ce1ec4a0f949419ff0b0394f29c3c
-    m_Address: Ball
+  - m_GUID: ef9519b7453cfa14ea0918aeddb1f218
+    m_Address: Grenade
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

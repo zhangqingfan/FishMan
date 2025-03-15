@@ -13,7 +13,6 @@
         Pass
         {
             ZWrite Off
-            //ZTest Always
             Blend one one
 
             CGPROGRAM
@@ -24,6 +23,7 @@
             #include "UnityCG.cginc"
 
             float4x4 GridWorldToLocal[9];
+            float4x4 GridLocalToWorld[9];
 
             struct appdata
             {
@@ -49,10 +49,15 @@
             {
                 float4 worldPos = mul(unity_ObjectToWorld, v.vertex);
                 int index = FindSelfGridIndex(worldPos.xyz);
+
                 float3 localPos = mul(GridWorldToLocal[index], worldPos).xyz;
-                
-                float3 gerstnerPos = SamplePosition(localPos, _Time.y);
-                v.vertex.y = gerstnerPos.y + 0.4f;
+                localPos = SamplePosition(localPos, _Time.y);
+                localPos.y -= SampleTrackRT(index, localPos);
+
+                worldPos = mul(GridLocalToWorld[index], float4(localPos.xyz, 1));
+
+                //v.vertex.y = mul(unity_WorldToObject, worldPos).y;
+                v.vertex.y += 0.4f;
 
                 v2f o;
                 o.vertex = UnityObjectToClipPos(v.vertex);

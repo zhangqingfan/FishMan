@@ -3,7 +3,7 @@
     Properties
     {
         _DepthScale("Depth Scale", Range(0, 2)) = 1
-        _DistortScale("Distort Scale", Range(0, 5)) = 1
+        _DistortScale("Distort Scale", Range(0, 0.5)) = 0.1
         
         _CausticsScale("Caustics Scale", Range(0, 0.3)) = 0.01
         _CausticsnItensity("Caustics Itensity", Range(0, 3)) = 1
@@ -15,10 +15,16 @@
         _SurfaceColor ("_SurfaceColor", Color) = (1, 1, 1, 1) 
         _DeepColor ("_DeepColor", Color) = (1, 1, 1, 1)
         _NormalTex ("Normal Texture", 2D) = "white" {}
+
+        _FoamMask ("FoamMask", 2D) = "white" {}
+        _FoamItensity("FoamItensity", Range(1, 1000)) = 1
+
+        _ContactFoamMask ("ContactFoamMask", 2D) = "white" {}
+        _Contactnsity("Contactnsity", Range(0, 10)) = 0.25
     }
     SubShader
     {
-        Tags { "Queue"="Transparent" }
+        Tags { "Queue"="Transparent" "RenderPipeline" = "UniversalPipeline"}
         LOD 100
 
         Pass
@@ -29,12 +35,15 @@
             
             #include "UnityCG.cginc"
             #include "AutoLight.cginc"
-            #include "UnityPBSLighting.cginc"
 
             #include "GerstnerWave.cginc"
             #include "WaterRT.cginc"
+            #include "WaterFoam.cginc"
             #include "UnityLightingCommon.cginc"
 
+            int _WaterDepth;
+
+            CBUFFER_START(UnityPerMaterial)
             sampler2D _ReflectionTex;
             float4 _ReflectionTex_ST;
             sampler2D _CausticsTex;
@@ -50,13 +59,15 @@
             float _CausticsnItensity;
             float _DepthScale;
             float _DistortScale;
-            int _WaterDepth;
             float4 _SurfaceColor;
             float4 _DeepColor;
             float4x4 _InverseVP;
             float _FresnelBias;
             float _NormalBias;
-            
+            float _FoamItensity;
+            float _Contactnsity;
+            CBUFFER_END
+
             float3 GetUnderWaterWorldPos(float2 screenUV, float3 waterWorldPos, float2 depth_distance)
             {
                 float depth = tex2D(_CameraDepthTexture, screenUV);
@@ -125,8 +136,9 @@
             {
                 worldNormal = normalize(worldNormal);
                 float3 viewDir = normalize(_WorldSpaceCameraPos.xyz - worldPos);
-                float fresnel = pow(1.0 - max(dot(viewDir, worldNormal), 0.0), 64.0);
-                return _FresnelBias + (1.0 - _FresnelBias) * fresnel;
+                float fresnel = pow(1.0 - dot(viewDir, worldNormal), _FresnelBias);
+                //return _FresnelBias + (1.0 - _FresnelBias) * fresnel;
+                return saturate(fresnel);
             }
 
             float3 DistortNormal(float3 worldPos, float3 worldNormal)
@@ -143,68 +155,56 @@
 
             struct v2f
             {
-                float4 vertex : POSITION;
+                float4 pos : POSITION;
                 float3 normal : TEXCOORD0;
                 float4 screenPos : TEXCOORD1;
                 float2 depth_distance: TEXCOORD2;
                 float3 worldPos: TEXCOORD3;
                 float4 localPos: TEXCOORD4; //w:grid index
-                SHADOW_COORDS(5) 
+                SHADOW_COORDS(6)
             };
 
             v2f vert (appdata v)
             {   
                 Wave wave = SampleWave(v.vertex, _Time.y);
+                float4 worldPos = mul(unity_ObjectToWorld, float4(wave.pos.xyz, 1));
+                int gridIndex = FindSelfGridIndex(worldPos.xyz);
+                wave.pos.y -= SampleTrackRT(gridIndex, wave.pos) * 4;
                 
                 v2f o;
-                o.vertex = UnityObjectToClipPos(wave.pos);
+                o.pos = UnityObjectToClipPos(wave.pos);
                 o.normal = UnityObjectToWorldNormal(wave.normal);
-                o.screenPos = ComputeScreenPos(o.vertex);
+                o.screenPos = ComputeScreenPos(o.pos);
                 
                 float3 viewPos = UnityObjectToViewPos(wave.pos);
                 o.depth_distance.x = abs(viewPos.z);   // 摄像机空间, 视线所指的方向Z坐标是负数!!!!!
                 o.depth_distance.y = length(viewPos);
                 
-                o.worldPos = mul(unity_ObjectToWorld, float4(wave.pos.xyz, 1));
+                o.worldPos = mul(unity_ObjectToWorld, float4(wave.pos.xyz, 1)).xyz;
                 o.localPos.xyz = wave.pos.xyz;
-                o.localPos.w = FindSelfGridIndex(o.worldPos);;
-
+                o.localPos.w = gridIndex;
                 TRANSFER_SHADOW(o);
                 return o;
             }
 
             fixed4 frag (v2f i) : SV_Target 
-            {
+            {   
+                float3 trackNormal = CalculateTrackRTNormal(i.localPos.w, i.localPos.xyz);
 
-
-                /*
-                if(i.localPos.w == 4)
+                if(length(trackNormal) > 0) //find a valid value
                 {
-                    float3 col = SampleTrackRT(4, i.localPos.xyz);
+                    i.normal = trackNormal;
+                    i.normal = normalize(i.normal);
+                }
 
-                    float epsilon = 1 * _GridLength / 512;
-                    float3 posX = float3(i.localPos.x + epsilon, 0, i.localPos.z);
-                    float3 posZ = float3(i.localPos.x, 0, i.localPos.z + epsilon);
-
-                    float3 newPosX = SampleTrackRT(4, posX);
-                    float3 newPosZ = SampleTrackRT(4, posZ);
-
-                    float3 tangentX = newPosX - col;
-                    float3 tangentZ = newPosZ - col;
-
-                    float3 nowCross = cross(float3(0,1,1), float3(0,1,0));
-                    nowCross = normalize(nowCross);
-                    return float4(nowCross.xyz, 1);
-                }*/
-                
-                //i.normal += CalculateTrackRTNormal(i.localPos.w, i.localPos.xyz);
-                //i.normal = normalize(i.normal);
-                
                 float2 screenUV = i.screenPos.xy / i.screenPos.w;
                 fixed shadow = SHADOW_ATTENUATION(i);
                 
-                float2 distortUV = screenUV + sin(_Time.y) * i.normal.zx * _DistortScale;
-                
+                //bug!!!
+                //float2 distortUV = mul(UNITY_MATRIX_VP, float4(i.normal.xyz, 1)).xz;
+                float2 distortUV = sin(_Time.y) * i.normal.zx * _DistortScale;
+                distortUV += screenUV;
+
                 //underWaterLength < 0 above water
                 //underWaterLength > 0 under water 
                 float underWaterLength = GetUnderWaterLength(distortUV, i.depth_distance);
@@ -215,9 +215,6 @@
                     distortUV = screenUV;
                     underWaterLength = GetUnderWaterLength(distortUV, i.depth_distance);
                 }
-
-                //if(underWaterLength < 0)
-                //    return float4(1, 0, 0, 1);
 
                 float totalLength = underWaterLength + i.depth_distance.y;
                 float3 underWaterWorldPos = _WorldSpaceCameraPos + normalize(i.worldPos - _WorldSpaceCameraPos) * totalLength;
@@ -231,6 +228,11 @@
                 //reflectionColor = LambertLight(reflectionColor, DistortNormal(i.worldPos, i.normal), i.worldPos, shadow);
                 
                 float4 finalColor = lerp(underWaterColor, reflectionColor, FresnelTerm(i.normal, i.worldPos));
+
+                float coverage = WaveFoamCoverage(i.localPos.y, normalize(i.normal)) * _FoamItensity +
+                                 ContactFoam(i.worldPos.xz, underWaterLength) * _Contactnsity;
+
+                finalColor += float4(GetFoamAlbedo(i.worldPos.xz, coverage).xyz, 1);
                 return finalColor;
             }
 

@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
@@ -6,109 +6,103 @@ using Unity.Mathematics;
 using System;
 using Unity.Burst;
 using System.Collections.Generic;
-using static UnityEditor.PlayerSettings;
+
+public struct Fish
+{
+    public Vector3 localPosition;
+    public Quaternion localRotation;
+    public float speed;
+    public Vector3 localTarget;
+
+    public float nextUpdateTime;
+    public float passTime;
+}
+
+[BurstCompile]
+public struct JobFish : IJobParallelFor
+{
+    public int spawnRadius;
+    public Vector3 localFlockPosition;
+    public float deltaTime;
+    public NativeArray<Fish> fishArray;
+    public NativeArray<Vector3> sharkLocalPos;
+
+    public float dangerRadius;
+    public float minSpeed;
+    public float maxSpeed;
+
+    public void Execute(int index)
+    {
+        Move(index);
+        Update(index);
+    }
+
+    void Move(int index)
+    {
+        var fish = fishArray[index];
+
+        fish.localPosition += (fish.localRotation * Vector3.forward).normalized * fish.speed * deltaTime;
+        fish.localPosition.y = Mathf.Clamp(fish.localPosition.y, -Water.depth, WorldManager.fishHeight);
+        //Debug.Log(fish.position.y);
+        var direction = Quaternion.LookRotation((fish.localTarget - fish.localPosition).normalized);
+        fish.localRotation = Quaternion.RotateTowards(fish.localRotation, direction, 0.5f);
+
+        fishArray[index] = fish;
+    }
+
+    void Update(int index)
+    {
+        var fish = fishArray[index];
+
+        Vector3 escape = Vector3.zero;
+        foreach (var shark in sharkLocalPos)
+        {
+            var dir = fish.localPosition - shark;
+            var weight = dir.magnitude - dangerRadius;
+            weight = weight >= 0 ? 0 : -weight;
+            escape += 2 * weight * dir.normalized;
+        }
+
+        if (escape != Vector3.zero)
+        {
+            fish.localTarget = fish.localPosition + escape;
+            var speed = escape.magnitude / dangerRadius;
+            var factor = Mathf.Clamp01((float)speed);
+            fish.speed = minSpeed + (maxSpeed - minSpeed) * factor;
+            fishArray[index] = fish;
+            return;
+        }
+
+        fish.passTime += deltaTime;
+        if (fish.passTime < fish.nextUpdateTime)
+        {
+            fishArray[index] = fish;
+            return;
+        }
+
+        var random = new Unity.Mathematics.Random((uint)(math.cos(index * 50) * 100) + (uint)index);
+        if (random.NextFloat() < 6.0f)
+        {
+            var pos = new Vector3(2 * random.NextFloat() - 1f, 2 * random.NextFloat() - 1f, 2 * random.NextFloat() - 1f).normalized;
+            pos.x *= spawnRadius;
+            pos.z *= spawnRadius;
+            pos.y *= (Water.depth * 0.5f);
+            fish.localTarget = pos + localFlockPosition;
+            fish.speed = random.NextFloat(minSpeed, maxSpeed);
+        }
+
+        fish.passTime = 0;
+        fish.nextUpdateTime = random.NextFloat(1.0f, 5.0f);
+        fishArray[index] = fish;
+    }
+}
 
 public class FishFlock : MonoBehaviour
 {
-    public int number;
-    public int spawnRadius = 30;
-    public float spawnHeightScale = 0.5f;
-
-    public Vector3 flockPosition;
+    public Vector3 localPosition;
     public GameObject fishPrefab;
     public List<Transform> sharkTrans;
     
-    public struct Fish
-    {
-        public Vector3 position;
-        public Vector3 scale;
-        public Quaternion rotation;
-        public float speed;
-        public Vector3 target;
-
-        public float nextUpdateTime;
-        public float passTime;
-    }
-
-    [BurstCompile]
-    public struct JobFish : IJobParallelFor
-    {
-        public int spawnRadius;
-        public float spawnHeightScale;
-        public Vector3 flockPosition;
-        public float deltaTime;
-        public NativeArray<Fish> fishArray;
-        public NativeArray<Vector3> sharks;
-
-        public float dangerRadius;
-        public float minSpeed;
-        public float maxSpeed;
-
-        public void Execute(int index)
-        {            
-            Move(index);
-            Update(index);
-        }
-
-        void Move(int index)
-        {
-            var fish = fishArray[index];
-
-            fish.position += (fish.rotation * Vector3.forward).normalized * fish.speed * deltaTime;
-            fish.position.y = fish.position.y > WorldManager.fishHeight ? WorldManager.fishHeight : fish.position.y;
-            //Debug.Log(fish.position.y);
-            var direction = Quaternion.LookRotation((fish.target - fish.position).normalized);
-            fish.rotation = Quaternion.RotateTowards(fish.rotation, direction, 0.5f);
-
-            fishArray[index] = fish;
-        }
-
-        void Update(int index)
-        {
-            var fish = fishArray[index];
-
-            Vector3 escape = Vector3.zero;
-            foreach (var shark in sharks)
-            {
-                var dir = fish.position - shark;
-                var weight = dir.magnitude - dangerRadius;
-                weight = weight >= 0 ? 0 : -weight;
-                escape += 2 * weight * dir.normalized;
-            }
-            
-            if(escape != Vector3.zero)
-            {
-                fish.target = fish.position + escape;
-                var speed = escape.magnitude / dangerRadius;
-                var factor = Mathf.Clamp01((float)speed);
-                fish.speed = minSpeed + (maxSpeed - minSpeed) * factor;
-                fishArray[index] = fish;
-                return;
-            }
-
-            fish.passTime += deltaTime;
-            if (fish.passTime < fish.nextUpdateTime)
-            {
-                fishArray[index] = fish;
-                return;
-            }
-
-            var random = new Unity.Mathematics.Random((uint)(math.cos(index * 50) * 100) + (uint)index);
-            if (random.NextFloat() < 6.0f)
-            {
-                var pos = new Vector3(2 * random.NextFloat() - 1f, 2 * random.NextFloat() - 1f, 2 * random.NextFloat() - 1f).normalized;
-                pos *= spawnRadius;
-                pos.y *= spawnHeightScale;
-                fish.target = pos + flockPosition;
-                fish.speed = random.NextFloat(minSpeed, maxSpeed);
-            }
-
-            fish.passTime = 0;
-            fish.nextUpdateTime = random.NextFloat(1.0f, 5.0f);
-            fishArray[index] = fish;
-        }
-    }
-
     JobFish jobFish;
 
     private void OnDestroy()
@@ -116,7 +110,7 @@ public class FishFlock : MonoBehaviour
         Dispose();
     }
 
-    public void CreateFishes()
+    public void CreateFishes(int number, int spawnRadius)
     {
         Dispose();
 
@@ -124,25 +118,22 @@ public class FishFlock : MonoBehaviour
         {
             fishArray = new NativeArray<Fish>(number, Allocator.Persistent),
             spawnRadius = spawnRadius,
-            spawnHeightScale = spawnHeightScale,
-            flockPosition = flockPosition,
-            dangerRadius = 20f,
+            localFlockPosition = localPosition,
+            dangerRadius = 15f,
             minSpeed = 2f,
-            maxSpeed = 10f,
-            sharks = new NativeArray<Vector3>(sharkTrans.Count, Allocator.Persistent),
+            maxSpeed = 6f,
+            sharkLocalPos = new NativeArray<Vector3>(sharkTrans.Count, Allocator.Persistent),
         };
 
         for (int i = 0; i < number; i++) 
         {
             var pos = UnityEngine.Random.onUnitSphere * spawnRadius;
             //Debug.Log(pos);
-            pos.y *= spawnHeightScale;
-
             var fish = jobFish.fishArray[i];
 
-            fish.position = pos + flockPosition;
-            fish.position.y = fish.position.y > WorldManager.fishHeight ? WorldManager.fishHeight : fish.position.y;
-            fish.rotation = Quaternion.identity;
+            fish.localPosition = pos + localPosition;
+            fish.localPosition.y = Mathf.Clamp(fish.localPosition.y, -Water.depth, WorldManager.fishHeight);
+            fish.localRotation = Quaternion.identity;
             fish.speed = jobFish.minSpeed;
             fish.nextUpdateTime = 0;
             fish.passTime = 0;
@@ -157,12 +148,12 @@ public class FishFlock : MonoBehaviour
     {
         for(int i = 0; i < sharkTrans.Count; i++) 
         {
-            jobFish.sharks[i] = sharkTrans[i].position;
+            jobFish.sharkLocalPos[i] = gameObject.transform.InverseTransformPoint(sharkTrans[i].position);
             //Debug.Log(jobFish.sharks[i]);
         }
 
         jobFish.deltaTime = Time.deltaTime;
-        jobFish.flockPosition = this.flockPosition;
+        jobFish.localFlockPosition = this.localPosition;
         JobHandle jobHandle = jobFish.Schedule(jobFish.fishArray.Length, 64 * 2);
         jobHandle.Complete();
     }
@@ -172,8 +163,7 @@ public class FishFlock : MonoBehaviour
         var fishMesh = fishPrefab.GetComponent<MeshFilter>().sharedMesh;
         var renderParams = new RenderParams(fishPrefab.GetComponent<Renderer>().sharedMaterial);
         var fishInstanceMatrixs = new Matrix4x4[jobFish.fishArray.Length];
-        var scale = new Vector3(1, 1, 1);
-
+        var Scale = new Vector3(1.4f, 1.4f, 1.4f);
         Debug.Log("GPU Instancing state: " + fishPrefab.GetComponent<Renderer>().sharedMaterial.enableInstancing);
 
         while (true)
@@ -183,7 +173,10 @@ public class FishFlock : MonoBehaviour
             for (int i = 0; i < jobFish.fishArray.Length; i++)
             {
                 var fish = jobFish.fishArray[i];
-                fishInstanceMatrixs[i] = Matrix4x4.TRS(fish.position, fish.rotation, scale);
+                var T = gameObject.transform.TransformPoint(fish.localPosition);
+                var R = gameObject.transform.rotation * fish.localRotation;
+                var S = Scale;
+                fishInstanceMatrixs[i] = Matrix4x4.TRS(T, R, S);
             }
 
             Graphics.RenderMeshInstanced(renderParams, fishMesh, 0, fishInstanceMatrixs);
@@ -193,6 +186,6 @@ public class FishFlock : MonoBehaviour
     void Dispose()
     {
         if(jobFish.fishArray != null) {  jobFish.fishArray.Dispose(); }
-        if(jobFish.sharks != null) { jobFish.sharks.Dispose(); }
+        if(jobFish.sharkLocalPos != null) { jobFish.sharkLocalPos.Dispose(); }
     }
 }

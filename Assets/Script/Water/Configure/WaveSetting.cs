@@ -1,21 +1,20 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-[System.Serializable]
-public class WaveInput
-{
-    public float amplitude;
-    public float length;
-    public float speed;
-    [Range(0, 6.28f)]
-    public float angle;
-}
 
 [CreateAssetMenu(fileName = "WaveSetting", menuName = "Custom/WaveSetting")]
 public class WaveSetting : ScriptableObject
 {
+    [System.Serializable]
+    public class WaveInput
+    {
+        public float amplitude;
+        public float length;
+        public float speed;
+        [Range(0, 6.28f)]
+        public float angle;
+    }
+
     [HideInInspector]
     public bool isChanged = true;
     public List<WaveInput> input = new List<WaveInput>();   

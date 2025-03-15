@@ -1,22 +1,40 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 public class Ball : MonoBehaviour
 {
     public Rigidbody rb;
-    
+    public ParticleSystem ps;
+
     public void AddVelocity(Vector3 velocity)
     {
         rb.velocity = velocity;
     }
 
-    void Update()
+    private void OnEnable()
     {
-        //todo...这里要修改！
-        if(transform.position.y < WorldManager.seaHeight) 
+        StartCoroutine(SpawnSplash());
+        var emissionModule = ps.emission;
+        emissionModule.rateOverTime = 100;
+    }
+
+    private void OnDisable()
+    {
+        var emissionModule = ps.emission;
+        emissionModule.rateOverTime = 0;
+    }
+
+    IEnumerator SpawnSplash()
+    {
+        while(true)
         {
-            WorldManager.Instance.CreateObject("Splash", transform.position);
-            WorldManager.Instance.ReleaseObject("Ball", gameObject);           
+            yield return null;
+            if (transform.position.y < WorldManager.seaHeight)
+            {
+                WorldManager.Instance.CreateObject("Splash", transform.position);
+                yield break;
+            }
         }
     }
 }

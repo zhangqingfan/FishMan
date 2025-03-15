@@ -12,7 +12,7 @@ public class ShipController : MonoBehaviour
 
     Camera renderCamera;
     Vector3 cameraEuler = new Vector3(300f, 180f, 0f);
-    float cameraDistance = 20f;
+    float cameraDistance = 80f;
     float scrollSpeed = 200f;
 
     public Transform wheelTrans;
@@ -30,7 +30,7 @@ public class ShipController : MonoBehaviour
         renderCamera = Camera.main;
         var rotation = Quaternion.Euler(cameraEuler);
         var direction = (rotation * Vector3.forward).normalized;
-        renderCamera.transform.position = transform.position + direction * cameraDistance;
+        //renderCamera.transform.position = transform.position + direction * 500;
     }
 
     private void Update()
@@ -47,7 +47,7 @@ public class ShipController : MonoBehaviour
             {
                 cameraEuler.x += mouseOffset.y * mouseSpeed * Time.deltaTime;
                 cameraEuler.y += mouseOffset.x * mouseSpeed * Time.deltaTime;
-                cameraEuler.x = Mathf.Clamp(cameraEuler.x, 290f, 340f);
+                cameraEuler.x = Mathf.Clamp(cameraEuler.x, 290f, 320f);
             }
         }
 

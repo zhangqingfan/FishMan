@@ -10,7 +10,7 @@ public class WorldManager : MonoBehaviour
     Dictionary<string, AsyncOperationHandle<GameObject>> addressHandles = new Dictionary<string, AsyncOperationHandle<GameObject>>();
     Dictionary<string, Queue<GameObject>> goPool = new Dictionary<string, Queue<GameObject>>();
     public static WorldManager Instance;
-    public static readonly float fishHeight = -10f;
+    public static readonly float fishHeight = -1f;
     public static readonly float seaHeight = 0f;
 
     private void Awake()
@@ -42,18 +42,20 @@ public class WorldManager : MonoBehaviour
 
         var obj = goPool[name].Dequeue();
         obj.transform.position = position;
+        obj.SetActive(true);
 
         if(time >= 0)
+        {
             StartCoroutine(ShowObject(name, obj, time));
-        
+        }
+
         return obj;
     }
 
     IEnumerator ShowObject(string name, GameObject gameObject, float time)
     {
-        if (time >= 0f)
+        if (time >= 0)
         {
-            gameObject.SetActive(true);
             yield return new WaitForSeconds(time);
         }
         ReleaseObject(name, gameObject);
@@ -65,10 +67,11 @@ public class WorldManager : MonoBehaviour
         {
             Debug.Log("Memory pool does not contain " + name);
             return;
-        }            
+        }
 
         gameObject.SetActive(false);
         goPool[name].Enqueue(gameObject);
+        //Debug.Log(goPool[name].Count);
     }
 
     bool LoadFromAA(string name, Vector3 position, float time = 5f)

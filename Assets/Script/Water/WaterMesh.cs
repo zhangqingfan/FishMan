@@ -1,31 +1,27 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using UnityEditor;
-using UnityEditor.Build.Pipeline;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Rendering;
-using UnityEngine.UIElements;
-using static Water;
 
 partial class Water : MonoBehaviour 
 {
-    [Range(2, 30)]
+    //[Range(30, 500)]
     public int segmentsPerEdge;
     
-    [Range(10, 100)]
+    [Range(150, 500)]
     public int length;
 
-    [Range(20, 60)]
-    public int depth;
+    [HideInInspector]
+    public readonly static int depth = 20;
 
     [Range(0, 10)]
-    private int rtMargin = 0;
+    private int rtMargin = 40;
 
     public GameObject seaMeshPrefab;
     public Material surfaceMat;
     public Material bottomMat;
+    public GameObject environmentPrefab;
 
     public Transform playerTrans;
     Grid oldGrid;
@@ -77,41 +73,45 @@ partial class Water : MonoBehaviour
 
         canOnValidate = true;
 
-        offsetList.Add(new Vector3(-1, 0, -1));
-        offsetList.Add(new Vector3(-1, 0, 0));
-        offsetList.Add(new Vector3(-1, 0, 1));
-        offsetList.Add(new Vector3(0, 0, -1));
+        //offsetList.Add(new Vector3(-1, 0, -1));
+        //offsetList.Add(new Vector3(-1, 0, 0));
+        //offsetList.Add(new Vector3(-1, 0, 1));
+        //offsetList.Add(new Vector3(0, 0, -1));
         offsetList.Add(new Vector3(0, 0, 0));
-        offsetList.Add(new Vector3(0, 0, 1));
-        offsetList.Add(new Vector3(1, 0, -1));
-        offsetList.Add(new Vector3(1, 0, 0));
-        offsetList.Add(new Vector3(1, 0, 1));
+        //offsetList.Add(new Vector3(0, 0, 1));
+        //offsetList.Add(new Vector3(1, 0, -1));
+        //offsetList.Add(new Vector3(1, 0, 0));
+        //offsetList.Add(new Vector3(1, 0, 1));
 
         CreatePlanes(offsetList);
         Shader.SetGlobalInt("_WaterDepth", depth);
         Shader.SetGlobalFloat("_GridLength", length);
         
-        //先注释掉试试看？？
-        //Shader.SetGlobalVectorArray("GridWorldPosArray", GetGridWorldPos());
-
         StartCoroutine(CentralizeGameObject(playerTrans));
         StartCoroutine(RenderTrackRT());
     }
 
     void CreatePlanes(List<Vector3> offsets)
     {
-        for(int i = 0; i < offsets.Count; i++)  
+        for (int i = 0; i < offsets.Count; i++)
         {
             gridList.Add(CreatePlane(offsets[i]));
         }
 
-        for(int i = 0; i < gridList.Count; i++) 
+        for (int i = 0; i < gridList.Count; i++)
         {
             gridList[i].trackRT = trackRTList[i];
             ClearRenderTarget(gridList[i].trackRT);
             string rtName = $"_RT{i}";
             Shader.SetGlobalTexture(rtName, gridList[i].trackRT);
             Debug.Log(rtName);
+        }
+
+        for (int i = 0; i < gridList.Count; i++)
+        {
+            var enviroment = Instantiate(environmentPrefab, gridList[i].root.transform);
+            enviroment.transform.localPosition = Vector3.zero;
+            enviroment.transform.localRotation = Quaternion.identity;
         }
     }
 
@@ -139,7 +139,6 @@ partial class Water : MonoBehaviour
         return grid;
     }
 
-
     List<Vector4> worldPos = new List<Vector4>();
     List<Vector4> GetGridWorldPos()
     {
@@ -165,6 +164,18 @@ partial class Water : MonoBehaviour
         return world2Local;
     }
 
+    List<Matrix4x4> local2World = new List<Matrix4x4>();
+    List<Matrix4x4> GetGridLocal2World()
+    {
+        local2World.Clear();
+        for (int i = 0; i < gridList.Count; i++)
+        {
+            var trans = gridList[i].surface.transform;
+            local2World.Add(trans.localToWorldMatrix);
+        }
+        return local2World;
+    }
+
     IEnumerator CentralizeGameObject(Transform trans)
     {
         oldGrid = null;
@@ -173,12 +184,15 @@ partial class Water : MonoBehaviour
         while (true)
         {
             curGrid = FindGrid(trans.position);
+
             if (curGrid != oldGrid)
             {
                 Debug.Log("Change Grid!!!"); 
                 CentralizeGrid(curGrid);
                 oldGrid = curGrid;
+
                 Shader.SetGlobalMatrixArray("GridWorldToLocal", GetGridWorld2Local());
+                Shader.SetGlobalMatrixArray("GridLocalToWorld", GetGridLocal2World());
                 Shader.SetGlobalVectorArray("GridWorldPosArray", GetGridWorldPos());
             }
 
