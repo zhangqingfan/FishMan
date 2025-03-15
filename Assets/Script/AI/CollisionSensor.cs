@@ -6,7 +6,7 @@ using UnityEngine.Purchasing;
 public class CollisionSensor : MonoBehaviour
 {
     public LayerMask collisionLayer;
-    int deltaSensorAngle = 20;
+    int deltaSensorAngle = 2;
    
     BoxCollider boxCollider;
     float avoidDistance;
