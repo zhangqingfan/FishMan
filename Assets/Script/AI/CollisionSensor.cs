@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Purchasing;
 
 [RequireComponent(typeof(BoxCollider))]
 public class CollisionSensor : MonoBehaviour
@@ -73,9 +74,16 @@ public class CollisionSensor : MonoBehaviour
             transform.TransformPoint(new Vector3(boxCollider.size.x / 2, -boxCollider.size.y / 2, -boxCollider.size.z / 2 + offsetZ)),
             transform.TransformPoint(new Vector3(-boxCollider.size.x / 2, -boxCollider.size.y / 2, boxCollider.size.z / 2 + offsetZ)),
             transform.TransformPoint(new Vector3(-boxCollider.size.x / 2, -boxCollider.size.y / 2, -boxCollider.size.z / 2 + offsetZ)),
-
         };
-        return RayDetect(forward, startPoints, avoidDistance, collisionLayer);
+
+        for (int i = 0; i < startPoints.Count; i++)
+        {
+            var bo = Physics.Raycast(startPoints[i], forward, out RaycastHit hitInfo, avoidDistance, collisionLayer);
+            Debug.DrawLine(startPoints[i], startPoints[i] + forward * avoidDistance, Color.red);
+            if (bo == true)
+                return true;
+        }
+        return false;
     }
 
     bool RayDetect(Vector3 forward, List<Vector3> startPoints, float detectLength, LayerMask collisionLayer)
