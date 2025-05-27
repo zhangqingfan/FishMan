@@ -72,44 +72,32 @@ public class ShipWander : Node
     NpcShip npcShip;
     List<WayPoint> wayPoints = new List<WayPoint> ();
     int curIndex = 0;
-    Vector3 oldLocalPos = Vector3.zero;
-
-    Vector3 GetLocalPos()
-    {
-        var worldPos = npcShip.transform.position;
-        return npcShip.transform.parent.InverseTransformPoint(worldPos);
-    }
-
-    void SyncLocalPosition(Vector3 localPos)
-    {
-        npcShip.transform.localPosition = localPos;
-        npcShip.steerBehaviour.rb.position = npcShip.transform.position;
-    }
-
+    Vector3 oldlocalPos = Vector3.zero;
+    Vector3 oldParentPos = Vector3.zero;
     public ShipWander(NpcShip npcShip)
     {
         this.npcShip = npcShip;
-        oldLocalPos = GetLocalPos();
+        oldlocalPos = npcShip.transform.localPosition;
+        oldParentPos = npcShip.transform.parent.position;
     }
-
     WayPoint FindRandomWayPoint()
     {
         int index = Random.Range(0, npcShip.pathfinding.wayPoints.Length);
         return npcShip.pathfinding.wayPoints.Length == 0 ? null : npcShip.pathfinding.wayPoints[index];
     }
-
     public override IEnumerator Exec()
     {
         yield return null;
 
-        var newLocalPos = GetLocalPos();
-        if (Vector3.Distance(newLocalPos, oldLocalPos) > 10)
+        var curParentPos = npcShip.transform.parent.position;
+        if(curParentPos != oldParentPos)
         {
-            SyncLocalPosition(oldLocalPos);
-            newLocalPos = oldLocalPos;
+            npcShip.transform.localPosition = oldlocalPos;
+            npcShip.steerBehaviour.rb.position = npcShip.transform.position;
+            oldParentPos = curParentPos;
         }
-        oldLocalPos = newLocalPos;
-
+        oldlocalPos = npcShip.transform.localPosition;
+        
         if (curIndex >= wayPoints.Count)
         {
             curIndex = 0;
