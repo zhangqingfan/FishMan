@@ -4,12 +4,6 @@ using UnityEngine;
 
 public class PathFinding : MonoBehaviour
 {
-    static public PathFinding instance { get; private set; }
-    private void Awake()
-    {
-        instance = this;
-    }
-
     public GameObject startGo;
     public GameObject endGo;
     public LayerMask layer;
@@ -20,9 +14,20 @@ public class PathFinding : MonoBehaviour
     HashSet<WayPoint> openSet = new HashSet<WayPoint>();
     HashSet<WayPoint> closeSet = new HashSet<WayPoint>();
 
-    private void Start()
+    private void Awake()
     {
-        wayPoints = FindObjectsOfType<WayPoint>();
+        var wayPointList = new List<WayPoint>();
+
+        for (int i = 0; i < transform.childCount; i++)
+        {
+            WayPoint wp = transform.GetChild(i).GetComponent<WayPoint>();
+            if(wp != null)
+            {
+                wayPointList.Add(wp);
+            }
+        }
+
+        wayPoints = wayPointList.ToArray();
         BuildConnection();
         //OnButtonClicked();
     }

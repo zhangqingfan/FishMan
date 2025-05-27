@@ -1,7 +1,5 @@
 using System;
-using System.Collections;
 using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
 
 [RequireComponent(typeof(CollisionSensor))]
 [RequireComponent(typeof(Rigidbody))]
@@ -17,7 +15,7 @@ public class SteerBehaviour : MonoBehaviour
     [Header("Pursue")]
     public float maxPursueLength = 30f;
     
-    Rigidbody rb;
+    public Rigidbody rb;
     Vector3 steerVelocity;
 
     CollisionSensor collisionSensor;

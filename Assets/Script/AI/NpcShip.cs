@@ -72,21 +72,43 @@ public class ShipWander : Node
     NpcShip npcShip;
     List<WayPoint> wayPoints = new List<WayPoint> ();
     int curIndex = 0;
+    Vector3 oldLocalPos = Vector3.zero;
+
+    Vector3 GetLocalPos()
+    {
+        var worldPos = npcShip.transform.position;
+        return npcShip.transform.parent.InverseTransformPoint(worldPos);
+    }
+
+    void SyncLocalPosition(Vector3 localPos)
+    {
+        npcShip.transform.localPosition = localPos;
+        npcShip.steerBehaviour.rb.position = npcShip.transform.position;
+    }
 
     public ShipWander(NpcShip npcShip)
     {
         this.npcShip = npcShip;
+        oldLocalPos = GetLocalPos();
     }
 
     WayPoint FindRandomWayPoint()
     {
-        int index = Random.Range(0, PathFinding.instance.wayPoints.Length);
-        return PathFinding.instance.wayPoints.Length == 0 ? null : PathFinding.instance.wayPoints[index];
+        int index = Random.Range(0, npcShip.pathfinding.wayPoints.Length);
+        return npcShip.pathfinding.wayPoints.Length == 0 ? null : npcShip.pathfinding.wayPoints[index];
     }
 
     public override IEnumerator Exec()
     {
         yield return null;
+
+        var newLocalPos = GetLocalPos();
+        if (Vector3.Distance(newLocalPos, oldLocalPos) > 10)
+        {
+            SyncLocalPosition(oldLocalPos);
+            newLocalPos = oldLocalPos;
+        }
+        oldLocalPos = newLocalPos;
 
         if (curIndex >= wayPoints.Count)
         {
@@ -98,7 +120,7 @@ public class ShipWander : Node
                 yield break;
             }
 
-            wayPoints = PathFinding.instance.FindPath(npcShip.gameObject.transform.position, endPoint.transform.position);
+            wayPoints = npcShip.pathfinding.FindPath(npcShip.gameObject.transform.position, endPoint.transform.position);
             foreach (var p in wayPoints)
                 Debug.Log(p);
         }
@@ -118,10 +140,11 @@ public class NpcShip : Actor
 {
     ShipAI shipAI;
     public Transform greetPanel;
+    public PathFinding pathfinding;
 
-    void Start()
+    public new void Start()
     {
-        steerBehaviour = GetComponent<SteerBehaviour>();
+        base.Start();
         shipAI = new ShipAI(this);
     }
 

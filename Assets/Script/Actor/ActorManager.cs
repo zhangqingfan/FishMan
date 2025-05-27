@@ -17,7 +17,7 @@ public class Actor : MonoBehaviour
         ActorManager.Instance.RemoveActor(this);
     }
 
-    void Start()
+    public void Start()
     {
         steerBehaviour = GetComponent<SteerBehaviour>();
     }
